@@ -1,4 +1,4 @@
-using _Scripts.Player;
+using _Scripts.PlayerComponent;
 using UnityEngine;
 
 namespace _Scripts.Projectile
@@ -24,7 +24,7 @@ namespace _Scripts.Projectile
             {
                 Debug.Log($"Collider found: {collider.name}, Layer: {LayerMask.LayerToName(collider.gameObject.layer)}");
 
-                PlayerController player = collider.GetComponent<PlayerController>();
+                var player = collider.GetComponent<PlayerComponent.Player>();
                 if (player != null)
                 {
                     Debug.Log($"Player found at {player.transform.position}");
@@ -49,7 +49,7 @@ namespace _Scripts.Projectile
                 Debug.LogWarning($"- Player Layer: {LayerMask.LayerToName(3)}"); // Assuming 3 is playerLayer
                 Debug.LogWarning($"- Explosion Position: {transform.position}");
                 Debug.LogWarning($"- Explosion Radius: {explosionRadius}");
-                Debug.LogWarning($"- Player's Current Position: {GameObject.FindObjectOfType<PlayerController>()?.transform.position}");
+                Debug.LogWarning($"- Player's Current Position: {GameObject.FindObjectOfType<PlayerComponent.Player>()?.transform.position}");
             }
 
             // Destroy the explosion after applying the effect

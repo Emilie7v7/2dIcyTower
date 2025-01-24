@@ -1,12 +1,32 @@
+using _Scripts.CoreSystem;
+using _Scripts.InputHandler;
+using _Scripts.Player.Player_States;
+using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
 
-namespace _Scripts.Player
+namespace _Scripts.PlayerComponent
 {
-    public class PlayerController : MonoBehaviour
+    public class Player : MonoBehaviour
     {
+        #region PlayerStates
+        public PlayerStateMachine StateMachine { get; private set; }
+        
+        public PlayerIdleState IdleState { get; private set; }
+        public PlayerMoveState MoveState { get; private set; }
+        
         [SerializeField] private PlayerDataSo playerData;  // Player data reference
+        
+        #endregion
+        
+        #region Components
+        
+        public Core Core { get; private set; }
+        public CollisionSenses CollisionSenses { get; private set; }
+        public PlayerInputHandler InputHandler { get; private set; }
     
+        #endregion
+        
         [Header("Player Settings")]
     
         public Rigidbody2D rb;
@@ -21,17 +41,33 @@ namespace _Scripts.Player
         private float explosionDuration = 0.5f; // Duration to keep explosion momentum
         private float explosionTimer = 0f;
 
+        #region Unity Callback Functions
         void Awake()
         {
             // Ensure the Rigidbody2D is assigned
             if (rb == null) rb = GetComponent<Rigidbody2D>();
+            
+            Core = GetComponentInChildren<Core>();
+            CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
+            
+            StateMachine = new PlayerStateMachine();
+            
+            IdleState = new PlayerIdleState(this, StateMachine, playerData, "isIdle");
+            MoveState = new PlayerMoveState(this, StateMachine, playerData, "isMoving");
+        }
+
+        private void Start()
+        {
+            //StateMachine.Initialize(IdleState);
+            InputHandler = GetComponent<PlayerInputHandler>();
+            
+            StateMachine.Initialize(IdleState);
         }
 
         void Update()
         {
-            // Handle movement input
-            movementInput.x = Input.GetAxis("Horizontal");
-            //movementInput.y = Input.GetAxis("Vertical");
+            Core.LogicUpdate();
+            StateMachine.CurrentState.LogicUpdate();
 
             // Throw potion when pressing the space bar
             if (Input.GetKeyDown(KeyCode.Space))
@@ -53,6 +89,8 @@ namespace _Scripts.Player
 
         private void FixedUpdate()
         {
+            StateMachine.CurrentState.PhysicsUpdate();
+            
             // Preserve horizontal velocity from explosion
             float currentHorizontalVelocity = rb.velocity.x;
 
@@ -70,6 +108,7 @@ namespace _Scripts.Player
                 rb.velocity = new Vector2(smoothHorizontalVelocity, rb.velocity.y);
             }
         }
+        #endregion
 
         public void ApplyExplosionForce(Vector2 explosionDirection, float explosionForce)
         {
@@ -109,6 +148,14 @@ namespace _Scripts.Player
                 // Apply force to the potion
                 potionRb.AddForce(throwDirection * throwForce, ForceMode2D.Impulse);
             }
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (Core == null) return;
+            
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(CollisionSenses.GroundCheck.position, CollisionSenses.GroundCheckRadius) ;
         }
     }
 }
