@@ -3,30 +3,15 @@ using UnityEngine;
 
 namespace _Scripts.Projectile
 {
-<<<<<<< HEAD
     public class Potion : CoreComp
     {
         public GameObject projectile;
         [SerializeField] private float spawnOffset; // Offset for spawning the projectile
         [SerializeField] private float explosionForce = 10f;
-=======
-    public GameObject projectile;
-    [SerializeField] private float spawnOffset; // Offset for spawning the projectile
-    [SerializeField] private float explosionForce = 10f;
 
-    public CollisionSenses collisionSenses { get; private set; }// Reference to CollisionSenses
-    public Core Core { get; private set; } // Reference to Core
-
-    private void Awake()
-    {
-        Core = GetComponentInChildren<Core>();
-        collisionSenses = Core.GetCoreComponent<CollisionSenses>();
-    }
->>>>>>> origin/Tom_Branch
-
-        public CollisionSenses CollisionSenses { get; private set; } // Reference to CollisionSenses
-        public Core Core { get; private set; }
-
+        public CollisionSenses CollisionSenses { get; private set; }// Reference to CollisionSenses
+        public Core Core { get; private set; } // Reference to Core
+    
         private void Awake()
         {
             Core = GetComponentInChildren<Core>();
