@@ -17,34 +17,9 @@ namespace _Scripts.Projectile
             Core = GetComponentInChildren<Core>();
             CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
         }
-
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                if (projectile != null)
-                {
-                    Instantiate(projectile, transform.position + new Vector3(spawnOffset, spawnOffset, 0f),
-                        transform.rotation);
-                }
-                else
-                {
-                    Debug.LogError("Projectile reference is missing. Please assign it in the Inspector.");
-                }
-            }
-        }
-
         private void OnTriggerEnter2D(Collider2D collision)
         {
             Vector2 explosionPosition = transform.position;
-
-            // Check if touching Player using CollisionSenses property
-            if (CollisionSenses.Player)
-            {
-                Destroy(gameObject);
-                Explosion(explosionPosition);
-                Debug.Log("Explosion caused by a detected Player.");
-            }
 
             // Check if touching Enemy using CollisionSenses property
             if (CollisionSenses.Enemy)
@@ -52,6 +27,13 @@ namespace _Scripts.Projectile
                 Destroy(gameObject);
                 Explosion(explosionPosition);
                 Debug.Log("Explosion caused by a detected Enemy.");
+            }
+
+            if (CollisionSenses.Ground)
+            {
+                Destroy(gameObject);
+                Explosion(explosionPosition);
+                Debug.Log("Explosion caused by a detected Ground.");
             }
         }
 
@@ -70,6 +52,8 @@ namespace _Scripts.Projectile
                 CollisionSenses.EntityCheckRadius, 
                 CollisionSenses.WhatIsEnemy
             );
+            
+            
 
             // Apply explosion force to players
             foreach (Collider2D obj in playersInRadius)

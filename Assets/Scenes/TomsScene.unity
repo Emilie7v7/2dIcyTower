@@ -774,11 +774,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheck: {fileID: 684733107}
-  playerCheck: {fileID: 0}
-  enemyCheck: {fileID: 0}
+  entityCheck: {fileID: 0}
   groundCheckRadius: 0.5
-  playerCheckRadius: 0
-  enemyCheckRadius: 0
+  entityCheckRadius: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 128
@@ -960,6 +958,10 @@ PrefabInstance:
     - target: {fileID: 150889919213297270, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
       propertyPath: m_Name
       value: Potion
+      objectReference: {fileID: 0}
+    - target: {fileID: 963366458784540891, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
+      propertyPath: entityCheckRadius
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 8983963826348146360, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1292,6 +1294,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e948e05335410c428648eb469044df4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerData: {fileID: 11400000, guid: 17d699dfef661804b91beb4bc2cab8c3, type: 2}
   playerInput: {fileID: 6207994451041901321}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

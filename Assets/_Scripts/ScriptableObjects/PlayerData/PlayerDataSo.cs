@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.ScriptableObjects.PlayerData
 {
@@ -7,5 +8,9 @@ namespace _Scripts.ScriptableObjects.PlayerData
     {
         [Header("Player Movement Speed")] 
         public float PlayerMovementSpeed = 5f;
+        
+        [Header("ProjectilePrefab")]
+        public GameObject projectile;
     }
+        
 }
