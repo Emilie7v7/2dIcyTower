@@ -7,18 +7,13 @@ public class Potion : CoreComp
     [SerializeField] private float spawnOffset; // Offset for spawning the projectile
     [SerializeField] private float explosionForce = 10f;
 
-    [SerializeField] private CollisionSenses collisionSenses; // Reference to CollisionSenses
+    public CollisionSenses collisionSenses { get; private set; }// Reference to CollisionSenses
+    public Core Core { get; private set; } // Reference to Core
 
-    private void Start()
+    private void Awake()
     {
-        if (collisionSenses == null)
-        {
-            collisionSenses = GetComponent<CollisionSenses>();
-            if (collisionSenses == null)
-            {
-                Debug.LogError("CollisionSenses component is not attached or assigned to this GameObject.");
-            }
-        }
+        Core = GetComponentInChildren<Core>();
+        collisionSenses = Core.GetCoreComponent<CollisionSenses>();
     }
 
     void Update()
