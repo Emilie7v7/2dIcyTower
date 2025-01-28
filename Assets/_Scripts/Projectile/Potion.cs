@@ -91,7 +91,8 @@ namespace _Scripts.Projectile
         private void OnDrawGizmos()
         {
             if (Core == null) return;
-        
+                Gizmos.color = Color.red;
+                Gizmos.DrawWireSphere(transform.position, CollisionSenses.EntityCheckRadius);
         
         }
     }
