@@ -1,109 +1,114 @@
 using _Scripts.CoreSystem;
 using UnityEngine;
 
-public class Potion : CoreComp
+namespace _Scripts.Projectile
 {
-    public GameObject projectile;
-    [SerializeField] private float spawnOffset; // Offset for spawning the projectile
-    [SerializeField] private float explosionForce = 10f;
-
-    [SerializeField] private CollisionSenses collisionSenses; // Reference to CollisionSenses
-
-    private void Start()
+    public class Potion : CoreComp
     {
-        if (collisionSenses == null)
-        {
-            collisionSenses = GetComponent<CollisionSenses>();
-            if (collisionSenses == null)
-            {
-                Debug.LogError("CollisionSenses component is not attached or assigned to this GameObject.");
-            }
-        }
-    }
+        public GameObject projectile;
+        [SerializeField] private float spawnOffset; // Offset for spawning the projectile
+        [SerializeField] private float explosionForce = 10f;
 
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            if (projectile != null)
-            {
-                Instantiate(projectile, transform.position + new Vector3(spawnOffset, spawnOffset, 0f),
-                    transform.rotation);
-            }
-            else
-            {
-                Debug.LogError("Projectile reference is missing. Please assign it in the Inspector.");
-            }
-        }
-    }
+        public CollisionSenses CollisionSenses { get; private set; } // Reference to CollisionSenses
+        public Core Core { get; private set; }
 
-    void OnTriggerEnter2D(Collider2D collision)
-    {
-        Vector2 explosionPosition = transform.position;
-
-        // Check if touching Player using CollisionSenses property
-        if (collisionSenses.Player)
+        private void Awake()
         {
-            Destroy(gameObject);
-            Explosion(explosionPosition);
-            Debug.Log("Explosion caused by a detected Player.");
+            Core = GetComponentInChildren<Core>();
+            CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
         }
 
-        // Check if touching Enemy using CollisionSenses property
-        if (collisionSenses.Enemy)
+        private void Update()
         {
-            Destroy(gameObject);
-            Explosion(explosionPosition);
-            Debug.Log("Explosion caused by a detected Enemy.");
-        }
-    }
-
-    void ApplyExplosionForce(Vector2 explosionPosition)
-    {
-        // Find players within the explosion radius
-        Collider2D[] playersInRadius = Physics2D.OverlapCircleAll(
-            explosionPosition, 
-            collisionSenses.PlayerCheckRadius, 
-            collisionSenses.WhatIsPlayer
-        );
-
-        // Find enemies within the explosion radius
-        Collider2D[] enemiesInRadius = Physics2D.OverlapCircleAll(
-            explosionPosition, 
-            collisionSenses.EnemyCheckRadius, 
-            collisionSenses.WhatIsEnemy
-        );
-
-        // Apply explosion force to players
-        foreach (Collider2D obj in playersInRadius)
-        {
-            Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
-
-            if (rb != null)
+            if (Input.GetKeyDown(KeyCode.Space))
             {
-                Vector2 direction = (rb.position - explosionPosition).normalized;
-                rb.AddForce(direction * explosionForce, ForceMode2D.Impulse);
-                Debug.Log($"Applied explosion force to Player: {obj.name}");
+                if (projectile != null)
+                {
+                    Instantiate(projectile, transform.position + new Vector3(spawnOffset, spawnOffset, 0f),
+                        transform.rotation);
+                }
+                else
+                {
+                    Debug.LogError("Projectile reference is missing. Please assign it in the Inspector.");
+                }
             }
         }
 
-        // Apply explosion force to enemies
-        foreach (Collider2D obj in enemiesInRadius)
+        private void OnTriggerEnter2D(Collider2D collision)
         {
-            Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+            Vector2 explosionPosition = transform.position;
 
-            if (rb != null)
+            // Check if touching Player using CollisionSenses property
+            if (CollisionSenses.Player)
             {
-                Vector2 direction = (rb.position - explosionPosition).normalized;
-                rb.AddForce(direction * explosionForce, ForceMode2D.Impulse);
-                Debug.Log($"Applied explosion force to Enemy: {obj.name}");
+                Destroy(gameObject);
+                Explosion(explosionPosition);
+                Debug.Log("Explosion caused by a detected Player.");
+            }
+
+            // Check if touching Enemy using CollisionSenses property
+            if (CollisionSenses.Enemy)
+            {
+                Destroy(gameObject);
+                Explosion(explosionPosition);
+                Debug.Log("Explosion caused by a detected Enemy.");
             }
         }
-    }
 
-    void Explosion(Vector2 explosionPosition)
-    {
-        // Apply explosion logic
-        ApplyExplosionForce(explosionPosition);
+        private void ApplyExplosionForce(Vector2 explosionPosition)
+        {
+            // Find players within the explosion radius
+            Collider2D[] playersInRadius = Physics2D.OverlapCircleAll(
+                explosionPosition, 
+                CollisionSenses.EntityCheckRadius, 
+                CollisionSenses.WhatIsPlayer
+            );
+
+            // Find enemies within the explosion radius
+            Collider2D[] enemiesInRadius = Physics2D.OverlapCircleAll(
+                explosionPosition, 
+                CollisionSenses.EntityCheckRadius, 
+                CollisionSenses.WhatIsEnemy
+            );
+
+            // Apply explosion force to players
+            foreach (Collider2D obj in playersInRadius)
+            {
+                Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+
+                if (rb != null)
+                {
+                    Vector2 direction = (rb.position - explosionPosition).normalized;
+                    rb.AddForce(direction * explosionForce, ForceMode2D.Impulse);
+                    Debug.Log($"Applied explosion force to Player: {obj.name}");
+                }
+            }
+        
+            // Apply explosion force to enemies
+            foreach (Collider2D obj in enemiesInRadius)
+            {
+                Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+
+                if (rb != null)
+                {
+                    Vector2 direction = (rb.position - explosionPosition).normalized;
+                    rb.AddForce(direction * explosionForce, ForceMode2D.Impulse);
+                    Debug.Log($"Applied explosion force to Enemy: {obj.name}");
+                }
+            }
+        }
+
+        private void Explosion(Vector2 explosionPosition)
+        {
+            // Apply explosion logic
+            ApplyExplosionForce(explosionPosition);
+        }
+
+        private void OnDrawGizmos()
+        {
+            if (Core == null) return;
+        
+        
+        }
     }
 }
