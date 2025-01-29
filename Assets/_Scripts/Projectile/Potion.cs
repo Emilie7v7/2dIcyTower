@@ -9,27 +9,27 @@ namespace _Scripts.Projectile
         [SerializeField] private float spawnOffset; // Offset for spawning the projectile
         [SerializeField] private float explosionForce = 10f;
 
-        public CollisionSenses CollisionSenses { get; private set; }// Reference to CollisionSenses
-        public Core Core { get; private set; } // Reference to Core
+        public CollisionSenses collisionSenses { get; private set; }// Reference to CollisionSenses
+        public Core core { get; private set; } // Reference to Core
     
         private void Awake()
         {
-            Core = GetComponentInChildren<Core>();
-            CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
+            core = GetComponentInChildren<Core>();
+            collisionSenses = core.GetCoreComponent<CollisionSenses>();
         }
         private void OnTriggerEnter2D(Collider2D collision)
         {
             Vector2 explosionPosition = transform.position;
 
             // Check if touching Enemy using CollisionSenses property
-            if (CollisionSenses.Enemy)
+            if (collisionSenses.Enemy)
             {
                 Destroy(gameObject);
                 Explosion(explosionPosition);
                 Debug.Log("Explosion caused by a detected Enemy.");
             }
 
-            if (CollisionSenses.Ground)
+            if (collisionSenses.Ground)
             {
                 Destroy(gameObject);
                 Explosion(explosionPosition);
@@ -42,15 +42,15 @@ namespace _Scripts.Projectile
             // Find players within the explosion radius
             Collider2D[] playersInRadius = Physics2D.OverlapCircleAll(
                 explosionPosition, 
-                CollisionSenses.EntityCheckRadius, 
-                CollisionSenses.WhatIsPlayer
+                collisionSenses.EntityCheckRadius, 
+                collisionSenses.WhatIsPlayer
             );
 
             // Find enemies within the explosion radius
             Collider2D[] enemiesInRadius = Physics2D.OverlapCircleAll(
                 explosionPosition, 
-                CollisionSenses.EntityCheckRadius, 
-                CollisionSenses.WhatIsEnemy
+                collisionSenses.EntityCheckRadius, 
+                collisionSenses.WhatIsEnemy
             );
             
             
@@ -90,9 +90,9 @@ namespace _Scripts.Projectile
 
         private void OnDrawGizmos()
         {
-            if (Core == null) return;
+            if (core == null) return;
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(transform.position, CollisionSenses.EntityCheckRadius);
+                Gizmos.DrawWireSphere(transform.position, collisionSenses.EntityCheckRadius);
         
         }
     }
