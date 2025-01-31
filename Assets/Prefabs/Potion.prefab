@@ -101,7 +101,7 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
+  m_LinearDrag: 1
   m_AngularDrag: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
@@ -163,40 +163,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectile: {fileID: 150889919213297270}
-  spawnOffset: 10.09
-  explosionForce: 10
-  collisionSenses: {fileID: 963366458784540891}
---- !u!1 &545280926821219223
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 6467450577526880754}
-  m_Layer: 6
-  m_Name: EnemyCheck
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &6467450577526880754
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545280926821219223}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.03, y: -0.039, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3330940979420972323}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  spawnOffset: 0
+  explosionForce: 20
 --- !u!1 &1596546509189641961
 GameObject:
   m_ObjectHideFlags: 0
@@ -251,7 +219,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3528577000520651673}
   m_Layer: 6
-  m_Name: PlayerCheck
+  m_Name: EntityCheck
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -304,7 +272,6 @@ Transform:
   m_Children:
   - {fileID: 7804550892715396813}
   - {fileID: 3528577000520651673}
-  - {fileID: 6467450577526880754}
   m_Father: {fileID: 6385004508694870043}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &963366458784540891
@@ -320,11 +287,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheck: {fileID: 7804550892715396813}
-  playerCheck: {fileID: 3528577000520651673}
-  enemyCheck: {fileID: 6467450577526880754}
+  entityCheck: {fileID: 3528577000520651673}
   groundCheckRadius: 0.5
-  playerCheckRadius: 0.5
-  enemyCheckRadius: 0.5
+  entityCheckRadius: 0.5
   whatIsGround:
     serializedVersion: 2
     m_Bits: 128
