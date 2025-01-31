@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.ScriptableObjects.EntityData
 {
@@ -6,16 +7,17 @@ namespace _Scripts.ScriptableObjects.EntityData
     public class EntityDataSo : ScriptableObject
     {
         [Header("Movement Speed")] 
-        public float MovementSpeed;
+        public float movementSpeed;
         
         [Header("Projectile Speed")]
-        public float ProjectileSpeed;
+        public float projectileSpeed;
         
         [Header("Projectile Damage")]
-        public float ProjectileDamage;
+        public float projectileDamage;
         
         [Header("Min Idle Time/Max Idle Time")]
-        public float MinIdleTime;
-        public float MaxIdleTime;
+        public float minIdleTime;
+        public float maxIdleTime;
+        
     }
 }

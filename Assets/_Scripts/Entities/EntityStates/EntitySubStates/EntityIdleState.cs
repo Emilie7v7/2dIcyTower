@@ -50,7 +50,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
 
         private void SetRandomIdleTime()
         {
-            IdleTime = Random.Range(EntityData.MinIdleTime, EntityData.MaxIdleTime);
+            IdleTime = Random.Range(EntityData.minIdleTime, EntityData.maxIdleTime);
         }
 
         public void SetFlipAfterIdle(bool flipAfterIdle)

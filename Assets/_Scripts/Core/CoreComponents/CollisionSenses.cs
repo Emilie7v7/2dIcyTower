@@ -1,3 +1,5 @@
+using UnityEditor;
+using UnityEditor.TerrainTools;
 using UnityEngine;
 
 namespace _Scripts.CoreSystem
@@ -5,13 +7,17 @@ namespace _Scripts.CoreSystem
     public class CollisionSenses : CoreComponent
     {
         private Movement _movement;
+        private RaycastHit2D[] _results;
 
         protected override void Awake()
         {
             base.Awake();
 
             _movement = core.GetCoreComponent<Movement>();
+            _results = new RaycastHit2D[MaxHitsRay]; // Pre-allocate array for performance
         }
+
+        #region Transform Checks
 
         public Transform GroundCheck
         {
@@ -34,28 +40,51 @@ namespace _Scripts.CoreSystem
             private set => playerDetectedCheck = value;
         }
         
+        [Header("Transform Checks")]
+        
         [SerializeField] private Transform groundCheck;
         [SerializeField] private Transform entityCheck;
-        [SerializeField] private Transform playerDetectedCheck;
         
+        [Header("Specific Settings For Enemies")]
+        [SerializeField] private Transform playerDetectedCheck;
+
+        #endregion
+        
+        #region Parameters
         
         public float GroundCheckRadius { get => groundCheckRadius; set => groundCheckRadius = value; }
         public float EntityCheckRadius { get => entityCheckRadius; set => entityCheckRadius = value; }
-        public float PlayerDetectedRadius { get => playerDetectedCheckRadius; set => playerDetectedCheckRadius = value; }
-
+        public float PlayerDetectionRadius { get => playerDetectionCheckRadius; set => playerDetectionCheckRadius = value; }
+        public float PlayerDetectionDistance { get => playerDetectionDistance; set => playerDetectionDistance = value; }
+        public float AngleInDegreesForDetectingPlayer { get => angleInDegreesForDetectingPlayer; set => angleInDegreesForDetectingPlayer = value; }
+        public int MaxHitsRay { get => maxHitsRay; set => maxHitsRay = value; }
+        
+        [Header("Radius Checks")]
         [SerializeField] private float groundCheckRadius;
         [SerializeField] private float entityCheckRadius;
-        [SerializeField] private float playerDetectedCheckRadius;
+        
+        [Header("Specific Settings For Enemies")]
+        [SerializeField] private float playerDetectionCheckRadius;
+        [SerializeField] private float playerDetectionDistance;
+        [SerializeField] private float angleInDegreesForDetectingPlayer;
+        [SerializeField] private int maxHitsRay;
 
+        #endregion
+
+        #region Layers
         
         public LayerMask WhatIsGround { get => whatIsGround; set => whatIsGround = value; }
         public LayerMask WhatIsPlayer { get => whatIsPlayer; set => whatIsPlayer = value; }
         public LayerMask WhatIsPlatform { get => whatIsPlatform; set => whatIsPlatform = value; }
         public LayerMask WhatIsEnemy { get => whatIsEnemy; set => whatIsEnemy = value; }
         
+        [Header("Layer")]
         [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsPlatform, whatIsEnemy;
 
-        
+        #endregion
+
+        #region Bools
+
         //Checks whether Player or an Entity is grounded or not
         public bool Ground => Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, whatIsGround);
         
@@ -65,41 +94,39 @@ namespace _Scripts.CoreSystem
         //Check whether Entity is touching Enemy
         public bool Enemy => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, whatIsEnemy);
         
-        public bool PlayerDetected => Physics2D.OverlapCircle(PlayerDetectedCheck.position, playerDetectedCheckRadius, whatIsPlayer);
-        
-        
-        // Detect player with line of sight
+        // Detects if the player is in line of sight using 360-degree CircleCast.
         public bool IsPlayerInLineOfSight()
         {
-            float angleStep = 360f / 36; // Dividing circle into 36 steps (10-degree increments)
-            float detectionRadius = PlayerDetectedRadius;
-            Vector3 origin = PlayerDetectedCheck.position;
+            Vector2 origin = PlayerDetectedCheck.position;
+            var layerMask = ~LayerMask.GetMask("Ground"); // Ignore ground collisions
+            var angleStep = AngleInDegreesForDetectingPlayer;
 
             for (float angle = 0; angle < 360; angle += angleStep)
             {
-                // Calculate the direction of the ray
-                float radian = angle * Mathf.Deg2Rad;
-                Vector2 direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+                var radian = angle * Mathf.Deg2Rad;
+                var direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
 
-                // Cast a ray in the direction
-                RaycastHit2D hit = Physics2D.Raycast(origin, direction, detectionRadius);
+                var hitCount = Physics2D.CircleCastNonAlloc(origin, PlayerDetectionRadius, direction, _results, PlayerDetectionDistance, layerMask);
 
-                if (hit.collider != null)
+                if (hitCount > 0)
                 {
-                    // Check if the ray hit the player
-                    if (((1 << hit.collider.gameObject.layer) & whatIsPlayer) != 0)
+                    for (int i = 0; i < hitCount; i++)
                     {
-                        // Ensure the line of sight is not blocked
-                        if (!Physics2D.Raycast(origin, direction, hit.distance, whatIsGround))
+                        RaycastHit2D hit = _results[i];
+                
+                        if (hit.collider.CompareTag("Player")) // Ensure we detect the player
                         {
-                            return true; // Player detected with clear line of sight
+                            Debug.Log("Player detected at: " + hit.point);
+                            Debug.DrawLine(origin, hit.point, Color.green, 0.1f);
+                            // Add logic to react to player detection (e.g., alert enemy AI)
+                            return true; // Exit after detecting the player
                         }
                     }
                 }
             }
-
             return false; // Player not detected
         }
+        #endregion
+        
     }
-    
 }

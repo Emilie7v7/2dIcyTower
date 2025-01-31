@@ -14,7 +14,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
         {
             base.Enter();
             
-            Movement?.SetVelocityX(EntityData.MovementSpeed * Movement.FacingDirection);
+            Movement?.SetVelocityX(EntityData.movementSpeed * Movement.FacingDirection);
         }
 
         public override void LogicUpdate()
@@ -23,7 +23,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
 
             if (Movement.CanSetVelocity)
             {
-                Movement?.SetVelocityX(EntityData.MovementSpeed * Movement.FacingDirection);
+                Movement?.SetVelocityX(EntityData.movementSpeed * Movement.FacingDirection);
             }
         }
     }

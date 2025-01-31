@@ -33,11 +33,45 @@ namespace _Scripts.Entities.EntitySpecific
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-
-            if (CollisionSenses.PlayerDetected)
+             
+            if (CollisionSenses.IsPlayerInLineOfSight())
             {
-                Debug.Log("Player is detected");
+                Debug.Log("Player is in line of sight");
             }
+            // var angleStep = degreesForRays; // Dividing circle into 36 steps (10-degree increments)
+            // var detectionDistance = CollisionSenses.PlayerDetectionDistance;
+            // var detectionRadius = CollisionSenses.PlayerDetectionRadius;
+            // var origin = CollisionSenses.PlayerDetectedCheck.position;
+            // var maxHits = maxHitsRay; // Adjust based on expected number of hits
+            // var results = new RaycastHit2D[maxHits];
+            //
+            // var layerMask = ~LayerMask.GetMask("Ground"); // Ignore ground layer
+            //
+            // for (float angle = 0; angle < 360; angle += angleStep)
+            // {
+            //     // Calculate the direction of the ray
+            //     var radian = angle * Mathf.Deg2Rad;
+            //     var direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+            //
+            //     // Perform the CircleCast using the pre-allocated array
+            //     var hitCount = Physics2D.CircleCastNonAlloc(origin, detectionRadius, direction, results, detectionDistance, layerMask);
+            //
+            //     if (hitCount > 0)
+            //     {
+            //         for (int i = 0; i < hitCount; i++)
+            //         {
+            //             RaycastHit2D hit = results[i];
+            //
+            //             if (hit.collider.CompareTag("Player")) // Ensure we detect the player
+            //             {
+            //                 Debug.Log("Player detected at: " + hit.point);
+            //                 Debug.DrawLine(origin, hit.point, Color.green, 0.1f);
+            //                 // Add logic to react to player detection (e.g., alert enemy AI)
+            //                 return; // Exit after detecting the player
+            //             }
+            //         }
+            //     }
+            // }
         }
 
         // Visualize the raycasts
@@ -45,36 +79,56 @@ namespace _Scripts.Entities.EntitySpecific
         {
             if(Core == null) return;
             
-            Gizmos.color = CollisionSenses.PlayerDetected ? Color.blue : Color.black;
-            Gizmos.DrawWireSphere(CollisionSenses.PlayerDetectedCheck.position, CollisionSenses.PlayerDetectedRadius);
-            
-            var angleStep = 360f / 36; // Dividing circle into 36 steps (10-degree increments)
-            float detectionRadius = CollisionSenses.PlayerDetectedRadius;
-            Vector3 origin = CollisionSenses.PlayerDetectedCheck.position;
-
-            for (float angle = 0; angle < 360; angle += angleStep)
-            {
-                // Calculate the direction of the ray
-                float radian = angle * Mathf.Deg2Rad;
-                Vector2 direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
-
-                // Cast a ray in the direction
-                RaycastHit2D hit = Physics2D.Raycast(origin, direction, detectionRadius);
-
-                // Draw the ray
-                if (hit.collider != null)
-                {
-                    // If the ray hits something, draw to the hit point
-                    Gizmos.color = ((1 << hit.collider.gameObject.layer) & CollisionSenses.WhatIsPlayer) != 0 ? Color.green : Color.red;
-                    Gizmos.DrawLine(origin, hit.point);
-                }
-                else
-                {
-                    // If the ray hits nothing, draw the full length
-                    Gizmos.color = Color.yellow;
-                    Gizmos.DrawLine(origin, origin + (Vector3)direction * detectionRadius);
-                }
-            }
+            // var angleStep = degreesForRays; // Dividing circle into 36 steps (10-degree increments)
+            // var detectionDistance = CollisionSenses.PlayerDetectionDistance;
+            // var detectionRadius = CollisionSenses.PlayerDetectionRadius;
+            // var origin = CollisionSenses.PlayerDetectedCheck.position;
+            // var maxHits = maxHitsRay; // Adjust based on expected number of hits
+            // var results = new RaycastHit2D[maxHits];
+            //
+            //
+            // for (float angle = 0; angle < 360; angle += angleStep)
+            // {
+            //     // Calculate the direction of the ray
+            //     float radian = angle * Mathf.Deg2Rad;
+            //     Vector2 direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+            //
+            //     // Cast a ray in the direction
+            //     //RaycastHit2D hit = Physics2D.Raycast(origin, direction, detectionDistance);
+            //     
+            //     int hitCount = Physics2D.CircleCastNonAlloc(origin, detectionRadius, direction, results, detectionDistance);
+            //     
+            //     // Draw the main detection area (optional, to see the entire scanning radius)
+            //     Gizmos.color = new Color(1f, 1f, 0f, 0.3f); // Semi-transparent yellow
+            //     Gizmos.DrawWireSphere(origin, detectionRadius); 
+            //
+            //     // Process only valid hits
+            //     if (hitCount > 0)
+            //     {
+            //         for (int i = 0; i < hitCount; i++)
+            //         {
+            //             RaycastHit2D hit = results[i];
+            //
+            //             if (hit.collider != null)
+            //             {
+            //                 // Check if the hit object belongs to the player layer
+            //                 Gizmos.color = ((1 << hit.collider.gameObject.layer) & CollisionSenses.WhatIsPlayer) != 0 ? Color.green : Color.red;
+            //             }
+            //
+            //             // Draw a line to each hit point
+            //             Gizmos.DrawLine(origin, hit.point);
+            //             
+            //             // Draw a circle at the hit point to represent the radius of detection
+            //             Gizmos.DrawWireSphere(hit.point, detectionRadius);
+            //         }
+            //     }
+            //     else
+            //     {
+            //         // If nothing was hit, draw the full length of the detection distance
+            //         Gizmos.color = Color.yellow;
+            //         Gizmos.DrawLine(origin, origin + (Vector3)direction * detectionDistance);
+            //     }
+            // }
         }
     }
 }
