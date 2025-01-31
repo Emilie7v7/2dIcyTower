@@ -774,11 +774,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   groundCheck: {fileID: 684733107}
-  playerCheck: {fileID: 0}
-  enemyCheck: {fileID: 0}
+  entityCheck: {fileID: 0}
   groundCheckRadius: 0.5
-  playerCheckRadius: 0
-  enemyCheckRadius: 0
+  entityCheckRadius: 0
   whatIsGround:
     serializedVersion: 2
     m_Bits: 128
@@ -961,6 +959,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Potion
       objectReference: {fileID: 0}
+    - target: {fileID: 545280926821219223, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
+      propertyPath: m_Name
+      value: EntityCheck
+      objectReference: {fileID: 0}
+    - target: {fileID: 963366458784540891, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
+      propertyPath: entityCheck
+      value: 
+      objectReference: {fileID: 1648751427}
     - target: {fileID: 8983963826348146360, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.872792
@@ -1002,10 +1008,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 2509203159809654655, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
+--- !u!4 &1648751427 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6467450577526880754, guid: 5856a765fa1bdfa448a941bd28f3bea5, type: 3}
+  m_PrefabInstance: {fileID: 1648751426}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6207994451041901314
 GameObject:
   m_ObjectHideFlags: 0

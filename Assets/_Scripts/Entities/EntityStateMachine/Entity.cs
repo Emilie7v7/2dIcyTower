@@ -13,10 +13,12 @@ namespace _Scripts.Entities.EntityStateMachine
         protected EntityStateMachine StateMachine {get; private set;}
         
         public Core Core { get; private set; }
+        public CollisionSenses CollisionSenses { get; private set; }
 
         public virtual void Awake()
         {
             Core = GetComponentInChildren<Core>();
+            CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
             StateMachine = new EntityStateMachine();
         }
 
