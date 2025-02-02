@@ -45,7 +45,7 @@ namespace _Scripts.Entities.EntityStateMachine
         
         public virtual void LogicUpdate() {}
         
-        public virtual void PhysicsUpdate() {}
+        public virtual void PhysicsUpdate() { DoChecks(); }
 
         public virtual void DoChecks() {}
 

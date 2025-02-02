@@ -8,6 +8,7 @@ namespace _Scripts.Entities.EntityStates.EntitySuperState
     {
         //Checks
         protected bool IsGrounded;
+        protected bool IsPlayerInLineOfSight;
     
         public EntityGroundState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
         {
@@ -24,6 +25,7 @@ namespace _Scripts.Entities.EntityStates.EntitySuperState
             base.DoChecks();
 
             IsGrounded = CollisionSenses.Ground;
+            IsPlayerInLineOfSight = CollisionSenses.IsPlayerInLineOfSight();
         }
     }
 }
