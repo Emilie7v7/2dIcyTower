@@ -15,24 +15,24 @@ namespace _Scripts.Entities.EntityStateMachine
 
         protected float StartTime;
         
-        protected string AnimBoolName;
-        
         protected bool IsAnimationFinished;
         protected bool IsExitingState;
         
+        private string _animationBoolName;
         
         protected EntityState(Entity entity, EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName)
         {
             Entity = entity;
             StateMachine = stateMachine;
             EntityData = entityData;
-            this.AnimBoolName = animBoolName;
+            _animationBoolName = animBoolName;
             Core = entity.Core;
         }
         
         public virtual void Enter()
         {
             DoChecks();
+            Entity.MyAnimator.SetBool(_animationBoolName, true);
             StartTime = Time.time;
             IsExitingState = false;
             IsAnimationFinished = false;
@@ -40,6 +40,7 @@ namespace _Scripts.Entities.EntityStateMachine
 
         public virtual void Exit()
         {
+            Entity.MyAnimator.SetBool(_animationBoolName, false);
             IsExitingState = true;
         }
         
@@ -51,5 +52,6 @@ namespace _Scripts.Entities.EntityStateMachine
 
         public virtual void AnimationTrigger() {}
         public virtual void AnimationFinishedTrigger() => IsAnimationFinished = true;
+        public virtual void AnimationAttackTrigger() {}
     }
 }

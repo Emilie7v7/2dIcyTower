@@ -3,14 +3,14 @@ using _Scripts.Entities.EntityStates.EntitySuperState;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;
 
-namespace _Scripts.Entities.EntityStates.EntitySubStates
+namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates
 {
     public class EntityIdleState : EntityGroundState
     {
-        protected float IdleTime;
+        private float _idleTime;
 
         protected bool IsIdleTimeOver;
-        protected bool SetFlipAfterIdleBool;
+        private bool _setFlipAfterIdleBool;
         
         public EntityIdleState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
         {
@@ -30,7 +30,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
         {
             base.Exit();
 
-            if (SetFlipAfterIdleBool)
+            if (_setFlipAfterIdleBool)
             {
                 Movement?.Flip();
             }
@@ -39,10 +39,17 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
         public override void LogicUpdate()
         {
             base.LogicUpdate();
+            
+            if (!Movement.CanSetVelocity)
+            {
+                Movement?.SetZeroVelocity();
+            }
+            else
+            {
+                Movement?.SetVelocityY(Movement.R2BD.velocity.y);
+            }
 
-            Movement?.SetVelocityY(Movement.R2BD.velocity.y);
-
-            if (Time.time >= StartTime + IdleTime)
+            if (Time.time >= StartTime + _idleTime)
             {
                 IsIdleTimeOver = true;
             }
@@ -50,12 +57,12 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
 
         private void SetRandomIdleTime()
         {
-            IdleTime = Random.Range(EntityData.minIdleTime, EntityData.maxIdleTime);
+            _idleTime = Random.Range(EntityData.minIdleTime, EntityData.maxIdleTime);
         }
 
         public void SetFlipAfterIdle(bool flipAfterIdle)
         {
-            SetFlipAfterIdleBool = flipAfterIdle;
+            _setFlipAfterIdleBool = flipAfterIdle;
         }
     }
 }

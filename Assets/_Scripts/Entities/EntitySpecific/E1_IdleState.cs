@@ -1,5 +1,6 @@
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Entities.EntityStates.EntitySubStates;
+using _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;
 
@@ -18,13 +19,18 @@ namespace _Scripts.Entities.EntitySpecific
         {
             base.Enter();
             
-            Debug.Log("Random idle time is = " + IdleTime);
+            Debug.Log("We have entered the IdleState");
         }
 
         public override void LogicUpdate()
         {
             base.LogicUpdate();
 
+            if (IsPlayerInLineOfSight)
+            {
+                StateMachine.ChangeState(enemy.PlayerDetectedState);
+            }
+            
             if (IsIdleTimeOver)
             {
                 StateMachine.ChangeState(enemy.MoveState);

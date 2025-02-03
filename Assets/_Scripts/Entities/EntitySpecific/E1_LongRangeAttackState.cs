@@ -1,16 +1,15 @@
 using _Scripts.Entities.EntityStateMachine;
-using _Scripts.Entities.EntityStates.EntitySubStates;
-using _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates;
+using _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;
 
 namespace _Scripts.Entities.EntitySpecific
 {
-    public class E1_MoveState : EntityMoveState
+    public class E1_LongRangeAttackState : EntityRangedAttackState
     {
         private Entity1 enemy;
-        
-        public E1_MoveState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
+    
+        public E1_LongRangeAttackState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
         {
             this.enemy = enemy;
         }
@@ -18,22 +17,23 @@ namespace _Scripts.Entities.EntitySpecific
         public override void Enter()
         {
             base.Enter();
-            
-            Debug.Log("We have entered the MoveState");
+        
+            Movement?.SetZeroVelocity();
+            Debug.Log("We have entered Long Range State");
         }
 
         public override void LogicUpdate()
         {
             base.LogicUpdate();
 
+            if(!IsAnimationFinished) return;
+
             if (IsPlayerInLineOfSight)
             {
                 StateMachine.ChangeState(enemy.PlayerDetectedState);
             }
-            else if (!IsDetectingLedge)
+            else
             {
-                Debug.Log("Ledge not detected");
-                enemy.IdleState.SetFlipAfterIdle(true);
                 StateMachine.ChangeState(enemy.IdleState);
             }
         }

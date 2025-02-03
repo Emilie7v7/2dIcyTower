@@ -9,15 +9,16 @@ namespace _Scripts.ScriptableObjects.EntityData
         [Header("Movement Speed")] 
         public float movementSpeed;
         
-        [Header("Projectile Speed")]
-        public float projectileSpeed;
-        
-        [Header("Projectile Damage")]
+        [Header("Projectile Properties")]
         public float projectileDamage;
+        public float projectileSpeed;
         
         [Header("Min Idle Time/Max Idle Time")]
         public float minIdleTime;
         public float maxIdleTime;
-        
+
+        [Header("Long Range Attack Cooldown")] 
+        public float longRangeAttackCooldown;
+
     }
 }

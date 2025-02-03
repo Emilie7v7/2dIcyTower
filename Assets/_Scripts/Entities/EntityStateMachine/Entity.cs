@@ -13,6 +13,9 @@ namespace _Scripts.Entities.EntityStateMachine
         protected EntityStateMachine StateMachine {get; private set;}
         
         public Core Core { get; private set; }
+        public Animator MyAnimator { get; private set; }
+        public AnimationToStateMachine AnimationToStateMachine { get; private set; }
+        
         public CollisionSenses CollisionSenses { get; private set; }
 
         public virtual void Awake()
@@ -24,7 +27,8 @@ namespace _Scripts.Entities.EntityStateMachine
 
         public virtual void Start()
         {
-            
+            MyAnimator = GetComponent<Animator>();
+            AnimationToStateMachine = GetComponent<AnimationToStateMachine>();
         }
 
         public virtual void Update()
@@ -40,7 +44,13 @@ namespace _Scripts.Entities.EntityStateMachine
 
         public virtual void OnDrawGizmos()
         {
-            if(Core == null) return;
+            if (Core != null)
+            {
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(CollisionSenses.LedgeCheckVertical.position, 
+                    new Vector2(CollisionSenses.LedgeCheckVertical.transform.position.x, CollisionSenses.LedgeCheckVertical.position.y - CollisionSenses.LedgeCheckVerticalDistance));
+            }
+
         }
     }
 }

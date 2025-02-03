@@ -1,3 +1,4 @@
+using _Scripts.Generics;
 using UnityEditor;
 using UnityEditor.TerrainTools;
 using UnityEngine;
@@ -39,11 +40,19 @@ namespace _Scripts.CoreSystem
             
             private set => playerDetectedCheck = value;
         }
+
+        public Transform LedgeCheckVertical
+        {
+            get => GenericNotImplementedError<Transform>.TryGet(ledgeCheckVertical, core.transform.parent.name);
+            
+            private set => ledgeCheckVertical = value;
+        }
         
         [Header("Transform Checks")]
         
         [SerializeField] private Transform groundCheck;
         [SerializeField] private Transform entityCheck;
+        [SerializeField] private Transform ledgeCheckVertical;
         
         [Header("Specific Settings For Enemies")]
         [SerializeField] private Transform playerDetectedCheck;
@@ -54,6 +63,7 @@ namespace _Scripts.CoreSystem
         
         public float GroundCheckRadius { get => groundCheckRadius; set => groundCheckRadius = value; }
         public float EntityCheckRadius { get => entityCheckRadius; set => entityCheckRadius = value; }
+        public float LedgeCheckVerticalDistance { get => ledgeCheckVerticalDistance; set => ledgeCheckVerticalDistance = value; }
         public float PlayerDetectionRadius { get => playerDetectionCheckRadius; set => playerDetectionCheckRadius = value; }
         public float PlayerDetectionDistance { get => playerDetectionDistance; set => playerDetectionDistance = value; }
         public float AngleInDegreesForDetectingPlayer { get => angleInDegreesForDetectingPlayer; set => angleInDegreesForDetectingPlayer = value; }
@@ -62,6 +72,7 @@ namespace _Scripts.CoreSystem
         [Header("Radius Checks")]
         [SerializeField] private float groundCheckRadius;
         [SerializeField] private float entityCheckRadius;
+        [SerializeField] private float ledgeCheckVerticalDistance;
         
         [Header("Specific Settings For Enemies")]
         [SerializeField] private float playerDetectionCheckRadius;
@@ -94,6 +105,9 @@ namespace _Scripts.CoreSystem
         //Check whether Entity is touching Enemy
         public bool Enemy => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, whatIsEnemy);
         
+        //Check whether Entity or Player is on the ledge
+        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, whatIsGround);
+        
         // Detects if the player is in line of sight using 360-degree CircleCast.
         public bool IsPlayerInLineOfSight()
         {
@@ -116,7 +130,7 @@ namespace _Scripts.CoreSystem
                 
                         if (hit.collider.CompareTag("Player")) // Ensure we detect the player
                         {
-                            Debug.Log("Player detected at: " + hit.point);
+                            //Debug.Log("Player detected at: " + hit.point);
                             Debug.DrawLine(origin, hit.point, Color.green, 0.1f);
                             // Add logic to react to player detection (e.g., alert enemy AI)
                             return true; // Exit after detecting the player
@@ -126,6 +140,7 @@ namespace _Scripts.CoreSystem
             }
             return false; // Player not detected
         }
+        
         #endregion
         
     }

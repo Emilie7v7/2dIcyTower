@@ -8,13 +8,17 @@ namespace _Scripts.Entities.EntitySpecific
         [SerializeField] private GameObject test;
         public E1_IdleState IdleState { get; private set; }
         public E1_MoveState MoveState { get; private set; }
+        public E1_PlayerDetectedState PlayerDetectedState { get; private set; }
+        public E1_LongRangeAttackState LongRangeAttackState { get; private set; }
         
         public override void Awake()
         {
             base.Awake();
             
-            IdleState = new E1_IdleState(this, StateMachine, entityDataSo, "IsIdle", this);
-            MoveState = new E1_MoveState(this, StateMachine, entityDataSo, "IsMoving", this);
+            IdleState = new E1_IdleState(this, StateMachine, entityDataSo, "isIdle", this);
+            MoveState = new E1_MoveState(this, StateMachine, entityDataSo, "isMoving", this);
+            PlayerDetectedState = new E1_PlayerDetectedState(this, StateMachine, entityDataSo, "isPlayerDetected", this);
+            LongRangeAttackState = new E1_LongRangeAttackState(this, StateMachine, entityDataSo, "isLongRangeAttacking", this);
         }
 
         public override void Start()
@@ -30,54 +34,14 @@ namespace _Scripts.Entities.EntitySpecific
             
         }
 
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-             
-            if (CollisionSenses.IsPlayerInLineOfSight())
-            {
-                Debug.Log("Player is in line of sight");
-            }
-            // var angleStep = degreesForRays; // Dividing circle into 36 steps (10-degree increments)
-            // var detectionDistance = CollisionSenses.PlayerDetectionDistance;
-            // var detectionRadius = CollisionSenses.PlayerDetectionRadius;
-            // var origin = CollisionSenses.PlayerDetectedCheck.position;
-            // var maxHits = maxHitsRay; // Adjust based on expected number of hits
-            // var results = new RaycastHit2D[maxHits];
-            //
-            // var layerMask = ~LayerMask.GetMask("Ground"); // Ignore ground layer
-            //
-            // for (float angle = 0; angle < 360; angle += angleStep)
-            // {
-            //     // Calculate the direction of the ray
-            //     var radian = angle * Mathf.Deg2Rad;
-            //     var direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
-            //
-            //     // Perform the CircleCast using the pre-allocated array
-            //     var hitCount = Physics2D.CircleCastNonAlloc(origin, detectionRadius, direction, results, detectionDistance, layerMask);
-            //
-            //     if (hitCount > 0)
-            //     {
-            //         for (int i = 0; i < hitCount; i++)
-            //         {
-            //             RaycastHit2D hit = results[i];
-            //
-            //             if (hit.collider.CompareTag("Player")) // Ensure we detect the player
-            //             {
-            //                 Debug.Log("Player detected at: " + hit.point);
-            //                 Debug.DrawLine(origin, hit.point, Color.green, 0.1f);
-            //                 // Add logic to react to player detection (e.g., alert enemy AI)
-            //                 return; // Exit after detecting the player
-            //             }
-            //         }
-            //     }
-            // }
-        }
-
         // Visualize the raycasts
-        public override void OnDrawGizmos()
-        {
-            if(Core == null) return;
+        //public override void OnDrawGizmos()
+        //{
+            //if (Core == null) return;
+            
+            //Gizmos.color = Color.yellow;
+            //Gizmos.DrawLine(CollisionSenses.LedgeCheckVertical.position, 
+                    //new Vector2(CollisionSenses.LedgeCheckVertical.transform.position.x, CollisionSenses.LedgeCheckVertical.position.y - CollisionSenses.LedgeCheckVerticalDistance));
             
             // var angleStep = degreesForRays; // Dividing circle into 36 steps (10-degree increments)
             // var detectionDistance = CollisionSenses.PlayerDetectionDistance;
@@ -129,6 +93,6 @@ namespace _Scripts.Entities.EntitySpecific
             //         Gizmos.DrawLine(origin, origin + (Vector3)direction * detectionDistance);
             //     }
             // }
-        }
+        //}
     }
 }

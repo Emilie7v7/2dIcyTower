@@ -12,7 +12,7 @@ namespace _Scripts.CoreSystem
         
         public Vector2 CurrentVelocity { get; private set; }
         
-        private Vector2 workspace;
+        private Vector2 _workspace;
 
         protected override void Awake()
         {
@@ -34,46 +34,46 @@ namespace _Scripts.CoreSystem
         
         public void SetZeroVelocity()
         {
-            workspace = Vector2.zero;
+            _workspace = Vector2.zero;
             SetFinalVelocity();
         }
 
         public void SetVelocity(float velocity, Vector2 angle, int direction)
         {
             angle.Normalize();
-            workspace.Set(angle.x * velocity * direction, angle.y * velocity);
+            _workspace.Set(angle.x * velocity * direction, angle.y * velocity);
             SetFinalVelocity();
         }
 
         public void SetVelocity(float velocity, Vector2 direction)
         {
-            workspace = direction * velocity;
+            _workspace = direction * velocity;
             SetFinalVelocity();
         }
         
         public void SetVelocityX(float velocity)
         {
-            workspace.Set(velocity, CurrentVelocity.y);
+            _workspace.Set(velocity, CurrentVelocity.y);
             SetFinalVelocity();
         }
 
         public void SetVelocityY(float velocity)
         {
-            workspace.Set(CurrentVelocity.x, velocity);
+            _workspace.Set(CurrentVelocity.x, velocity);
             SetFinalVelocity();
         }
 
         private void SetFinalVelocity()
         {
             if(!CanSetVelocity) return;
-            R2BD.velocity = workspace;
-            CurrentVelocity = workspace;
+            R2BD.velocity = _workspace;
+            CurrentVelocity = _workspace;
         }
         
         public void Flip()
         {
             //Flips a sprite of a Player or an Entity whether they hit a detection for a flip
-            FacingDirection *= 1;
+            FacingDirection *= -1;
             R2BD.transform.Rotate(0f, 180f, 0f);
         }
 

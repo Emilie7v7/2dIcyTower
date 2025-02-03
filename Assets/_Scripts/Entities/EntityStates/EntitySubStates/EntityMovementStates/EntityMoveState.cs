@@ -2,7 +2,7 @@ using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Entities.EntityStates.EntitySuperState;
 using _Scripts.ScriptableObjects.EntityData;
 
-namespace _Scripts.Entities.EntityStates.EntitySubStates
+namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates
 {
     public class EntityMoveState : EntityGroundState
     {
@@ -21,7 +21,11 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates
         {
             base.LogicUpdate();
 
-            if (Movement.CanSetVelocity)
+            if (Movement.CurrentVelocity.y <= 0.01f && !Movement.CanSetVelocity)
+            {
+                Movement.SetZeroVelocity();
+            }
+            else
             {
                 Movement?.SetVelocityX(EntityData.movementSpeed * Movement.FacingDirection);
             }
