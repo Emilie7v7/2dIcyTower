@@ -7,7 +7,7 @@ namespace _Scripts.ScriptableObjects.PlayerData
     public class PlayerDataSo : ScriptableObject
     {
         [Header("Player Movement Speed")] 
-        public float PlayerMovementSpeed = 5f;
+        public float playerMovementSpeed = 5f;
         
         [Header("ProjectilePrefab")]
         public GameObject projectile;

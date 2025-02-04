@@ -59,7 +59,7 @@ namespace _Scripts.InputHandler
             if (potionRb != null)
             {
                 Vector2 throwDirection = Vector2.right * transform.localScale.x;
-                potionRb.AddForce(throwDirection * playerData.PlayerMovementSpeed, ForceMode2D.Impulse);
+                potionRb.AddForce(throwDirection * playerData.playerMovementSpeed, ForceMode2D.Impulse);
             }
         }
     }

@@ -13,8 +13,8 @@ namespace _Scripts.Projectile
         public CollisionSenses collisionSenses { get; private set; }// Reference to CollisionSenses
         public Core core { get; private set; } // Reference to Core
         public Movement movement { get; private set; }
-    
-        private void Awake()
+
+        protected override void Awake()
         {
             core = GetComponentInChildren<Core>();
             collisionSenses = core.GetCoreComponent<CollisionSenses>();

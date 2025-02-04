@@ -9,10 +9,8 @@ namespace _Scripts.ScriptableObjects.EntityData
         [Header("Movement Speed")] 
         public float movementSpeed;
         
-        [Header("Projectile Properties")]
+        [Header("Projectile Prefab")]
         public GameObject projectilePrefab;
-        public float projectileDamage;
-        public float projectileSpeed;
         
         [Header("Min Idle Time/Max Idle Time")]
         public float minIdleTime;

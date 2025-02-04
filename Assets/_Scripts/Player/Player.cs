@@ -97,13 +97,13 @@ namespace _Scripts.PlayerComponent
             if (isExploding)
             {
                 // Apply player input as additional force, not overriding velocity
-                Vector2 inputForce = movementInput * playerData.PlayerMovementSpeed;
+                Vector2 inputForce = movementInput * playerData.playerMovementSpeed;
                 rb.AddForce(inputForce, ForceMode2D.Force);
             }
             else
             {
                 // Combine player input with current horizontal velocity
-                float targetHorizontalVelocity = movementInput.x * playerData.PlayerMovementSpeed;
+                float targetHorizontalVelocity = movementInput.x * playerData.playerMovementSpeed;
                 float smoothHorizontalVelocity = Mathf.Lerp(currentHorizontalVelocity, targetHorizontalVelocity, Time.fixedDeltaTime * 5f);
                 rb.velocity = new Vector2(smoothHorizontalVelocity, rb.velocity.y);
             }
