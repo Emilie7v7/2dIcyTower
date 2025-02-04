@@ -6,8 +6,9 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
 {
     public class EntityRangedAttackState : EntityAttackState
     {
-    
-        public EntityRangedAttackState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
+        protected GameObject Projectile;
+
+        protected EntityRangedAttackState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
         {
         }
 
@@ -16,6 +17,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
             base.AnimationAttackTrigger();
 
             Debug.Log("Entity shot at player!!");
+            Projectile = Object.Instantiate(EntityData.projectilePrefab, Entity.transform.position, Quaternion.identity);
         }
     }
 }

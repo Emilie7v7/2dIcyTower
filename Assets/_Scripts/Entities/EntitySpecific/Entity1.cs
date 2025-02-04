@@ -5,7 +5,6 @@ namespace _Scripts.Entities.EntitySpecific
 {
     public class Entity1 : Entity
     {
-        [SerializeField] private GameObject test;
         public E1_IdleState IdleState { get; private set; }
         public E1_MoveState MoveState { get; private set; }
         public E1_PlayerDetectedState PlayerDetectedState { get; private set; }

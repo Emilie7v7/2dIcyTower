@@ -10,6 +10,7 @@ namespace _Scripts.ScriptableObjects.EntityData
         public float movementSpeed;
         
         [Header("Projectile Properties")]
+        public GameObject projectilePrefab;
         public float projectileDamage;
         public float projectileSpeed;
         

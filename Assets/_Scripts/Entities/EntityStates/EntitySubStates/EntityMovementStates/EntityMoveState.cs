@@ -6,7 +6,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates
 {
     public class EntityMoveState : EntityGroundState
     {
-        public EntityMoveState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
+        protected EntityMoveState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
         {
         }
 

@@ -5,15 +5,15 @@ namespace _Scripts.CoreSystem
 {
     public class CoreComponent : MonoBehaviour, ILogicUpdate
     {
-        protected Core core;
+        protected Core Core;
 
         protected virtual void Awake()
         {
-            core = transform.parent.GetComponent<Core>();
+            Core = transform.parent.GetComponent<Core>();
         
-            if (core == null) { Debug.LogWarning("There isn't Core on the parent"); }
+            if (Core == null) { Debug.LogWarning("There isn't Core on the parent"); }
 
-            core.AddComponent(this);
+            Core.AddComponent(this);
         }
 
         public virtual void LogicUpdate() { }

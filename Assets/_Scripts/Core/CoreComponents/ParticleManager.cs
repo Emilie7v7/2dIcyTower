@@ -1,0 +1,32 @@
+using UnityEngine;
+
+namespace _Scripts.CoreSystem
+{
+    public class ParticleManager : CoreComponent
+    {
+        private Transform _particleManager;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            
+            _particleManager = GameObject.FindGameObjectWithTag("ParticleManager").transform;
+        }
+
+        public GameObject StartParticles(GameObject particlePrefab, Vector2 position, Quaternion rotation)
+        {
+            return Instantiate(particlePrefab, position, rotation, _particleManager);
+        }
+
+        public GameObject StartParticles(GameObject particlePrefab)
+        {
+            return StartParticles(particlePrefab, transform.position, Quaternion.identity);
+        }
+
+        public GameObject StartParticlesWithRandomRotation(GameObject particlePrefab)
+        {
+            var randomRotation = Quaternion.Euler(0f, 0f, Random.Range(0f, 360f));
+            return StartParticles(particlePrefab, transform.position, randomRotation);
+        }
+    }
+}

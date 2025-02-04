@@ -1,9 +1,10 @@
 using _Scripts.CoreSystem;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace _Scripts.Projectile
 {
-    public class Potion : CoreComp
+    public class Potion : CoreComponent
     {
         public GameObject projectile;
         [SerializeField] private float spawnOffset; // Offset for spawning the projectile
@@ -11,11 +12,13 @@ namespace _Scripts.Projectile
 
         public CollisionSenses collisionSenses { get; private set; }// Reference to CollisionSenses
         public Core core { get; private set; } // Reference to Core
+        public Movement movement { get; private set; }
     
         private void Awake()
         {
             core = GetComponentInChildren<Core>();
             collisionSenses = core.GetCoreComponent<CollisionSenses>();
+            movement = core.GetCoreComponent<Movement>();
         }
         private void OnTriggerEnter2D(Collider2D collision)
         {

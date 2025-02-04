@@ -14,7 +14,7 @@ namespace _Scripts.CoreSystem
         {
             base.Awake();
 
-            _movement = core.GetCoreComponent<Movement>();
+            _movement = Core.GetCoreComponent<Movement>();
             _results = new RaycastHit2D[MaxHitsRay]; // Pre-allocate array for performance
         }
 
@@ -22,28 +22,28 @@ namespace _Scripts.CoreSystem
 
         public Transform GroundCheck
         {
-            get => GenericNotImplementedError<Transform>.TryGet(groundCheck, core.transform.parent.name);
+            get => GenericNotImplementedError<Transform>.TryGet(groundCheck, Core.transform.parent.name);
         
             private set => groundCheck = value;
         }
 
         public Transform EntityCheck
         {
-            get => GenericNotImplementedError<Transform>.TryGet(entityCheck, core.transform.parent.name);
+            get => GenericNotImplementedError<Transform>.TryGet(entityCheck, Core.transform.parent.name);
 
             private set => entityCheck = value;
         }
 
         public Transform PlayerDetectedCheck
         {
-            get => GenericNotImplementedError<Transform>.TryGet(playerDetectedCheck, core.transform.parent.name);
+            get => GenericNotImplementedError<Transform>.TryGet(playerDetectedCheck, Core.transform.parent.name);
             
             private set => playerDetectedCheck = value;
         }
 
         public Transform LedgeCheckVertical
         {
-            get => GenericNotImplementedError<Transform>.TryGet(ledgeCheckVertical, core.transform.parent.name);
+            get => GenericNotImplementedError<Transform>.TryGet(ledgeCheckVertical, Core.transform.parent.name);
             
             private set => ledgeCheckVertical = value;
         }

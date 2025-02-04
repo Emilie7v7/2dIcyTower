@@ -3,6 +3,7 @@ using _Scripts.Entities.EntityStates.EntitySubStates;
 using _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;
+using EntityMoveState = _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates.EntityMoveState;
 
 namespace _Scripts.Entities.EntitySpecific
 {
