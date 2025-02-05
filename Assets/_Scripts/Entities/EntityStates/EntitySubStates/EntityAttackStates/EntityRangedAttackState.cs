@@ -7,8 +7,6 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
 {
     public class EntityRangedAttackState : EntityAttackState
     {
-        protected GameObject Projectile;
-
         protected EntityRangedAttackState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
         {
         }

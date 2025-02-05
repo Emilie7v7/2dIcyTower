@@ -15,7 +15,7 @@ namespace _Scripts.CoreSystem
             base.Awake();
 
             _movement = Core.GetCoreComponent<Movement>();
-            _results = new RaycastHit2D[MaxHitsRay]; // Pre-allocate array for performance
+            _results = new RaycastHit2D[MaxHitsRayForEnemy]; // Pre-allocate array for performance
         }
 
         #region Transform Checks
@@ -67,18 +67,20 @@ namespace _Scripts.CoreSystem
         public float PlayerDetectionRadius { get => playerDetectionCheckRadius; set => playerDetectionCheckRadius = value; }
         public float PlayerDetectionDistance { get => playerDetectionDistance; set => playerDetectionDistance = value; }
         public float AngleInDegreesForDetectingPlayer { get => angleInDegreesForDetectingPlayer; set => angleInDegreesForDetectingPlayer = value; }
-        public int MaxHitsRay { get => maxHitsRay; set => maxHitsRay = value; }
+        public int MaxHitsRayForEnemy { get => maxHitsRayForEnemy; set => maxHitsRayForEnemy = value; }
+        public int MaxHitsRayForProjectile { get => maxHitsRayForProjectile; set => maxHitsRayForProjectile = value; }
         
         [Header("Radius Checks")]
         [SerializeField] private float groundCheckRadius;
         [SerializeField] private float entityCheckRadius;
         [SerializeField] private float ledgeCheckVerticalDistance;
+        [SerializeField] private int maxHitsRayForProjectile;
         
         [Header("Specific Settings For Enemies")]
         [SerializeField] private float playerDetectionCheckRadius;
         [SerializeField] private float playerDetectionDistance;
         [SerializeField] private float angleInDegreesForDetectingPlayer;
-        [SerializeField] private int maxHitsRay;
+        [SerializeField] private int maxHitsRayForEnemy;
 
         #endregion
 
@@ -88,9 +90,10 @@ namespace _Scripts.CoreSystem
         public LayerMask WhatIsPlayer { get => whatIsPlayer; set => whatIsPlayer = value; }
         public LayerMask WhatIsPlatform { get => whatIsPlatform; set => whatIsPlatform = value; }
         public LayerMask WhatIsEnemy { get => whatIsEnemy; set => whatIsEnemy = value; }
+        public LayerMask MultipleLayers { get => multipleLayers; set => multipleLayers = value; }
         
         [Header("Layer")]
-        [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsPlatform, whatIsEnemy;
+        [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsPlatform, whatIsEnemy, multipleLayers;
 
         #endregion
 
@@ -106,7 +109,7 @@ namespace _Scripts.CoreSystem
         public bool Enemy => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, whatIsEnemy);
         
         //Check whether Entity or Player is on the ledge
-        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, whatIsGround);
+        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, whatIsPlatform);
         
         // Detects if the player is in line of sight using 360-degree CircleCast.
         public bool IsPlayerInLineOfSight()
@@ -131,7 +134,7 @@ namespace _Scripts.CoreSystem
 
                         if (hit.collider.CompareTag("Player"))
                         {
-                            //Debug.Log("✅ Player detected at: " + hit.point);
+                            //Debug.Log("Player detected at: " + hit.point);
                             Debug.DrawLine(origin, hit.point, Color.green, 0.5f);
                             return true;
                         }

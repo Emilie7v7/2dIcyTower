@@ -10,6 +10,7 @@ namespace _Scripts.Projectile
     {
         private Vector2 _startPosition;
         private bool _hasHitGround;
+        private Collider2D[] _results;
         
         [field: SerializeField] public Transform DamagePosition {get; private set;}
         [field: SerializeField] public ProjectileDataSo ProjectileData { get; private set; }
@@ -22,6 +23,8 @@ namespace _Scripts.Projectile
             Core = GetComponentInChildren<Core>();
             CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
             Movement = Core.GetCoreComponent<Movement>();
+
+            _results = new Collider2D[CollisionSenses.MaxHitsRayForProjectile];
         }
 
         private void Start()
@@ -31,12 +34,33 @@ namespace _Scripts.Projectile
             _startPosition = transform.position;
         }
 
-        private void Update()
+        private void FixedUpdate()
         {
-            if(_hasHitGround) return;
+            var detectedCollisions = Physics2D.OverlapCircleNonAlloc(DamagePosition.position, ProjectileData.projectileRadius, _results, CollisionSenses.MultipleLayers);
+
+            if (detectedCollisions > 0)
+            {
+                for (var i = 0; i < detectedCollisions; i++)
+                {
+                    var hit = _results[i];
+
+                    if (hit)
+                    {
+                        Debug.Log($"Detected {detectedCollisions} projectiles");
+                        
+                        Destroy(gameObject);
+                    }
+                }
+            }
         }
 
-        private void FixedUpdate()
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(DamagePosition.position, ProjectileData.projectileRadius);
+        }
+
+        private void DetectedPlayerAndGround()
         {
             if (!_hasHitGround)
             {
@@ -65,13 +89,12 @@ namespace _Scripts.Projectile
                             // Check if this is the actual Player (compare by tag or component)
                             if (root.CompareTag("Player"))
                             {
-                                Debug.Log("✅ Hit Player: " + root.name);
+                                Debug.Log("Hit Player: " + root.name);
                                 damageable.Damage(new DamageData(ProjectileData.projectileDamage, Core.Root));
-                                Destroy(gameObject); // Destroy projectile after hitting player
                             }
                             else
                             {
-                                Debug.Log("❌ Hit something else: " + root.name);
+                                Debug.Log("Hit something else: " + root.name);
                             }
                         }
                     }
@@ -86,12 +109,6 @@ namespace _Scripts.Projectile
                     Destroy(gameObject);
                 }
             }
-        }
-
-        private void OnDrawGizmos()
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(DamagePosition.position, ProjectileData.projectileRadius);
         }
     }
 }
