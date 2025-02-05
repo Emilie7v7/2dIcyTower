@@ -120,27 +120,27 @@ namespace _Scripts.CoreSystem
                 var radian = angle * Mathf.Deg2Rad;
                 var direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
 
-                var hitCount = Physics2D.CircleCastNonAlloc(origin, PlayerDetectionRadius, direction, _results, PlayerDetectionDistance, layerMask);
+                var hitCount = Physics2D.CircleCastNonAlloc(origin, PlayerDetectionRadius, direction, _results,
+                    PlayerDetectionDistance, layerMask);
 
                 if (hitCount > 0)
                 {
-                    for (int i = 0; i < hitCount; i++)
+                    for (var i = 0; i < hitCount; i++)
                     {
-                        RaycastHit2D hit = _results[i];
-                
-                        if (hit.collider.CompareTag("Player")) // Ensure we detect the player
+                        var hit = _results[i];
+
+                        if (hit.collider.CompareTag("Player"))
                         {
-                            //Debug.Log("Player detected at: " + hit.point);
-                            Debug.DrawLine(origin, hit.point, Color.green, 0.1f);
-                            // Add logic to react to player detection (e.g., alert enemy AI)
-                            return true; // Exit after detecting the player
+                            //Debug.Log("✅ Player detected at: " + hit.point);
+                            Debug.DrawLine(origin, hit.point, Color.green, 0.5f);
+                            return true;
                         }
                     }
                 }
-            }
+            } 
             return false; // Player not detected
         }
-        
+
         #endregion
         
     }

@@ -9,5 +9,6 @@ namespace _Scripts.ScriptableObjects.ProjectileData
         public float projectileSpeed;
         public float projectileDamage;
         public float projectileRadius;
+        public Vector2 projectileArc;
     }
 }

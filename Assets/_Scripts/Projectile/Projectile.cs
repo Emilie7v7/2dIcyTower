@@ -15,17 +15,17 @@ namespace _Scripts.Projectile
         [field: SerializeField] public ProjectileDataSo ProjectileData { get; private set; }
         public Core Core { get; private set; }
         public CollisionSenses CollisionSenses { get; private set; }
-        public Rigidbody2D MyRigidbody2D { get; private set; }
+        public Movement Movement { get; private set; }
 
         private void Awake()
         {
             Core = GetComponentInChildren<Core>();
             CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
+            Movement = Core.GetCoreComponent<Movement>();
         }
 
         private void Start()
         {
-            MyRigidbody2D = GetComponent<Rigidbody2D>();
             _hasHitGround = false;
 
             _startPosition = transform.position;
@@ -47,12 +47,33 @@ namespace _Scripts.Projectile
                 {
                     var detectedObjects = Physics2D.OverlapCircleAll(DamagePosition.position, ProjectileData.projectileRadius, CollisionSenses.WhatIsPlayer);
 
+                    // foreach (var colliders in detectedObjects)
+                    // {
+                    //     var damageable = colliders.GetComponent<IDamageable>();
+                    //     
+                    //     damageable?.Damage(new DamageData(ProjectileData.projectileDamage, Core.Root));
+                    // }
                     foreach (var colliders in detectedObjects)
                     {
                         var damageable = colliders.GetComponent<IDamageable>();
-                        
-                        Debug.Log("HitPlayer");
-                        damageable?.Damage(new DamageData(ProjectileData.projectileDamage, Core.Root));
+
+                        if (damageable != null)
+                        {
+                            // Find the top-most parent (the Player)
+                            var root = colliders.transform.root;
+
+                            // Check if this is the actual Player (compare by tag or component)
+                            if (root.CompareTag("Player"))
+                            {
+                                Debug.Log("✅ Hit Player: " + root.name);
+                                damageable.Damage(new DamageData(ProjectileData.projectileDamage, Core.Root));
+                                Destroy(gameObject); // Destroy projectile after hitting player
+                            }
+                            else
+                            {
+                                Debug.Log("❌ Hit something else: " + root.name);
+                            }
+                        }
                     }
                     Destroy(gameObject);
                 }
@@ -60,8 +81,9 @@ namespace _Scripts.Projectile
                 if (groundHit)
                 {
                     _hasHitGround = true;
-                    MyRigidbody2D.velocity = Vector2.zero;
-                    MyRigidbody2D.gravityScale = 0f;
+                    Movement.R2BD.velocity = Vector2.zero;
+                    Movement.R2BD.gravityScale = 0f;
+                    Destroy(gameObject);
                 }
             }
         }

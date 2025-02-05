@@ -63,6 +63,18 @@ namespace _Scripts.CoreSystem
             SetFinalVelocity();
         }
 
+        public void LaunchProjectile(Vector2 direction, float force)
+        {
+            if (R2BD == null) return;
+
+            // Ensure the direction is normalized
+            direction = direction.normalized;
+
+            // Apply a force in the given direction with impulse mode
+            R2BD.velocity = Vector2.zero; // Reset velocity to avoid accumulation
+            R2BD.AddForce(direction * force, ForceMode2D.Impulse);
+            //Debug.Log($"Projectile launched with force: {force}, direction: {direction}");
+        }
         private void SetFinalVelocity()
         {
             if(!CanSetVelocity) return;
