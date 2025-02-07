@@ -40,9 +40,6 @@ namespace _Scripts.Projectile
                 new Vector2(DetectionPosition.position.x, DetectionPosition.position.y), 
                 explosionDataSo.explosionRadius, _colliders,explosionDataSo.targetLayer);
             
-            var noDamageDetectedColliders = Physics2D.OverlapCircleNonAlloc(
-                new Vector2(DetectionPosition.position.x, DetectionPosition.position.y),
-                explosionDataSo.explosionRadius, _colliders, explosionDataSo.noDamageLayer);
             
             if (detectedColliders > 0)
             {
@@ -57,6 +54,30 @@ namespace _Scripts.Projectile
                         var damageable = hit.GetComponentInChildren<IDamageable>();
                         damageable?.Damage(new DamageData(explosionDataSo.explosionDamage, _core.Root));
                         break;
+                    }
+
+                    if (hit && hit.gameObject.CompareTag("Enemy"))
+                    {
+                        var damageable = hit.GetComponentInChildren<IDamageable>();
+                        Debug.Log($"{hit.gameObject.name} damaged");
+                        damageable?.Damage(new DamageData(explosionDataSo.explosionDamage, _core.Root));
+                    }
+                }
+            }
+
+            var noDamageDetectedColliders = Physics2D.OverlapCircleNonAlloc(
+                new Vector2(DetectionPosition.position.x, DetectionPosition.position.y),
+                explosionDataSo.explosionRadius, _colliders, explosionDataSo.noDamageLayer);
+            
+            if (noDamageDetectedColliders > 0)
+            {
+                for (var i = 0; i < noDamageDetectedColliders; i++)
+                {
+                    var hit = _colliders[i];
+                    
+                    if (hit && hit.gameObject.CompareTag("Player"))
+                    {
+                        Debug.Log($"Player hit {hit.gameObject.name}");
                     }
                 }
             }
