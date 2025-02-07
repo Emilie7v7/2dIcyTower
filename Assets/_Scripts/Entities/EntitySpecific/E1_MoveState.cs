@@ -20,7 +20,7 @@ namespace _Scripts.Entities.EntitySpecific
         {
             base.Enter();
             
-            Debug.Log("We have entered the MoveState");
+            //Debug.Log("We have entered the MoveState");
         }
 
         public override void LogicUpdate()
@@ -33,7 +33,6 @@ namespace _Scripts.Entities.EntitySpecific
             }
             else if (!IsDetectingLedge)
             {
-                Debug.Log("Ledge not detected");
                 enemy.IdleState.SetFlipAfterIdle(true);
                 StateMachine.ChangeState(enemy.IdleState);
             }

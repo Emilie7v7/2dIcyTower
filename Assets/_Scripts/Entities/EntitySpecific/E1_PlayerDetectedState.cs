@@ -17,7 +17,7 @@ namespace _Scripts.Entities.EntitySpecific
         {
             base.Enter();
             
-            Debug.Log("We have entered the player detected state");
+            //Debug.Log("We have entered the player detected state");
         }
 
         public override void LogicUpdate()

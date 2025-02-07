@@ -1,3 +1,4 @@
+using System;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -6,14 +7,23 @@ namespace _Scripts.InputHandler
 {
     public class PlayerInputHandler : MonoBehaviour
     {
-        [SerializeField] private PlayerDataSo playerData;
         public PlayerInput playerInput;
-        public bool throwInput { get; private set; }
-
+        
+        private static Camera MainCamera => Camera.main;
+        
+        public Vector2 RawThrowDirection { get; private set; }
+        public Vector2 ThrowDirectionInput { get; private set; }
         public Vector2 RawMovementInput { get; private set; }
 
         public int NormInputX { get; private set; }
         public int NormInputY { get; private set; }
+
+        public bool ThrowInput { get; private set; }
+
+        private void Start()
+        {
+            playerInput = GetComponent<PlayerInput>();
+        }
 
         public void SetMove(InputAction.CallbackContext ctx)
         {
@@ -25,43 +35,33 @@ namespace _Scripts.InputHandler
             NormInputY = Mathf.RoundToInt(RawMovementInput.y);
         }
 
-        public void SetThrow(InputAction.CallbackContext context)
+        public void SetThrow(InputAction.CallbackContext ctx)
         {
-            if (context.performed)
+            if (ctx.started)
             {
-                throwInput = true; 
+                ThrowInput = true;
+            }
+            if (ctx.canceled)
+            {
+                ThrowInput = false;
             }
         }
 
-        private void Update()
+        public void SetThrowDirection(InputAction.CallbackContext ctx)
         {
-           
-            if (throwInput)
+            RawThrowDirection = ctx.ReadValue<Vector2>();
+
+            if (MainCamera == null) return;
+
+            if (playerInput.currentControlScheme is "Keyboard&Mouse" or "Touch")
             {
-                ThrowPotion();
-                throwInput = false; 
+                RawThrowDirection = MainCamera.ScreenToWorldPoint(RawThrowDirection) - transform.position;
             }
+
+            // Keep it as Vector2 instead of Vector2Int for smooth rotation
+            ThrowDirectionInput = RawThrowDirection.normalized;
         }
-
-        private void ThrowPotion()
-        {
-            if (playerData == null || playerData.projectile == null)
-            {
-                Debug.LogWarning("PlayerDataSO or projectile prefab is missing. Potion cannot be thrown.");
-                return;
-            }
-
-           
-            GameObject potion = Instantiate(playerData.projectile, transform.position, Quaternion.identity);
-
-            
-            Rigidbody2D potionRb = potion.GetComponent<Rigidbody2D>();
-            if (potionRb != null)
-            {
-                Vector2 throwDirection = Vector2.right * transform.localScale.x;
-                potionRb.AddForce(throwDirection * playerData.playerMovementSpeed, ForceMode2D.Impulse);
-            }
-        }
+        
     }
 }
 

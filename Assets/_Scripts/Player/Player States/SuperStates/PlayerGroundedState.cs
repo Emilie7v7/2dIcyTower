@@ -1,48 +1,54 @@
-using System.Collections;
-using System.Collections.Generic;
 using _Scripts.CoreSystem;
-using _Scripts.PlayerComponent;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
 
-public class PlayerGroundedState : PlayerState
+namespace _Scripts.Player.Player_States.SuperStates
 {
-    
-    //Input
-    protected int XInput;
-    protected int YInput;
-    
-    private bool jumpInput;
-    
-    //Checks
-    private bool isGrounded;
-    
-    protected PlayerGroundedState(Player player, PlayerStateMachine stateMachine, PlayerDataSo playerDataSo, string animBoolName) : base(player, stateMachine, playerDataSo, animBoolName)
+    public class PlayerGroundedState : PlayerState.PlayerState
     {
-    }
-
-    protected Movement Movement { get => movement != null ? movement : Core.GetCoreComponent(ref movement); }
-    private Movement movement;
+        //Input
+        //protected int XInput;
+        //protected int YInput;
     
-    protected CollisionSenses CollisionSenses { get => collisionSenses != null ? collisionSenses : Core.GetCoreComponent(ref collisionSenses); }
-    private CollisionSenses collisionSenses;
-
-    public override void DoChecks()
-    {
-        base.DoChecks();
-
-        if (collisionSenses)
+        private bool _jumpInput;
+    
+        //Checks
+        protected bool IsGrounded;
+        private bool _isThrowing;
+    
+        protected PlayerGroundedState(PlayerComponent.Player player, PlayerStateMachine stateMachine, PlayerDataSo playerDataSo, string animBoolName) : base(player, stateMachine, playerDataSo, animBoolName)
         {
-            isGrounded = CollisionSenses.Ground;
         }
-    }
 
-    public override void LogicUpdate()
-    {
-        base.LogicUpdate();
+        protected Movement Movement => _movement ? _movement : Core.GetCoreComponent(ref _movement);
+        private Movement _movement;
+
+        private CollisionSenses CollisionSenses => _collisionSenses ? _collisionSenses : Core.GetCoreComponent(ref _collisionSenses);
+        private CollisionSenses _collisionSenses;
+
+        public override void DoChecks()
+        {
+            base.DoChecks();
+
+            if (CollisionSenses)
+            {
+                IsGrounded = CollisionSenses.Grounded;
+            }
+        }
+
+        public override void LogicUpdate()
+        {
+            base.LogicUpdate();
         
-        XInput = Player.InputHandler.NormInputX;
-        YInput = Player.InputHandler.NormInputY;
+            //XInput = Player.InputHandler.NormInputX;
+            //YInput = Player.InputHandler.NormInputY;
+            _isThrowing = Player.InputHandler.ThrowInput;
+
+            if (_isThrowing)
+            {
+                StateMachine.ChangeState(Player.ThrowState);
+            }
+        }
     }
 }

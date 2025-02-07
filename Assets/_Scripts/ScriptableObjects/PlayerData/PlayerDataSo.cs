@@ -10,7 +10,11 @@ namespace _Scripts.ScriptableObjects.PlayerData
         public float playerMovementSpeed = 5f;
         
         [Header("ProjectilePrefab")]
-        public GameObject projectile;
+        public GameObject projectilePrefab;
+
+        [Header("Speed Rotation Of Indicator")]
+        public float rotationSpeed;
+
     }
         
 }

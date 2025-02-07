@@ -27,7 +27,7 @@ namespace _Scripts.Entities.EntityStates.EntitySuperState
 
             if (CollisionSenses)
             {
-                IsGrounded = CollisionSenses.Ground;
+                IsGrounded = CollisionSenses.Grounded;
                 IsPlayerInLineOfSight = CollisionSenses.IsPlayerInLineOfSight();
                 IsDetectingLedge = CollisionSenses.LedgeVertical;
             }

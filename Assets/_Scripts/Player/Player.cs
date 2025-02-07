@@ -1,19 +1,24 @@
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
+using _Scripts.Player;
 using _Scripts.Player.Player_States;
+using _Scripts.Player.Player_States.SubStates;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace _Scripts.PlayerComponent
 {
     public class Player : MonoBehaviour
     {
         #region PlayerStates
-        public PlayerStateMachine StateMachine { get; private set; }
         
+        public PlayerStateMachine StateMachine { get; private set; }
         public PlayerIdleState IdleState { get; private set; }
-        public PlayerMoveState MoveState { get; private set; }
+        //public PlayerMoveState MoveState { get; private set; }
+        public PlayerThrowState ThrowState { get; private set; }
+        public PlayerInAirState InAirState { get; private set; }
         
         [SerializeField] private PlayerDataSo playerData;  // Player data reference
         
@@ -23,131 +28,86 @@ namespace _Scripts.PlayerComponent
         
         public Core Core { get; private set; }
         public CollisionSenses CollisionSenses { get; private set; }
+        public Movement Movement { get; private set; }
         public PlayerInputHandler InputHandler { get; private set; }
+        public Animator MyAnimator { get; private set; }
+        public AnimationEventHandler AnimationEventHandler { get; private set; }
+        public Transform ThrowDirectionIndicator { get; private set; }
     
         #endregion
         
-        [Header("Player Settings")]
-    
-        public Rigidbody2D rb;
-    
-        [Header("Potion Settings")]
-        [SerializeField] private GameObject potionPrefab;
-        public Transform throwPoint;
-        public float throwForce = 10f;
-
-        private Vector2 movementInput;
-        private bool isExploding = false;
-        private float explosionDuration = 0.5f; // Duration to keep explosion momentum
-        private float explosionTimer = 0f;
-
+        
         #region Unity Callback Functions
-        void Awake()
+
+        private void Awake()
         {
-            // Ensure the Rigidbody2D is assigned
-            if (rb == null) rb = GetComponent<Rigidbody2D>();
-            
             Core = GetComponentInChildren<Core>();
             CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
+            Movement = Core.GetCoreComponent<Movement>();
             
             StateMachine = new PlayerStateMachine();
             
             IdleState = new PlayerIdleState(this, StateMachine, playerData, "isIdle");
-            MoveState = new PlayerMoveState(this, StateMachine, playerData, "isMoving");
+            //MoveState = new PlayerMoveState(this, StateMachine, playerData, "isMoving");
+            ThrowState = new PlayerThrowState(this, StateMachine, playerData, "isThrowing");
+            InAirState = new PlayerInAirState(this, StateMachine, playerData, "isInAir");
         }
 
         private void Start()
         {
-            //StateMachine.Initialize(IdleState);
+            
+            MyAnimator = GetComponent<Animator>();
             InputHandler = GetComponent<PlayerInputHandler>();
+            AnimationEventHandler = GetComponent<AnimationEventHandler>();
+            
+            ThrowDirectionIndicator = transform.Find("ThrowDirectionIndicator");
             
             StateMachine.Initialize(IdleState);
         }
 
-        void Update()
+        private void Update()
         {
             Core.LogicUpdate();
             StateMachine.CurrentState.LogicUpdate();
+            
+            float targetAngle = Vector2.SignedAngle(Vector2.right, InputHandler.ThrowDirectionInput);
 
-            // Throw potion when pressing the space bar
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                ThrowPotion();
-            }
-
-            // Manage explosion timer
-            if (isExploding)
-            {
-                explosionTimer += Time.deltaTime;
-                if (explosionTimer >= explosionDuration)
-                {
-                    isExploding = false;
-                    explosionTimer = 0f;
-                }
-            }
+            // Smoothly interpolate rotation using Quaternion.Lerp
+            Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle - 45f);
+            ThrowDirectionIndicator.rotation = Quaternion.Lerp(
+                ThrowDirectionIndicator.rotation,
+                targetRotation,
+                Time.deltaTime * playerData.rotationSpeed
+            );
         }
 
         private void FixedUpdate()
         {
             StateMachine.CurrentState.PhysicsUpdate();
-            
-            // Preserve horizontal velocity from explosion
-            float currentHorizontalVelocity = rb.velocity.x;
-
-            if (isExploding)
-            {
-                // Apply player input as additional force, not overriding velocity
-                Vector2 inputForce = movementInput * playerData.playerMovementSpeed;
-                rb.AddForce(inputForce, ForceMode2D.Force);
-            }
-            else
-            {
-                // Combine player input with current horizontal velocity
-                float targetHorizontalVelocity = movementInput.x * playerData.playerMovementSpeed;
-                float smoothHorizontalVelocity = Mathf.Lerp(currentHorizontalVelocity, targetHorizontalVelocity, Time.fixedDeltaTime * 5f);
-                rb.velocity = new Vector2(smoothHorizontalVelocity, rb.velocity.y);
-            }
         }
         #endregion
 
+        private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
+
+        private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
+        
         public void ApplyExplosionForce(Vector2 explosionDirection, float explosionForce)
         {
             // Apply the explosion force to the player's Rigidbody2D (push away from explosion)
-            rb.AddForce(explosionDirection * explosionForce, ForceMode2D.Impulse);
-    
-            // Set the explosion flag
-            isExploding = true;
-
+            Movement.R2BD.AddForce(explosionDirection * explosionForce, ForceMode2D.Impulse);
+            
             // Debugging applied force and velocity
             Debug.Log($"Applying Explosion Force: {explosionDirection * explosionForce}");
-            Debug.Log($"Player Velocity After Explosion: {rb.velocity}");
+            Debug.Log($"Player Velocity After Explosion: {Movement.R2BD.velocity}");
         
             // Wait for the next physics update to log the result
-            Invoke("LogPostExplosionVelocity", Time.fixedDeltaTime);
+            Invoke(nameof(LogPostExplosionVelocity), Time.fixedDeltaTime);
         }
 
         void LogPostExplosionVelocity()
         {
-            Debug.Log($"Player Velocity After Explosion (Post Physics Update): {rb.velocity}");
+            Debug.Log($"Player Velocity After Explosion (Post Physics Update): {Movement.R2BD.velocity}");
             Debug.Log($"Player Position After Explosion: {transform.position}");
-        }
-
-        private void ThrowPotion()
-        {
-            if (potionPrefab != null && throwPoint != null)
-            {
-                // Instantiate the potion at the throwPoint's position
-                GameObject potion = Instantiate(potionPrefab, throwPoint.position, Quaternion.identity);
-
-                // Get the Rigidbody2D of the potion to apply force
-                Rigidbody2D potionRb = potion.GetComponent<Rigidbody2D>();
-
-                // Calculate the throw direction
-                Vector2 throwDirection = (Camera.main.ScreenToWorldPoint(Input.mousePosition) - throwPoint.position).normalized;
-
-                // Apply force to the potion
-                potionRb.AddForce(throwDirection * throwForce, ForceMode2D.Impulse);
-            }
         }
 
         private void OnDrawGizmos()

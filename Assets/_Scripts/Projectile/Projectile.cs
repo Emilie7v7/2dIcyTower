@@ -8,35 +8,42 @@ namespace _Scripts.Projectile
 {
     public class Projectile : MonoBehaviour
     {
-        private Vector2 _startPosition;
-        private bool _hasHitGround;
+        private bool _hasExploded;
         private Collider2D[] _results;
-        
-        [field: SerializeField] public Transform DamagePosition {get; private set;}
+
+        [field: SerializeField] public Transform DetectionPosition { get; private set; }
         [field: SerializeField] public ProjectileDataSo ProjectileData { get; private set; }
-        public Core Core { get; private set; }
-        public CollisionSenses CollisionSenses { get; private set; }
+        private Core _core;
         public Movement Movement { get; private set; }
 
         private void Awake()
         {
-            Core = GetComponentInChildren<Core>();
-            CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
-            Movement = Core.GetCoreComponent<Movement>();
+            _core = GetComponentInChildren<Core>();
+            Movement = _core.GetCoreComponent<Movement>();
 
-            _results = new Collider2D[CollisionSenses.MaxHitsRayForProjectile];
+            _results = new Collider2D[ProjectileData.maxHitsRayForProjectile];
         }
 
         private void Start()
         {
-            _hasHitGround = false;
-
-            _startPosition = transform.position;
+            _hasExploded = false;
         }
 
         private void FixedUpdate()
         {
-            var detectedCollisions = Physics2D.OverlapCircleNonAlloc(DamagePosition.position, ProjectileData.projectileRadius, _results, CollisionSenses.MultipleLayers);
+            ProjectileHitDetection();
+        }
+
+        private void ProjectileHitDetection()
+        {
+            if (_hasExploded) return; // Prevents multiple explosions
+
+            var detectedCollisions = Physics2D.OverlapCircleNonAlloc(
+                new Vector2(DetectionPosition.position.x, DetectionPosition.position.y),
+                ProjectileData.projectileRadius,
+                _results,
+                ProjectileData.targetLayer
+            );
 
             if (detectedCollisions > 0)
             {
@@ -46,69 +53,22 @@ namespace _Scripts.Projectile
 
                     if (hit)
                     {
-                        Debug.Log($"Detected {detectedCollisions} projectiles");
+                        _hasExploded = true; // Prevents multiple explosions
+
+                        var hitPosition = hit.ClosestPoint(transform.position);
                         
+                        Instantiate(ProjectileData.explosionPrefab, hitPosition, Quaternion.identity);
                         Destroy(gameObject);
+                        break; // Stops loop after first valid collision
                     }
                 }
             }
         }
 
-        private void OnDrawGizmos()
+    private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(DamagePosition.position, ProjectileData.projectileRadius);
-        }
-
-        private void DetectedPlayerAndGround()
-        {
-            if (!_hasHitGround)
-            {
-                var playerHit = Physics2D.OverlapCircle(DamagePosition.position, ProjectileData.projectileRadius, CollisionSenses.WhatIsPlayer);
-                var groundHit = Physics2D.OverlapCircle(DamagePosition.position, ProjectileData.projectileRadius, CollisionSenses.WhatIsGround);
-
-                if (playerHit)
-                {
-                    var detectedObjects = Physics2D.OverlapCircleAll(DamagePosition.position, ProjectileData.projectileRadius, CollisionSenses.WhatIsPlayer);
-
-                    // foreach (var colliders in detectedObjects)
-                    // {
-                    //     var damageable = colliders.GetComponent<IDamageable>();
-                    //     
-                    //     damageable?.Damage(new DamageData(ProjectileData.projectileDamage, Core.Root));
-                    // }
-                    foreach (var colliders in detectedObjects)
-                    {
-                        var damageable = colliders.GetComponent<IDamageable>();
-
-                        if (damageable != null)
-                        {
-                            // Find the top-most parent (the Player)
-                            var root = colliders.transform.root;
-
-                            // Check if this is the actual Player (compare by tag or component)
-                            if (root.CompareTag("Player"))
-                            {
-                                Debug.Log("Hit Player: " + root.name);
-                                damageable.Damage(new DamageData(ProjectileData.projectileDamage, Core.Root));
-                            }
-                            else
-                            {
-                                Debug.Log("Hit something else: " + root.name);
-                            }
-                        }
-                    }
-                    Destroy(gameObject);
-                }
-
-                if (groundHit)
-                {
-                    _hasHitGround = true;
-                    Movement.R2BD.velocity = Vector2.zero;
-                    Movement.R2BD.gravityScale = 0f;
-                    Destroy(gameObject);
-                }
-            }
+            Gizmos.DrawWireSphere(DetectionPosition.position, ProjectileData.projectileRadius);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace _Scripts.Entities.EntityStateMachine
         protected bool IsAnimationFinished;
         protected bool IsExitingState;
         
-        private string _animationBoolName;
+        private readonly string _animationBoolName;
         
         protected EntityState(Entity entity, EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName)
         {

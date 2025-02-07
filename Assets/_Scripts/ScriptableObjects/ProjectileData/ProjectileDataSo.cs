@@ -6,9 +6,13 @@ namespace _Scripts.ScriptableObjects.ProjectileData
     public class ProjectileDataSo : ScriptableObject
     {
         [Header("Projectile Properties")]
+        public GameObject explosionPrefab;
         public float projectileSpeed;
-        public float projectileDamage;
         public float projectileRadius;
         public Vector2 projectileArc;
+        public int maxHitsRayForProjectile;
+        
+        [Header("Projectile Target")]
+        public LayerMask targetLayer;
     }
 }

@@ -19,7 +19,7 @@ namespace _Scripts.Entities.EntitySpecific
         {
             base.Enter();
             
-            Debug.Log("We have entered the IdleState");
+            //Debug.Log("We have entered the IdleState");
         }
 
         public override void LogicUpdate()

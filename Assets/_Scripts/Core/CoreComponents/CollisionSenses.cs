@@ -68,13 +68,11 @@ namespace _Scripts.CoreSystem
         public float PlayerDetectionDistance { get => playerDetectionDistance; set => playerDetectionDistance = value; }
         public float AngleInDegreesForDetectingPlayer { get => angleInDegreesForDetectingPlayer; set => angleInDegreesForDetectingPlayer = value; }
         public int MaxHitsRayForEnemy { get => maxHitsRayForEnemy; set => maxHitsRayForEnemy = value; }
-        public int MaxHitsRayForProjectile { get => maxHitsRayForProjectile; set => maxHitsRayForProjectile = value; }
         
         [Header("Radius Checks")]
         [SerializeField] private float groundCheckRadius;
         [SerializeField] private float entityCheckRadius;
         [SerializeField] private float ledgeCheckVerticalDistance;
-        [SerializeField] private int maxHitsRayForProjectile;
         
         [Header("Specific Settings For Enemies")]
         [SerializeField] private float playerDetectionCheckRadius;
@@ -90,26 +88,31 @@ namespace _Scripts.CoreSystem
         public LayerMask WhatIsPlayer { get => whatIsPlayer; set => whatIsPlayer = value; }
         public LayerMask WhatIsPlatform { get => whatIsPlatform; set => whatIsPlatform = value; }
         public LayerMask WhatIsEnemy { get => whatIsEnemy; set => whatIsEnemy = value; }
-        public LayerMask MultipleLayers { get => multipleLayers; set => multipleLayers = value; }
         
         [Header("Layer")]
-        [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsPlatform, whatIsEnemy, multipleLayers;
+        [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsPlatform, whatIsEnemy;
 
         #endregion
 
         #region Bools
 
         //Checks whether Player or an Entity is grounded or not
-        public bool Ground => Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, whatIsGround);
-        
+        public bool Grounded 
+        {
+            get
+            {
+                bool isGrounded = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, WhatIsGround);
+                return isGrounded;
+            }
+        }        
         //Check whether Entity is touching Player
-        public bool Player => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, whatIsPlayer);
+        public bool Player => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, WhatIsPlayer);
 
         //Check whether Entity is touching Enemy
-        public bool Enemy => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, whatIsEnemy);
+        public bool Enemy => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, WhatIsEnemy);
         
         //Check whether Entity or Player is on the ledge
-        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, whatIsPlatform);
+        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, WhatIsPlatform);
         
         // Detects if the player is in line of sight using 360-degree CircleCast.
         public bool IsPlayerInLineOfSight()

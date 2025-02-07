@@ -32,7 +32,7 @@ namespace _Scripts.Projectile
                 Debug.Log("Explosion caused by a detected Enemy.");
             }
 
-            if (collisionSenses.Ground)
+            if (collisionSenses.Grounded)
             {
                 Destroy(gameObject);
                 Explosion(explosionPosition);

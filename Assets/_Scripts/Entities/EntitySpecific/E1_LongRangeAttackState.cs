@@ -19,7 +19,7 @@ namespace _Scripts.Entities.EntitySpecific
             base.Enter();
         
             Movement?.SetZeroVelocity();
-            Debug.Log("We have entered Long Range State");
+            //Debug.Log("We have entered Long Range State");
         }
 
         public override void LogicUpdate()

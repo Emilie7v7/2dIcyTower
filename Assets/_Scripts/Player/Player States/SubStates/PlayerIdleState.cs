@@ -1,5 +1,7 @@
+using _Scripts.Player.Player_States.SuperStates;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
+using UnityEngine;
 
 namespace _Scripts.Player.Player_States
 {
@@ -20,12 +22,9 @@ namespace _Scripts.Player.Player_States
         {
             base.LogicUpdate();
 
-            if (!IsExitingState)
+            if (!IsGrounded) // No need to manually call CollisionSenses.IsGrounded()
             {
-                if (XInput != 0f)
-                {
-                    StateMachine.ChangeState(Player.MoveState);
-                }
+                StateMachine.ChangeState(Player.InAirState);
             }
         }
     }

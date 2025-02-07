@@ -75,7 +75,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6402397921117159433}
-  - {fileID: 8269741401287654853}
   m_Father: {fileID: 6335561281356649881}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &808008105753231335
@@ -122,77 +121,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6335561281356649881}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8741132687109387643
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8269741401287654853}
-  - component: {fileID: 6682077749001566862}
-  m_Layer: 0
-  m_Name: CollisionSenses
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8269741401287654853
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8741132687109387643}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 8222322491084451975}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6682077749001566862
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8741132687109387643}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2f5e6a05989658744aca8c602662a735, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundCheck: {fileID: 0}
-  entityCheck: {fileID: 0}
-  ledgeCheckVertical: {fileID: 0}
-  playerDetectedCheck: {fileID: 0}
-  groundCheckRadius: 0
-  entityCheckRadius: 0
-  ledgeCheckVerticalDistance: 0
-  maxHitsRayForProjectile: 3
-  playerDetectionCheckRadius: 0
-  playerDetectionDistance: 0
-  angleInDegreesForDetectingPlayer: 0
-  maxHitsRayForEnemy: 0
-  whatIsGround:
-    serializedVersion: 2
-    m_Bits: 128
-  whatIsPlayer:
-    serializedVersion: 2
-    m_Bits: 8
-  whatIsPlatform:
-    serializedVersion: 2
-    m_Bits: 0
-  whatIsEnemy:
-    serializedVersion: 2
-    m_Bits: 0
-  multipleLayers:
-    serializedVersion: 2
-    m_Bits: 136
 --- !u!1 &8793792659792268612
 GameObject:
   m_ObjectHideFlags: 0
@@ -320,5 +248,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d34129033febbde47bf58814b7e98ca1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <DamagePosition>k__BackingField: {fileID: 523922792561082541}
+  <DetectionPosition>k__BackingField: {fileID: 523922792561082541}
   <ProjectileData>k__BackingField: {fileID: 11400000, guid: fe1b93093eb7ef548ad4149505a6567c, type: 2}
