@@ -74,10 +74,23 @@ namespace _Scripts.Projectile
                 for (var i = 0; i < noDamageDetectedColliders; i++)
                 {
                     var hit = _colliders[i];
-                    
+        
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
                         Debug.Log($"Player hit {hit.gameObject.name}");
+
+                        var rb = hit.GetComponent<Rigidbody2D>();
+                        if (rb != null)
+                        {
+                            Vector2 explosionDirection = (hit.transform.position - DetectionPosition.position).normalized;
+                            float distance = Vector2.Distance(hit.transform.position, DetectionPosition.position);
+                
+                            // Impulse force decreases with distance from the explosion
+                            float forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x, 
+                                distance / explosionDataSo.explosionRadius);
+                
+                            rb.AddForce(explosionDirection * forceMagnitude, ForceMode2D.Impulse);
+                        }
                     }
                 }
             }

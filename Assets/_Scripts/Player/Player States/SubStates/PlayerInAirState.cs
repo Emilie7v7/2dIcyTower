@@ -43,7 +43,7 @@ namespace _Scripts.Player.Player_States.SubStates
 
             _isThrowing = Player.InputHandler.ThrowInput;
 
-            if (_isGrounded)
+            if (_isGrounded && Movement?.CurrentVelocity.y < 0.01f)
             {
                 StateMachine.ChangeState(Player.IdleState);
             }
