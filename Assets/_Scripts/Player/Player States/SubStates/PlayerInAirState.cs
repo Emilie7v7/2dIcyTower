@@ -9,7 +9,10 @@ namespace _Scripts.Player.Player_States.SubStates
     {
         private bool _isThrowing;
         private bool _isGrounded;
-
+        
+        private float _startingYPosition;
+        private bool _isFallingTriggered;
+        
         private Movement Movement => _movement ? _movement : Core.GetCoreComponent<Movement>();
         private Movement _movement;
 
@@ -30,18 +33,48 @@ namespace _Scripts.Player.Player_States.SubStates
                 _isGrounded = CollisionSenses.Grounded;
             }
         }
-
+        
         public override void Enter()
         {
             base.Enter();
-            Debug.Log("We have entered the in-air state");
+
+            if (Player.WasThrowingInAir)
+            {
+                // **Prevent resetting movement when re-entering from throw**
+                Player.WasThrowingInAir = false; // Reset flag
+            }
+            // else
+            // {
+            //     // **Apply normal gravity settings if NOT coming from a throw**
+            //     Movement.R2BD.gravityScale = PlayerData.gravityScaleUp;
+            // }
         }
 
         public override void LogicUpdate()
         {
             base.LogicUpdate();
-
+            
             _isThrowing = Player.InputHandler.ThrowInput;
+            
+            float verticalDistance = Movement.R2BD.position.y - _startingYPosition; // Measure height gained
+
+            if (Movement != null)
+            {
+                if (Movement.CurrentVelocity.y > 0.1f) // Moving Up
+                {
+                    // **Modify the gravity increase rate**
+                    float heightFactor = Mathf.Pow(verticalDistance / PlayerData.maxUpwardDistance, PlayerData.gravityIncreaseFactor); // Slower gravity increase
+                    float newGravity = Mathf.Lerp(PlayerData.gravityScaleUp, PlayerData.gravityScaleDown, heightFactor);
+
+                    Movement.R2BD.gravityScale = Mathf.Clamp(newGravity, PlayerData.gravityScaleUp, PlayerData.gravityScaleDown);
+                    Movement.R2BD.drag = PlayerData.dragUp;
+                }
+                else if (Movement.CurrentVelocity.y < -0.1f) // Falling
+                {
+                    Movement.R2BD.gravityScale = PlayerData.gravityScaleDown;
+                    Movement.R2BD.drag = PlayerData.dragDown;
+                }
+            }
 
             if (_isGrounded && Movement?.CurrentVelocity.y < 0.01f)
             {
@@ -51,6 +84,12 @@ namespace _Scripts.Player.Player_States.SubStates
             {
                 StateMachine.ChangeState(Player.ThrowState);
             }
+        }
+        
+        private void ResetGravity()
+        {
+            Movement.R2BD.gravityScale = PlayerData.defaultGravityScale; // Reset to normal gravity
+            Movement.R2BD.drag = 0f; // Reset drag
         }
     }
 }

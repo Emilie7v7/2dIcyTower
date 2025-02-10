@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
 using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
 using _Scripts.ScriptableObjects.ExplosionData;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.Projectile
 {
@@ -87,9 +84,11 @@ namespace _Scripts.Projectile
                 
                             // Impulse force decreases with distance from the explosion
                             float forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x, 
-                                distance / explosionDataSo.explosionRadius);
+                                distance / explosionDataSo.explosionRadius) * 1.8f; // Increase power
                 
-                            rb.AddForce(explosionDirection * forceMagnitude, ForceMode2D.Impulse);
+                            rb.velocity = Vector2.zero; // Reset velocity before applying new force
+                            rb.AddForce(explosionDirection * forceMagnitude * 1.5f, ForceMode2D.Impulse);
+                            rb.gravityScale = 0.5f; // Reduce gravity while going up for a smoother arc
                         }
                     }
                 }

@@ -37,6 +37,12 @@ namespace _Scripts.Player.Player_States.SuperStates
             }
         }
 
+        public override void Enter()
+        {
+            base.Enter();
+            ResetGravity(); // Reset gravity when touching the ground
+        }
+
         public override void LogicUpdate()
         {
             base.LogicUpdate();
@@ -48,6 +54,15 @@ namespace _Scripts.Player.Player_States.SuperStates
             if (_isThrowing)
             {
                 StateMachine.ChangeState(Player.ThrowState);
+            }
+        }
+        
+        private void ResetGravity()
+        {
+            if (Movement != null)
+            {
+                Movement.R2BD.gravityScale = PlayerData.defaultGravityScale; // Reset gravity scale
+                Movement.R2BD.drag = 0f; // Reset drag
             }
         }
     }

@@ -1,3 +1,4 @@
+using System.Collections;
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
 using _Scripts.Player;
@@ -36,6 +37,7 @@ namespace _Scripts.PlayerComponent
     
         #endregion
         
+        public bool WasThrowingInAir { get; set; }
         
         #region Unity Callback Functions
 
@@ -91,23 +93,25 @@ namespace _Scripts.PlayerComponent
 
         private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
         
-        public void ApplyExplosionForce(Vector2 explosionDirection, float explosionForce)
+        // Method to start the smooth fall transition
+        public void StartFallTransition(Movement movement, float transitionTime, float targetGravity)
         {
-            // Apply the explosion force to the player's Rigidbody2D (push away from explosion)
-            Movement.R2BD.AddForce(explosionDirection * explosionForce, ForceMode2D.Impulse);
-            
-            // Debugging applied force and velocity
-            Debug.Log($"Applying Explosion Force: {explosionDirection * explosionForce}");
-            Debug.Log($"Player Velocity After Explosion: {Movement.R2BD.velocity}");
-        
-            // Wait for the next physics update to log the result
-            Invoke(nameof(LogPostExplosionVelocity), Time.fixedDeltaTime);
+            StartCoroutine(SmoothFall(movement, transitionTime, targetGravity));
         }
 
-        void LogPostExplosionVelocity()
+        private IEnumerator SmoothFall(Movement movement, float transitionTime, float targetGravity)
         {
-            Debug.Log($"Player Velocity After Explosion (Post Physics Update): {Movement.R2BD.velocity}");
-            Debug.Log($"Player Position After Explosion: {transform.position}");
+            float elapsedTime = 0f;
+            float initialGravity = movement.R2BD.gravityScale;
+
+            while (elapsedTime < transitionTime)
+            {
+                elapsedTime += Time.deltaTime;
+                movement.R2BD.gravityScale = Mathf.Lerp(initialGravity, targetGravity, elapsedTime / transitionTime);
+                yield return null;
+            }
+
+            movement.R2BD.gravityScale = targetGravity;
         }
 
         private void OnDrawGizmos()

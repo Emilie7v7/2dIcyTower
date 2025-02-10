@@ -9,7 +9,7 @@ namespace _Scripts.InputHandler
     {
         public PlayerInput playerInput;
         
-        private static Camera MainCamera => Camera.main;
+        private static UnityEngine.Camera MainCamera => UnityEngine.Camera.main;
         
         public Vector2 RawThrowDirection { get; private set; }
         public Vector2 ThrowDirectionInput { get; private set; }

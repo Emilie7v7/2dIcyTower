@@ -14,7 +14,7 @@ namespace _Scripts.Player.Player_States.SubStates
         public PlayerThrowState(PlayerComponent.Player player, PlayerStateMachine stateMachine, PlayerDataSo playerDataSo, string animBoolName) : base(player, stateMachine, playerDataSo, animBoolName)
         {
         }
-
+        
         public override void AnimationTrigger()
         {
             base.AnimationTrigger();
