@@ -86,11 +86,11 @@ namespace _Scripts.CoreSystem
         
         public LayerMask WhatIsGround { get => whatIsGround; set => whatIsGround = value; }
         public LayerMask WhatIsPlayer { get => whatIsPlayer; set => whatIsPlayer = value; }
-        public LayerMask WhatIsPlatform { get => whatIsPlatform; set => whatIsPlatform = value; }
+        //public LayerMask WhatIsPlatform { get => whatIsPlatform; set => whatIsPlatform = value; }
         public LayerMask WhatIsEnemy { get => whatIsEnemy; set => whatIsEnemy = value; }
         
         [Header("Layer")]
-        [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsPlatform, whatIsEnemy;
+        [SerializeField] private LayerMask whatIsGround, whatIsPlayer, whatIsEnemy;
 
         #endregion
 
@@ -104,7 +104,7 @@ namespace _Scripts.CoreSystem
                 bool isGrounded = Physics2D.OverlapCircle(GroundCheck.position, GroundCheckRadius, WhatIsGround);
                 return isGrounded;
             }
-        }        
+        }
         //Check whether Entity is touching Player
         public bool Player => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, WhatIsPlayer);
 
@@ -112,7 +112,7 @@ namespace _Scripts.CoreSystem
         public bool Enemy => Physics2D.OverlapCircle(EntityCheck.position, EntityCheckRadius, WhatIsEnemy);
         
         //Check whether Entity or Player is on the ledge
-        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, WhatIsPlatform);
+        public bool LedgeVertical => Physics2D.Raycast(LedgeCheckVertical.position, Vector2.down, LedgeCheckVerticalDistance, WhatIsGround);
         
         // Detects if the player is in line of sight using 360-degree CircleCast.
         public bool IsPlayerInLineOfSight()
@@ -143,7 +143,8 @@ namespace _Scripts.CoreSystem
                         }
                     }
                 }
-            } 
+            }
+            Debug.Log("Player not found");
             return false; // Player not detected
         }
 

@@ -1,19 +1,20 @@
-using System.Collections;
-using System.Collections.Generic;
 using _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates;
 using UnityEngine;
 
-public class AnimationToStateMachine : MonoBehaviour
+namespace _Scripts.Intermediaries
 {
-    public EntityAttackState EntityAttackState;
-
-    private void AnimationAttackTrigger()
+    public class AnimationToStateMachine : MonoBehaviour
     {
-        EntityAttackState.AnimationAttackTrigger();
-    }
+        public EntityAttackState EntityAttackState;
 
-    private void AnimationFinishTrigger()
-    {
-        EntityAttackState.AnimationFinishedTrigger();
+        private void AnimationAttackTrigger()
+        {
+            EntityAttackState.AnimationAttackTrigger();
+        }
+
+        private void AnimationFinishTrigger()
+        {
+            EntityAttackState.AnimationFinishedTrigger();
+        }
     }
 }
