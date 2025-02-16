@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.ScriptableObjects.ProjectileData
 {
@@ -11,6 +12,7 @@ namespace _Scripts.ScriptableObjects.ProjectileData
         public float projectileRadius;
         public Vector2 projectileArc;
         public int maxHitsRayForProjectile;
+        public float maxTravelDistance;
         
         [Header("Projectile Target")]
         public LayerMask targetLayer;

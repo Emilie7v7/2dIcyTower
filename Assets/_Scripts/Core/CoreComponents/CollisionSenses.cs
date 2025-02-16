@@ -118,13 +118,13 @@ namespace _Scripts.CoreSystem
         public bool IsPlayerInLineOfSight()
         {
             Vector2 origin = PlayerDetectedCheck.position;
-            var layerMask = ~LayerMask.GetMask("Ground"); // Ignore ground collisions
+            var layerMask = WhatIsPlayer; // Ignore ground collisions
             var angleStep = AngleInDegreesForDetectingPlayer;
 
             for (float angle = 0; angle < 360; angle += angleStep)
             {
                 var radian = angle * Mathf.Deg2Rad;
-                var direction = new Vector2(Mathf.Cos(radian), Mathf.Sin(radian));
+                var direction = transform.right * Mathf.Cos(radian) + transform.up * Mathf.Sin(radian);
 
                 var hitCount = Physics2D.CircleCastNonAlloc(origin, PlayerDetectionRadius, direction, _results,
                     PlayerDetectionDistance, layerMask);
@@ -134,10 +134,10 @@ namespace _Scripts.CoreSystem
                     for (var i = 0; i < hitCount; i++)
                     {
                         var hit = _results[i];
-
+                        
                         if (hit.collider.CompareTag("Player"))
                         {
-                            //Debug.Log("Player detected at: " + hit.point);
+                            Debug.Log("Player detected at: " + hit.point);
                             Debug.DrawLine(origin, hit.point, Color.green, 0.5f);
                             return true;
                         }

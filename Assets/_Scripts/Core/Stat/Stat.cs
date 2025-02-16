@@ -1,4 +1,5 @@
 using System;
+using _Scripts.Managers.UI;
 using UnityEngine;
 
 namespace _Scripts.CoreSystem.StatSystem
@@ -8,27 +9,31 @@ namespace _Scripts.CoreSystem.StatSystem
     public class Stat
     {
         public event Action OnCurrentValueZero;
+        public event Action OnValueChanged;
         
-        [field: SerializeField] public float MaxValue { get; private set; }
+        [field: SerializeField] public int MaxValue { get; private set; }
 
-        public float CurrentValue
+
+        public int CurrentValue
         {
             get => _currentValue;
 
             set
             {
                 _currentValue = Mathf.Clamp(value, 0, MaxValue);
+                OnValueChanged?.Invoke();
+                
                 if (_currentValue <= 0)
                 {
                     OnCurrentValueZero?.Invoke();
                 }
             }
         }
-        private float _currentValue;
+        private int _currentValue;
         
         public void Initialize() => CurrentValue = MaxValue;
         
-        public void IncreaseAmount(float amount) => CurrentValue += amount;
-        public void DecreaseAmount(float amount) => CurrentValue -= amount;
+        public void IncreaseAmount(int amount) => CurrentValue += amount;
+        public void DecreaseAmount(int amount) => CurrentValue -= amount;
     }
 }

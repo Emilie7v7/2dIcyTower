@@ -4,15 +4,15 @@ namespace _Scripts.Combat.Damage
 {
     public class DamageData
     {
-        public float Amount { get; private set; }
+        public int Amount { get; private set; }
         public GameObject Source { get; private set; }
 
-        public DamageData(float amount, GameObject source)
+        public DamageData(int amount, GameObject source)
         {
             Amount = amount;
             Source = source;
         }
         
-        public void SetAmount(float amount) => Amount = amount;
+        public void SetAmount(int amount) => Amount = amount;
     }
 }

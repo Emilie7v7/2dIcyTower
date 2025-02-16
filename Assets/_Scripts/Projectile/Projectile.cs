@@ -10,9 +10,11 @@ namespace _Scripts.Projectile
     {
         private bool _hasExploded;
         private Collider2D[] _results;
+        private Vector2 _spawnPosition;
 
         [field: SerializeField] public Transform DetectionPosition { get; private set; }
         [field: SerializeField] public ProjectileDataSo ProjectileData { get; private set; }
+        
         private Core _core;
         public Movement Movement { get; private set; }
 
@@ -24,14 +26,22 @@ namespace _Scripts.Projectile
             _results = new Collider2D[ProjectileData.maxHitsRayForProjectile];
         }
 
+
         private void Start()
         {
-            _hasExploded = false;
+            _spawnPosition = transform.position; // Save initial position
         }
 
         private void FixedUpdate()
         {
+            //ProjectileRaycastCheck();
             ProjectileHitDetection();
+
+            // Destroy projectile if it has traveled too far
+            if (Vector2.Distance(_spawnPosition, transform.position) >= ProjectileData.maxTravelDistance)
+            {
+                Destroy(gameObject);
+            }
         }
 
         private void ProjectileHitDetection()
@@ -62,6 +72,23 @@ namespace _Scripts.Projectile
                         break; // Stops loop after first valid collision
                     }
                 }
+            }
+        }
+        private void ProjectileRaycastCheck()
+        {
+            Vector2 position = transform.position;
+            Vector2 velocity = Movement.CurrentVelocity.normalized;
+            float distance = ProjectileData.projectileSpeed * Time.fixedDeltaTime; 
+
+            RaycastHit2D hit = Physics2D.Raycast(position, velocity, distance, ProjectileData.targetLayer);
+
+            if (hit.collider != null)
+            {
+                Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
+
+                _hasExploded = true;
+                Instantiate(ProjectileData.explosionPrefab, hit.point, Quaternion.identity);
+                Destroy(gameObject);
             }
         }
 

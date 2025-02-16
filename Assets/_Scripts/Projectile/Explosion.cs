@@ -44,19 +44,27 @@ namespace _Scripts.Projectile
                 {
                     var hit = _colliders[i];
 
-                    Debug.Log($"Collider Detected: {hit.gameObject.name}", hit.gameObject);
+                    //Debug.Log($"Collider Detected: {hit.gameObject.name}", hit.gameObject);
 
+                    // if (hit && hit.gameObject.CompareTag("Player"))
+                    // {
+                    //     var damageable = hit.GetComponentInChildren<IDamageable>();
+                    //     damageable?.Damage(new DamageData(explosionDataSo.explosionDamage, _core.Root));
+                    //     break;
+                    // }
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
-                        var damageable = hit.GetComponentInChildren<IDamageable>();
-                        damageable?.Damage(new DamageData(explosionDataSo.explosionDamage, _core.Root));
-                        break;
+                        var stats = hit.GetComponentInChildren<Stats>();
+                        if (stats != null)
+                        {
+                            stats.Health.DecreaseAmount(explosionDataSo.explosionDamage);
+                        }
                     }
 
                     if (hit && hit.gameObject.CompareTag("Enemy"))
                     {
                         var damageable = hit.GetComponentInChildren<IDamageable>();
-                        Debug.Log($"{hit.gameObject.name} damaged");
+                        //Debug.Log($"{hit.gameObject.name} damaged");
                         damageable?.Damage(new DamageData(explosionDataSo.explosionDamage, _core.Root));
                     }
                 }
@@ -74,7 +82,7 @@ namespace _Scripts.Projectile
         
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
-                        Debug.Log($"Player hit {hit.gameObject.name}");
+                        //Debug.Log($"Player hit {hit.gameObject.name}");
 
                         var rb = hit.GetComponent<Rigidbody2D>();
                         if (rb != null)
