@@ -137,14 +137,14 @@ namespace _Scripts.CoreSystem
                         
                         if (hit.collider.CompareTag("Player"))
                         {
-                            Debug.Log("Player detected at: " + hit.point);
-                            Debug.DrawLine(origin, hit.point, Color.green, 0.5f);
+                            //Debug.Log("Player detected at: " + hit.point);
+                            //Debug.DrawLine(origin, hit.point, Color.green, 0.5f);
                             return true;
                         }
                     }
                 }
             }
-            Debug.Log("Player not found");
+            //Debug.Log("Player not found");
             return false; // Player not detected
         }
 

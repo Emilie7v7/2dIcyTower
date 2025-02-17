@@ -7,7 +7,7 @@ namespace _Scripts.CoreSystem
 {
     public class Stats : CoreComponent
     {
-        [field: SerializeField] public Stat Health { get; private set; }
+        [field: SerializeField] public Stat Health { get; set; }
         private HealthUIManager _healthUIManager;
         private bool _isPlayer;
 

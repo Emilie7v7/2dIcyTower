@@ -11,7 +11,7 @@ namespace _Scripts.CoreSystem.StatSystem
         public event Action OnCurrentValueZero;
         public event Action OnValueChanged;
         
-        [field: SerializeField] public int MaxValue { get; private set; }
+        [field: SerializeField] public int MaxValue { get; set; }
 
 
         public int CurrentValue
