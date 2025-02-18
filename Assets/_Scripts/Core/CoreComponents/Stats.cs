@@ -1,5 +1,6 @@
 using System;
 using _Scripts.CoreSystem.StatSystem;
+using _Scripts.Managers.GameManager;
 using _Scripts.Managers.UI;
 using UnityEngine;
 
@@ -21,6 +22,9 @@ namespace _Scripts.CoreSystem
 
             if (_isPlayer)
             {
+                Health.MaxValue = GameManager.Instance.MaxHealth;
+                Health.Initialize();
+
                 _healthUIManager = FindObjectOfType<HealthUIManager>();
 
                 if (_healthUIManager != null)

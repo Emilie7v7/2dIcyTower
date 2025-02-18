@@ -15,7 +15,7 @@ namespace _Scripts.Managers.UI
 
         public void InitializeHealthUI(int startingMaxHealth, int startingHealth)
         {
-            _maxHealth = startingMaxHealth;
+            _maxHealth = GameManager.GameManager.Instance.MaxHealth;
             _currentHealth = startingHealth;
             UpdateHearts();
         }
@@ -23,12 +23,6 @@ namespace _Scripts.Managers.UI
         public void UpdateHealth(int newHealth)
         {
             _currentHealth = Mathf.Clamp(newHealth, 0, _maxHealth);
-            UpdateHearts();
-        }
-
-        public void IncreaseMaxHealth(int newMaxHealth)
-        {
-            _maxHealth = newMaxHealth;
             UpdateHearts();
         }
 

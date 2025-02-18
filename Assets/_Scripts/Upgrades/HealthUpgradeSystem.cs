@@ -1,8 +1,7 @@
 using _Scripts.CoreSystem;
-using _Scripts.CoreSystem.StatSystem;
+using _Scripts.Managers.GameManager;
 using _Scripts.Managers.UI;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.Upgrades
 {
@@ -11,33 +10,20 @@ namespace _Scripts.Upgrades
         [SerializeField] private int healthIncreaseAmount = 1; // Increase per upgrade
         [SerializeField] private int upgradeCost = 10; // Example currency cost
         [SerializeField] private int playerCoins; // Example currency
-        
-        [SerializeField] private Stats playerStats;
-        [SerializeField] private HealthUIManager healthUIManager;
+
+        private void Start()
+        {
+            Debug.Log("HealthUpgradeSystem Loaded: Max Health = " + GameManager.Instance.MaxHealth);
+            GameManager.Instance.AddCoins(playerCoins);
+        }
 
         public void UpgradeHealth()
         {
-            if (playerStats == null) return;
-    
-            if (playerCoins >= upgradeCost)
+            if (GameManager.Instance.TrySpendCoins(upgradeCost))
             {
-                playerCoins -= upgradeCost;
-
-                // Modify the existing Stat object instead of replacing it
-                playerStats.Health.MaxValue += healthIncreaseAmount;
-                playerStats.Health.Initialize(); // Reset health to new max
-
-                if (healthUIManager != null)
-                {
-                    healthUIManager.IncreaseMaxHealth(playerStats.Health.MaxValue);
-                    healthUIManager.UpdateHealth(playerStats.Health.CurrentValue); // Force refresh
-                }
+                GameManager.Instance.UpgradeMaxHealth(healthIncreaseAmount);
+                Debug.Log("Upgraded Health! New Max Health: " + GameManager.Instance.MaxHealth);
             }
-        }
-
-        public void AddCoins(int amount)
-        {
-            playerCoins += amount;
         }
     }
 }
