@@ -15,7 +15,7 @@ namespace _Scripts.Managers.UI
 
         public void InitializeHealthUI(int startingMaxHealth, int startingHealth)
         {
-            _maxHealth = GameManager.GameManager.Instance.MaxHealth;
+            _maxHealth = GameManager.GameManager.Instance.PlayerData.maxHealth;
             _currentHealth = startingHealth;
             UpdateHearts();
         }

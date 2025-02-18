@@ -13,7 +13,7 @@ namespace _Scripts.Upgrades
 
         private void Start()
         {
-            Debug.Log("HealthUpgradeSystem Loaded: Max Health = " + GameManager.Instance.MaxHealth);
+            Debug.Log("HealthUpgradeSystem Loaded: Max Health = " + GameManager.Instance.PlayerData.maxHealth);
             GameManager.Instance.AddCoins(playerCoins);
         }
 
@@ -22,7 +22,7 @@ namespace _Scripts.Upgrades
             if (GameManager.Instance.TrySpendCoins(upgradeCost))
             {
                 GameManager.Instance.UpgradeMaxHealth(healthIncreaseAmount);
-                Debug.Log("Upgraded Health! New Max Health: " + GameManager.Instance.MaxHealth);
+                Debug.Log("Upgraded Health! New Max Health: " + GameManager.Instance.PlayerData.maxHealth);
             }
         }
     }

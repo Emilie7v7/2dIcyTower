@@ -22,7 +22,7 @@ namespace _Scripts.CoreSystem
 
             if (_isPlayer)
             {
-                Health.MaxValue = GameManager.Instance.MaxHealth;
+                Health.MaxValue = GameManager.Instance.PlayerData.maxHealth;
                 Health.Initialize();
 
                 _healthUIManager = FindObjectOfType<HealthUIManager>();
