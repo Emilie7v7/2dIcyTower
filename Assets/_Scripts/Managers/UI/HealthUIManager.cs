@@ -8,42 +8,44 @@ namespace _Scripts.Managers.UI
     {
         [SerializeField] private GameObject healthPrefab;
         [SerializeField] private Transform healthContainer;
-        private List<GameObject> _hearts = new();
+        private readonly List<GameObject> _hearts = new();
 
         private int _maxHealth;
         private int _currentHealth;
 
         public void InitializeHealthUI(int startingMaxHealth, int startingHealth)
         {
-            _maxHealth = GameManager.GameManager.Instance.PlayerData.maxHealth;
-            _currentHealth = startingHealth;
-            UpdateHearts();
+            _maxHealth = startingMaxHealth; // 🔹 Correctly assign max health
+            _currentHealth = startingHealth; // 🔹 Correctly assign current health
+
+            RefreshUI();
         }
 
         public void UpdateHealth(int newHealth)
         {
             _currentHealth = Mathf.Clamp(newHealth, 0, _maxHealth);
-            UpdateHearts();
+            RefreshUI();
         }
 
-        private void UpdateHearts()
+        private void RefreshUI()
         {
-            //Remove excess hearts if reducing max health
-            while (_hearts.Count > _maxHealth)
-            {
-                Destroy(_hearts[^1]);
-                _hearts.RemoveAt(_hearts.Count - 1);
-            }
+            var heartCount = _hearts.Count;
             
-            //Add missing hearts if increasing max health
-            while (_hearts.Count < _maxHealth)
+            //Add missing hearts if max health increased
+            for (var i = heartCount; i < _maxHealth; i++)
             {
                 var newHeart = Instantiate(healthPrefab, healthContainer);
                 _hearts.Add(newHeart);
             }
             
-            //Update heart visuals based on current health
-            for (var i = 0; i < _hearts.Count; i++)
+            //Hide extra hearts if max health decreased
+            for (var i = _maxHealth; i < heartCount; i++)
+            {
+                _hearts[i].SetActive(false);
+            }
+            
+            //Update heart visibility based on current health
+            for (var i = 0; i < _maxHealth; i++)
             {
                 _hearts[i].GetComponent<Image>().enabled = (i < _currentHealth);
             }
