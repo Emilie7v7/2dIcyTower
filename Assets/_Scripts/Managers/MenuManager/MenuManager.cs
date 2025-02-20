@@ -10,6 +10,11 @@ namespace _Scripts.Managers.MenuManager
             SceneManager.LoadScene("EmScene");
         }
 
+        public void BackToMenu()
+        {
+            SceneManager.LoadScene("MenuScene");
+        }
+
         public void QuitGame()
         {
             Application.Quit();

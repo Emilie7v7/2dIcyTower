@@ -8,13 +8,15 @@ namespace _Scripts.Managers
 {
     public static class SaveSystem
     {
-        private static string SavePath => Application.persistentDataPath + "/playerdata.json";
+        public static string SavePath => Application.persistentDataPath + "/playerdata.json";
 
         public static void SaveData(PlayerData data)
         {
             var json = JsonUtility.ToJson(data, true);
             var compressedJson = CompressString(json);
             File.WriteAllText(SavePath, compressedJson);
+    
+            Debug.Log($"💾 Data Saved: Coins = {data.playerCoins}, Max Health = {data.maxHealth}, Upgrade Level = {data.healthUpgradeLevel}");
         }
     
         public static PlayerData LoadData()
@@ -25,31 +27,24 @@ namespace _Scripts.Managers
 
                 if (string.IsNullOrWhiteSpace(savedData))
                 {
-                    Debug.LogWarning("Save file is empty. Creating new default PlayerData.");
+                    Debug.LogWarning("⚠ Save file is empty. Creating new default PlayerData.");
                     return new PlayerData();
                 }
 
                 try
                 {
-                    //First, try decompressing it
                     var json = DecompressString(savedData);
+                    Debug.Log($"📥 Loaded Data: {json}");
                     return JsonUtility.FromJson<PlayerData>(json);
                 }
                 catch
                 {
-                    //If decompression fails, assume it's already plain JSON
-                    try
-                    {
-                        return JsonUtility.FromJson<PlayerData>(savedData);
-                    }
-                    catch
-                    {
-                        Debug.LogWarning("Save file is corrupted. Resetting to default.");
-                        return new PlayerData();
-                    }
+                    Debug.LogWarning("⚠ Save file corrupted or not compressed. Resetting to default.");
+                    return new PlayerData();
                 }
             }
-            Debug.Log("No Save File Found. Creating New Data.");
+
+            Debug.Log("⚠ No Save File Found. Creating New Data.");
             return new PlayerData();
         }
 
@@ -76,16 +71,29 @@ namespace _Scripts.Managers
             }
         }
 
+        // public static void DeleteData()
+        // {
+        //     if (File.Exists(SavePath))
+        //     {
+        //         File.Delete(SavePath);
+        //         Debug.Log("Save Data Deleted: " + SavePath);
+        //     }
+        //
+        //     //Immediately create a new default save to prevent issues
+        //     SaveData(new PlayerData());
+        // }
+        
         public static void DeleteData()
         {
             if (File.Exists(SavePath))
             {
                 File.Delete(SavePath);
-                Debug.Log("Save Data Deleted: " + SavePath);
+                Debug.Log("✅ Save Data File Deleted.");
             }
-
-            //Immediately create a new default save to prevent issues
-            SaveData(new PlayerData());
+            else
+            {
+                Debug.Log("⚠ No Save Data Found to Delete.");
+            }
         }
     
         /// <summary>
