@@ -65,7 +65,6 @@ namespace _Scripts.Managers.GameManager
             PlayerData = SaveSystem.LoadData();
         }
         
-        //For testing purposes will be either deleted later or kept as a setting for player to choose if they want to reset their Data
         public void ResetGameData()
         {
             SaveSystem.DeleteData();
