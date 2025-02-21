@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using _Scripts.JSON;
 using UnityEngine;
@@ -73,33 +74,43 @@ namespace _Scripts.Managers.GameManager
             }
             else
             {
-                Debug.Log("🚨 No Save File Found. Creating new PlayerData.");
                 PlayerData = new PlayerData();
                 SaveGameData();
             }
+
+            // Ensure the upgrade dictionary exists
+            if (PlayerData.UpgradeLevels == null)
+            {
+                PlayerData.UpgradeLevels = new Dictionary<string, int>();
+            }
+
+            // List of all upgrade types (Add new types here when needed)
+            var defaultUpgrades = new List<string> {"Health", "Magnet", "Explosion", "Multiplier", "Rocket", "Immortality"};
+
+            // Ensure all upgrades exist in the dictionary
+            foreach (var upgrade in defaultUpgrades)
+            {
+                if (!PlayerData.UpgradeLevels.ContainsKey(upgrade))
+                {
+                    PlayerData.UpgradeLevels[upgrade] = 0; // Set to default level
+                }
+            }
+
+            OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
         }
         
         public void ResetGameData()
         {
-            Debug.Log("🚨 RESETTING GAME DATA 🚨");
-
             SaveSystem.DeleteData(); // Step 1: Delete the save file
-            Debug.Log("✅ Save file deleted.");
-
             PlayerData = new PlayerData(); // Step 2: Create brand-new PlayerData
-            Debug.Log($"✅ New PlayerData created: Coins = {PlayerData.playerCoins}, Max Health = {PlayerData.maxHealth}, Upgrade Level = {PlayerData.healthUpgradeLevel}");
+            
+            Debug.Log($"New PlayerData created: Coins = {PlayerData.playerCoins}, Max Health = {PlayerData.maxHealth}, Upgrade Level = {PlayerData.UpgradeLevels.ContainsKey("Health")}");
 
             SaveGameData(); // Step 3: Save fresh new data
-            Debug.Log("✅ New data saved.");
-
             LoadGameData(); // Step 4: Ensure we are using the fresh save
-            Debug.Log($"✅ Data after reload: Coins = {PlayerData.playerCoins}, Max Health = {PlayerData.maxHealth}, Upgrade Level = {PlayerData.healthUpgradeLevel}");
 
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins); // Step 5: Update UI
-            Debug.Log("🔥 Game Data Reset Successfully!");
-
-            // Step 6: Reload the scene to clear all lingering references
-            //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            
         }
 
     }

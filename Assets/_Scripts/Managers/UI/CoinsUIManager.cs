@@ -15,7 +15,7 @@ namespace _Scripts.Managers.UI
 
         private void UpdateCoinText(int currentCoins)
         {
-            coinText.text = $"Coins: {GameManager.GameManager.Instance.PlayerData.playerCoins}";
+            coinText.text = GameManager.GameManager.Instance.PlayerData.playerCoins.ToString();
         }
 
         private void OnDestroy()

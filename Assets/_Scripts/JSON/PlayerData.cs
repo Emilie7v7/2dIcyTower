@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine.Serialization;
 
 namespace _Scripts.JSON
@@ -8,13 +9,19 @@ namespace _Scripts.JSON
     {
         public int playerCoins;
         public int maxHealth;
-        public int healthUpgradeLevel;
+        public int magnetRange; // New stat
+        public Dictionary<string, int> UpgradeLevels;
 
         public PlayerData()
         {
             playerCoins = 0;
             maxHealth = 3;
-            healthUpgradeLevel = 0;
+            magnetRange = 0; // Default magnet range
+            UpgradeLevels = new Dictionary<string, int>
+            {
+                { "Health", 0 },
+                { "Magnet", 0 }
+            };
         }
     }
 }

@@ -2,6 +2,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using _Scripts.JSON;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace _Scripts.Managers
@@ -12,11 +13,11 @@ namespace _Scripts.Managers
 
         public static void SaveData(PlayerData data)
         {
-            var json = JsonUtility.ToJson(data, true);
+            var json = JsonConvert.SerializeObject(data, Formatting.Indented);
             var compressedJson = CompressString(json);
             File.WriteAllText(SavePath, compressedJson);
-    
-            Debug.Log($"💾 Data Saved: Coins = {data.playerCoins}, Max Health = {data.maxHealth}, Upgrade Level = {data.healthUpgradeLevel}");
+
+            Debug.Log($"Data Saved (Compressed): {compressedJson}");
         }
     
         public static PlayerData LoadData()
@@ -25,26 +26,19 @@ namespace _Scripts.Managers
             {
                 var savedData = File.ReadAllText(SavePath);
 
-                if (string.IsNullOrWhiteSpace(savedData))
-                {
-                    Debug.LogWarning("⚠ Save file is empty. Creating new default PlayerData.");
-                    return new PlayerData();
-                }
-
                 try
                 {
                     var json = DecompressString(savedData);
-                    Debug.Log($"📥 Loaded Data: {json}");
-                    return JsonUtility.FromJson<PlayerData>(json);
+                    return JsonConvert.DeserializeObject<PlayerData>(json) ?? new PlayerData();
                 }
                 catch
                 {
-                    Debug.LogWarning("⚠ Save file corrupted or not compressed. Resetting to default.");
+                    Debug.LogWarning("Save file might be corrupted or already decompressed. Resetting to default.");
                     return new PlayerData();
                 }
             }
 
-            Debug.Log("⚠ No Save File Found. Creating New Data.");
+            Debug.Log("No Save File Found. Creating New Data.");
             return new PlayerData();
         }
 
@@ -88,16 +82,16 @@ namespace _Scripts.Managers
             if (File.Exists(SavePath))
             {
                 File.Delete(SavePath);
-                Debug.Log("✅ Save Data File Deleted.");
+                Debug.Log("Save Data File Deleted.");
             }
             else
             {
-                Debug.Log("⚠ No Save Data Found to Delete.");
+                Debug.Log("No Save Data Found to Delete.");
             }
         }
     
         /// <summary>
-        /// Function that can be used for debugging, because right now the save file JSON is saved as encoded file so its not readable for person
+        /// Function that can be used for debugging, because right now the save file JSON is saved as encoded file so it is not readable for person
         /// </summary>
         /// <returns></returns>
         public static string GetReadableSaveData()
