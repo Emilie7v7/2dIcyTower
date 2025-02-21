@@ -48,7 +48,7 @@ namespace _Scripts.Upgrades
         private void UpdateUpgradeUI(int currentCoins)
         {
             var upgradeCost = CalculateUpgradeCost();
-            upgradeCostText.text = $"Cost: {upgradeCost} Coins";
+            upgradeCostText.text = upgradeCost.ToString();
         }
 
         private void OnDestroy()
