@@ -11,6 +11,10 @@ namespace _Scripts.JSON
         public int maxHealth;
         public int magnetRange; // New stat
         public Dictionary<string, int> UpgradeLevels;
+        public int killstreakMultiplier;
+        public int rocketBoostSpeed;
+        public int explosionRadius;
+        public int immortalityDuration;
 
         public PlayerData()
         {

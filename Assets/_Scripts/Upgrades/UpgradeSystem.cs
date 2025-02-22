@@ -12,6 +12,10 @@ namespace _Scripts.Upgrades
         [SerializeField] private int increaseAmount = 1; // Increase per upgrade
         [SerializeField] private int baseUpgradeCost = 10; // Base cost
         [SerializeField] private int maxUpgradeLevel = 7; // Max level for this upgrade
+        [SerializeField] private int killstreakMultiplier = 1; // Example: 2x killstreak multiplier
+        [SerializeField] private int rocketBoostSpeed = 1; // Example: 10% rocket boost speed
+        [SerializeField] private int explosionRadius = 1;
+        [SerializeField] float immortalityDuration = 0f;
 
         [SerializeField] private TMP_Text upgradeCostText; // UI Text for cost
         [SerializeField] private Slider upgradeLevelSlider; // UI Slider for upgrade level
@@ -102,6 +106,22 @@ namespace _Scripts.Upgrades
             
                 case "Magnet":
                     GameManager.Instance.PlayerData.magnetRange += increaseAmount; // Example: Magnet range increase
+                    break;
+                
+                case "Killstreak":
+                    GameManager.Instance.PlayerData.killstreakMultiplier += increaseAmount; // Add killstreak multiplier logic
+                    break;
+                
+                case "RocketBoost":
+                    GameManager.Instance.PlayerData.rocketBoostSpeed += increaseAmount; // Adds to player's rocket boost speed
+                    break;
+                
+                case "ExplosionRadius":
+                    GameManager.Instance.PlayerData.explosionRadius += increaseAmount; // Add explosion radius upgrade logic
+                    break;
+                
+                case "Immortality":
+                    GameManager.Instance.PlayerData.immortalityDuration += increaseAmount; // Increase immortality duration
                     break;
             
                 default:
