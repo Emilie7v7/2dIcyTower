@@ -9,17 +9,18 @@ namespace _Scripts.JSON
     {
         public int playerCoins;
         public int maxHealth;
+        public int explosionRadiusBonus;
         public int magnetRange; // New stat
-        public Dictionary<string, int> UpgradeLevels;
         public int killstreakMultiplier;
         public int rocketBoostSpeed;
-        public int explosionRadius;
         public int immortalityDuration;
+        public Dictionary<string, int> UpgradeLevels;
 
         public PlayerData()
         {
             playerCoins = 0;
             maxHealth = 3;
+            explosionRadiusBonus = 1;
             magnetRange = 0; // Default magnet range
             UpgradeLevels = new Dictionary<string, int>
             {

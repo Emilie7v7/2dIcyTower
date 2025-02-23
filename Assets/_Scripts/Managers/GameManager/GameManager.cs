@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using _Scripts.JSON;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 
 namespace _Scripts.Managers.GameManager
@@ -61,6 +62,22 @@ namespace _Scripts.Managers.GameManager
             }
         }
 
+        public void UpgradeMaxExplosionRadius(int amount)
+        {
+            if (PlayerData.explosionRadiusBonus < 10)
+            {
+                PlayerData.explosionRadiusBonus += amount;
+                SaveGameData();
+                Debug.Log($"Max Explosion Radius Upgraded: {PlayerData.explosionRadiusBonus}/10");
+            }
+            else
+            {
+                Debug.Log("Max Radius already at the limit");
+            }
+        }
+        
+        #region Game Data
+        
         public void SaveGameData()
         {
             SaveSystem.SaveData(PlayerData);
@@ -112,6 +129,6 @@ namespace _Scripts.Managers.GameManager
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins); // Step 5: Update UI
             
         }
-
+        #endregion
     }
 }

@@ -12,10 +12,6 @@ namespace _Scripts.Upgrades
         [SerializeField] private int increaseAmount = 1; // Increase per upgrade
         [SerializeField] private int baseUpgradeCost = 10; // Base cost
         [SerializeField] private int maxUpgradeLevel = 7; // Max level for this upgrade
-        [SerializeField] private int killstreakMultiplier = 1; // Example: 2x killstreak multiplier
-        [SerializeField] private int rocketBoostSpeed = 1; // Example: 10% rocket boost speed
-        [SerializeField] private int explosionRadius = 1;
-        [SerializeField] float immortalityDuration = 0f;
 
         [SerializeField] private TMP_Text upgradeCostText; // UI Text for cost
         [SerializeField] private Slider upgradeLevelSlider; // UI Slider for upgrade level
@@ -24,7 +20,7 @@ namespace _Scripts.Upgrades
 
         private void Start()
         {
-            // Ensure upgrade exists in dictionary
+            //Ensure upgrade exists in dictionary
             GameManager.Instance.PlayerData.UpgradeLevels.TryAdd(upgradeType, 0);
 
             upgradeLevelSlider.maxValue = maxUpgradeLevel;
@@ -32,7 +28,7 @@ namespace _Scripts.Upgrades
 
             UpdateUpgradeUI(GameManager.Instance.PlayerData.playerCoins);
     
-            // ✅ Subscribe using a named method (no anonymous lambda)
+            //Subscribe using a named method (no anonymous lambda)
             GameManager.Instance.OnCoinsUpdated += UpdateUpgradeUI;
         }
 
@@ -103,6 +99,10 @@ namespace _Scripts.Upgrades
                 case "Health":
                     GameManager.Instance.UpgradeMaxHealth(increaseAmount); // Increases max health
                     break;
+                
+                case "ExplosionRadius":
+                    GameManager.Instance.UpgradeMaxExplosionRadius(increaseAmount); // Add explosion radius upgrade logic
+                    break;
             
                 case "Magnet":
                     GameManager.Instance.PlayerData.magnetRange += increaseAmount; // Example: Magnet range increase
@@ -114,10 +114,6 @@ namespace _Scripts.Upgrades
                 
                 case "RocketBoost":
                     GameManager.Instance.PlayerData.rocketBoostSpeed += increaseAmount; // Adds to player's rocket boost speed
-                    break;
-                
-                case "ExplosionRadius":
-                    GameManager.Instance.PlayerData.explosionRadius += increaseAmount; // Add explosion radius upgrade logic
                     break;
                 
                 case "Immortality":
