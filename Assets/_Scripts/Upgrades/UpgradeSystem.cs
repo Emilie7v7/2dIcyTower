@@ -105,7 +105,7 @@ namespace _Scripts.Upgrades
                     break;
             
                 case "Magnet":
-                    GameManager.Instance.PlayerData.magnetRange += increaseAmount; // Example: Magnet range increase
+                    GameManager.Instance.UpgradeMagnetDuration(increaseAmount); // Example: Magnet range increase
                     break;
                 
                 case "Killstreak":

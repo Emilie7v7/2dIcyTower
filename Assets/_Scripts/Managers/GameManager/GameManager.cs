@@ -75,6 +75,20 @@ namespace _Scripts.Managers.GameManager
                 Debug.Log("Max Radius already at the limit");
             }
         }
+
+        public void UpgradeMagnetDuration(int amount)
+        {
+            if (PlayerData.magnetDuration < 10)
+            {
+                PlayerData.magnetDuration += amount;
+                SaveGameData();
+                Debug.Log($"Magnet Duration Upgraded: {PlayerData.magnetDuration}/10");
+            }
+            else
+            {
+                Debug.Log("Magnet Duration already at the limit");
+            }
+        }
         
         #region Game Data
         

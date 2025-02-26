@@ -10,7 +10,7 @@ namespace _Scripts.JSON
         public int playerCoins;
         public int maxHealth;
         public int explosionRadiusBonus;
-        public int magnetRange; // New stat
+        public int magnetDuration;
         public int killstreakMultiplier;
         public int rocketBoostSpeed;
         public int immortalityDuration;
@@ -21,7 +21,7 @@ namespace _Scripts.JSON
             playerCoins = 0;
             maxHealth = 3;
             explosionRadiusBonus = 1;
-            magnetRange = 0; // Default magnet range
+            magnetDuration = 5;
             UpgradeLevels = new Dictionary<string, int>
             {
                 { "Health", 0 },

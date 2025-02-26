@@ -40,7 +40,7 @@ namespace _Scripts.Projectile
             if (isPlayerExplosion && GameManager.Instance?.PlayerData != null)
             {
                 effectiveRadius += GameManager.Instance.PlayerData.explosionRadiusBonus;
-                Debug.Log("Player Explosion Radius is: " + effectiveRadius);
+                //Debug.Log("Player Explosion Radius is: " + effectiveRadius);
             }
 
             // Detect colliders for damage application
