@@ -7,7 +7,8 @@ namespace _Scripts.Pickups
 {
     public class MagnetPickup : MonoBehaviour
     {
-        [SerializeField] private float magnetRange = 5f; // Static range, doesn't change
+        [SerializeField] private float horizontalMagnetRange = 300f; // Wider horizontal range
+        [SerializeField] private float verticalMagnetRange = 50f; // Shorter vertical range
         private float _magnetDuration; // Will be fetched from PlayerData
         private bool _isMagnetActive = false;
         private Transform _player;
@@ -56,26 +57,34 @@ namespace _Scripts.Pickups
         }
 
         private void PullCoinsTowardsPlayer()
-        {
-            var hitColliders = Physics2D.OverlapCircleAll(_player.position, magnetRange);
+{
+    var hitColliders = Physics2D.OverlapBoxAll(_player.position, new Vector2(horizontalMagnetRange, verticalMagnetRange), 0f);
 
-            foreach (var colliders in hitColliders)
-            {
-                if (colliders.CompareTag("Coin"))
-                {
-                    var coinTransform = colliders.transform;
-                    var direction = (_player.position - coinTransform.position).normalized;
-            
-                    const float pullSpeed = 10f; // Adjust speed as needed
-                    coinTransform.position += pullSpeed * Time.deltaTime * direction;
-                }
-            }
-        }
+    foreach (var colliders in hitColliders)
+{
+    if (colliders.CompareTag("Coin"))
+{
+    var coinTransform = colliders.transform;
+    var direction = (_player.position - coinTransform.position).normalized;
+    float distance = Vector3.Distance(_player.position, coinTransform.position);
 
-        private void OnDrawGizmosSelected()
-        {
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(transform.position, magnetRange);
-        }
+    // Normalized distance (0 = near player, 1 = far from player)
+    float t = Mathf.Clamp01(1 - (distance / horizontalMagnetRange));
+
+    // Ease-in, ease-out using cosine
+    const float maxPullSpeed = 80f; // Maximum pull speed
+    float smoothPullSpeed = maxPullSpeed * (0.5f * (1 - Mathf.Cos(t * Mathf.PI)));
+
+    // Apply pull movement
+    coinTransform.position += smoothPullSpeed * Time.deltaTime * direction;
+}
+}
+}
+
+private void OnDrawGizmosSelected()
+{
+    Gizmos.color = Color.yellow;
+    Gizmos.DrawWireCube(transform.position, new Vector3(horizontalMagnetRange, verticalMagnetRange, 0f));
+}
     }
 }
