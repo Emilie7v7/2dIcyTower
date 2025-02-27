@@ -1,16 +1,15 @@
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ScriptableObjects.EntityData;
-using UnityEngine;
 
 namespace _Scripts.Entities.EntitySpecific
 {
-    public class E1_PlayerDetectedState : EntityPlayerDetectedState
+    public class E1PlayerDetectedState : EntityPlayerDetectedState
     {
-        private Entity1 enemy;
+        private Entity1 _enemy;
     
-        public E1_PlayerDetectedState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
+        public E1PlayerDetectedState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
         {
-            this.enemy = enemy;
+            this._enemy = enemy;
         }
 
         public override void Enter()
@@ -26,11 +25,11 @@ namespace _Scripts.Entities.EntitySpecific
 
             if (PerformLongRangeAction)
             {
-                StateMachine.ChangeState(enemy.LongRangeAttackState);
+                StateMachine.ChangeState(_enemy.LongRangeAttackState);
             }
             else if (!IsPlayerInLineOfSight)
             {
-                StateMachine.ChangeState(enemy.IdleState);
+                StateMachine.ChangeState(_enemy.IdleState);
             }
         }
     }

@@ -1,8 +1,5 @@
-using System;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
-using _Scripts.Managers.GameManager;
 
 namespace _Scripts.Managers.UI
 {

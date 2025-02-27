@@ -1,4 +1,3 @@
-using _Scripts.CoreSystem;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;

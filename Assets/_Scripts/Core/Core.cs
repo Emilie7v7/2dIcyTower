@@ -8,7 +8,7 @@ namespace _Scripts.CoreSystem
     {
         [field: SerializeField] public GameObject Root { get; private set; }
     
-        private readonly List<CoreComponent> coreComponents = new List<CoreComponent>();
+        private readonly List<CoreComponent> _coreComponents = new List<CoreComponent>();
 
         private void Awake()
         {
@@ -17,7 +17,7 @@ namespace _Scripts.CoreSystem
 
         public void LogicUpdate()
         {
-            foreach (var component in coreComponents)
+            foreach (var component in _coreComponents)
             {
                 component.LogicUpdate();
             }
@@ -25,9 +25,9 @@ namespace _Scripts.CoreSystem
 
         public void AddComponent(CoreComponent component)
         {
-            if (!coreComponents.Contains(component))
+            if (!_coreComponents.Contains(component))
             {
-                coreComponents.Add(component);
+                _coreComponents.Add(component);
             }
         }
     
@@ -37,7 +37,7 @@ namespace _Scripts.CoreSystem
 
         public T GetCoreComponent<T>() where T : CoreComponent
         {
-            var component = coreComponents.OfType<T>().FirstOrDefault();
+            var component = _coreComponents.OfType<T>().FirstOrDefault();
 
             if (component) return component;
 

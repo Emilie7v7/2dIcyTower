@@ -1,6 +1,4 @@
 using _Scripts.Generics;
-using UnityEditor;
-using UnityEditor.TerrainTools;
 using UnityEngine;
 
 namespace _Scripts.CoreSystem

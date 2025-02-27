@@ -1,5 +1,4 @@
 using System;
-using _Scripts.Managers.UI;
 using UnityEngine;
 
 namespace _Scripts.CoreSystem.StatSystem

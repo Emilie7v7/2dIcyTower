@@ -1,4 +1,4 @@
-using System;
+using System.Collections;
 using _Scripts.CoreSystem.StatSystem;
 using _Scripts.Managers.GameManager;
 using _Scripts.Managers.UI;
@@ -11,6 +11,8 @@ namespace _Scripts.CoreSystem
         [field: SerializeField] public Stat Health { get; set; }
         private HealthUIManager _healthUIManager;
         private bool _isPlayer;
+
+        public bool IsImmortal { get; private set; } = false;
 
         protected override void Awake()
         {
@@ -34,9 +36,32 @@ namespace _Scripts.CoreSystem
                 
                 //Only subscribe the UI update for Player
                 Health.OnValueChanged += UpdateHealthUI;
+                Health.OnCurrentValueZero += SaveDataUponDeath;
             }
         }
 
+        public void ActivateImmortality(float duration)
+        {
+            StartCoroutine(ImmortalityCoroutine(duration));
+        }
+        
+        private IEnumerator ImmortalityCoroutine(float duration)
+        {
+            var elapsedTime = 0f;
+
+            while (elapsedTime < duration)
+            {
+                IsImmortal = true;
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            IsImmortal = false;
+        }
+        
+        private static void SaveDataUponDeath()
+        {
+            GameManager.Instance.SaveGameData();
+        }
         private void UpdateHealthUI()
         {
             if (_healthUIManager != null && _isPlayer)

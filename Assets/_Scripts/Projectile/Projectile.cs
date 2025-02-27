@@ -1,5 +1,3 @@
-using System;
-using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
 using _Scripts.ScriptableObjects.ProjectileData;
 using UnityEngine;

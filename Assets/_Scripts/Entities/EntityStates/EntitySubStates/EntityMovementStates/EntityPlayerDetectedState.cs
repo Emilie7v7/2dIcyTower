@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using _Scripts.CoreSystem;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ScriptableObjects.EntityData;

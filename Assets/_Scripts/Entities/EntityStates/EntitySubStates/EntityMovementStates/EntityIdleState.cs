@@ -46,7 +46,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates
             }
             else
             {
-                Movement?.SetVelocityY(Movement.R2BD.velocity.y);
+                Movement?.SetVelocityY(Movement.Rb2D.velocity.y);
             }
 
             if (Time.time >= StartTime + _idleTime)

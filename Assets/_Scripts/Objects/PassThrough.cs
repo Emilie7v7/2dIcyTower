@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using _Scripts.PlayerComponent;
 using UnityEngine;
 
@@ -8,14 +6,14 @@ namespace Scripts.Objects.PassTroughPlatform
 {
     public class PassThrough : MonoBehaviour
     {
-        private new Collider2D collider2D;
+        private Collider2D _collider2D;
         private bool _isPlayerOnPlatform;
 
         private Player _player;
 
         private void Awake()
         {
-            collider2D = GetComponent<Collider2D>();
+            _collider2D = GetComponent<Collider2D>();
         }
 
         private void Update()
@@ -23,7 +21,7 @@ namespace Scripts.Objects.PassTroughPlatform
             if(_player == null) return;
             if (_isPlayerOnPlatform && _player.InputHandler.NormInputY == -1)
             {
-                collider2D.enabled = false;
+                _collider2D.enabled = false;
                 StartCoroutine(EnableCollider());
             }
         }
@@ -31,7 +29,7 @@ namespace Scripts.Objects.PassTroughPlatform
         private IEnumerator EnableCollider()
         {
             yield return new WaitForSecondsRealtime(0.5f);
-            collider2D.enabled = true;
+            _collider2D.enabled = true;
         }
 
 

@@ -1,7 +1,6 @@
 using _Scripts.CoreSystem;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
-using UnityEngine;
 
 namespace _Scripts.Player.Player_States.SuperStates
 {
@@ -34,7 +33,7 @@ namespace _Scripts.Player.Player_States.SuperStates
         {
             base.Enter();
 
-            _startingYPosition = Movement.R2BD.position.y; // Store the height at the moment of throwing
+            _startingYPosition = Movement.Rb2D.position.y; // Store the height at the moment of throwing
             Player.WasThrowingInAir = !_isGrounded; // **Mark whether the player was in air when throwing**
         }
 

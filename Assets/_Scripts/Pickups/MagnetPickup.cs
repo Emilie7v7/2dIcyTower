@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using _Scripts.Managers.GameManager;
 using UnityEngine;
@@ -57,34 +56,26 @@ namespace _Scripts.Pickups
         }
 
         private void PullCoinsTowardsPlayer()
-{
-    var hitColliders = Physics2D.OverlapBoxAll(_player.position, new Vector2(horizontalMagnetRange, verticalMagnetRange), 0f);
+        {
+            var hitColliders = Physics2D.OverlapBoxAll(transform.position, new Vector2(horizontalMagnetRange, verticalMagnetRange), 0f);
 
-    foreach (var colliders in hitColliders)
-{
-    if (colliders.CompareTag("Coin"))
-{
-    var coinTransform = colliders.transform;
-    var direction = (_player.position - coinTransform.position).normalized;
-    float distance = Vector3.Distance(_player.position, coinTransform.position);
+            foreach (var colliders in hitColliders)
+            {
+                if (colliders.CompareTag("Coin"))
+                {
+                    var coinScript = colliders.GetComponent<CoinPickup>();
+                    if (coinScript != null)
+                    {
+                        coinScript.StartPulling();
+                    }
+                }
+            }
+        }
 
-    // Normalized distance (0 = near player, 1 = far from player)
-    float t = Mathf.Clamp01(1 - (distance / horizontalMagnetRange));
-
-    // Ease-in, ease-out using cosine
-    const float maxPullSpeed = 80f; // Maximum pull speed
-    float smoothPullSpeed = maxPullSpeed * (0.5f * (1 - Mathf.Cos(t * Mathf.PI)));
-
-    // Apply pull movement
-    coinTransform.position += smoothPullSpeed * Time.deltaTime * direction;
-}
-}
-}
-
-private void OnDrawGizmosSelected()
-{
-    Gizmos.color = Color.yellow;
-    Gizmos.DrawWireCube(transform.position, new Vector3(horizontalMagnetRange, verticalMagnetRange, 0f));
-}
+        private void OnDrawGizmosSelected()
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawWireCube(transform.position, new Vector3(horizontalMagnetRange, verticalMagnetRange, 0f));
+        }
     }
 }

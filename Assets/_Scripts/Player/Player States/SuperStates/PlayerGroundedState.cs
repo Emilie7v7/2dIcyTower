@@ -1,7 +1,6 @@
 using _Scripts.CoreSystem;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
-using UnityEngine;
 
 namespace _Scripts.Player.Player_States.SuperStates
 {
@@ -61,8 +60,8 @@ namespace _Scripts.Player.Player_States.SuperStates
         {
             if (Movement != null)
             {
-                Movement.R2BD.gravityScale = PlayerData.defaultGravityScale; // Reset gravity scale
-                Movement.R2BD.drag = 0f; // Reset drag
+                Movement.Rb2D.gravityScale = PlayerData.defaultGravityScale; // Reset gravity scale
+                Movement.Rb2D.drag = 0f; // Reset drag
             }
         }
     }

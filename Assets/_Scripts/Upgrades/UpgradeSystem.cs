@@ -2,12 +2,12 @@ using UnityEngine;
 using TMPro;
 using _Scripts.Managers.GameManager;
 using UnityEngine.UI;
-using System.Collections.Generic;
 
 namespace _Scripts.Upgrades
 {
     public class UpgradeSystem : MonoBehaviour
     {
+        private static readonly int NotEnoughCoins = Animator.StringToHash("notEnoughCoins");
         [SerializeField] private string upgradeType; // Example: "Health", "Magnet", "Speed"
         [SerializeField] private int increaseAmount = 1; // Increase per upgrade
         [SerializeField] private int baseUpgradeCost = 10; // Base cost
@@ -16,7 +16,7 @@ namespace _Scripts.Upgrades
         [SerializeField] private TMP_Text upgradeCostText; // UI Text for cost
         [SerializeField] private Slider upgradeLevelSlider; // UI Slider for upgrade level
         [SerializeField] private Button upgradeButton; // UI Button for upgrading
-        [SerializeField] private TMP_Text warningText; // Warning message
+        [SerializeField] private GameObject warningTextTest; // Warning message
 
         private void Start()
         {
@@ -40,7 +40,6 @@ namespace _Scripts.Upgrades
 
             if (upgradeLevel >= maxUpgradeLevel)
             {
-                ShowWarning($"{upgradeType} upgrade is already maxed out!");
                 return;
             }
 
@@ -48,7 +47,7 @@ namespace _Scripts.Upgrades
 
             if (GameManager.Instance.PlayerData.playerCoins < upgradeCost)
             {
-                ShowWarning("Not enough coins to upgrade!");
+                ShowWarning();
                 return;
             }
 
@@ -101,23 +100,23 @@ namespace _Scripts.Upgrades
                     break;
                 
                 case "ExplosionRadius":
-                    GameManager.Instance.UpgradeMaxExplosionRadius(increaseAmount); // Add explosion radius upgrade logic
+                    GameManager.Instance.UpgradeMaxExplosionRadius(increaseAmount); // Explosion radius upgrade
                     break;
             
                 case "Magnet":
-                    GameManager.Instance.UpgradeMagnetDuration(increaseAmount); // Example: Magnet range increase
+                    GameManager.Instance.UpgradeMagnetDuration(increaseAmount); // Magnet duration upgrade
                     break;
                 
                 case "Killstreak":
-                    GameManager.Instance.PlayerData.killstreakMultiplier += increaseAmount; // Add killstreak multiplier logic
+                    GameManager.Instance.PlayerData.killstreakMultiplier += increaseAmount; // Killstreak multiplier upgrade
                     break;
                 
                 case "RocketBoost":
-                    GameManager.Instance.PlayerData.rocketBoostSpeed += increaseAmount; // Adds to player's rocket boost speed
+                    GameManager.Instance.UpgradeRocketDuration(increaseAmount); // Rocket boost duration upgrade
                     break;
                 
                 case "Immortality":
-                    GameManager.Instance.PlayerData.immortalityDuration += increaseAmount; // Increase immortality duration
+                    GameManager.Instance.UpgradeImmortalityDuration(increaseAmount); // Immortality duration upgrade
                     break;
             
                 default:
@@ -125,16 +124,10 @@ namespace _Scripts.Upgrades
                     break;
             }
         }
-        private void ShowWarning(string message)
+        private void ShowWarning()
         {
-            warningText.text = message;
-            warningText.gameObject.SetActive(true);
-            Invoke(nameof(HideWarning), 1.5f);
-        }
-
-        private void HideWarning()
-        {
-            warningText.gameObject.SetActive(false);
+            var coinAnimator = warningTextTest.gameObject.GetComponent<Animator>();
+            coinAnimator.SetBool(NotEnoughCoins, true);
         }
 
         private void OnDestroy()

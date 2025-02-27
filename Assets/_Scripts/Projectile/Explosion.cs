@@ -1,6 +1,5 @@
 using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
-using _Scripts.JSON;
 using _Scripts.Managers.GameManager;
 using _Scripts.ScriptableObjects.ExplosionData;
 using UnityEngine;
@@ -59,7 +58,7 @@ namespace _Scripts.Projectile
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
                         var stats = hit.GetComponentInChildren<Stats>();
-                        if (stats != null)
+                        if (stats != null && !stats.IsImmortal)
                         {
                             stats.Health.DecreaseAmount(explosionDataSo.explosionDamage);
                         }

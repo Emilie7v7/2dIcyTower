@@ -1,5 +1,3 @@
-using System;
-using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -19,6 +17,7 @@ namespace _Scripts.InputHandler
         public int NormInputY { get; private set; }
 
         public bool ThrowInput { get; private set; }
+        public bool CanThrow { get; set; } = true;
 
         private void Start()
         {
@@ -37,13 +36,16 @@ namespace _Scripts.InputHandler
 
         public void SetThrow(InputAction.CallbackContext ctx)
         {
-            if (ctx.started)
+            if (CanThrow)
             {
-                ThrowInput = true;
-            }
-            if (ctx.canceled)
-            {
-                ThrowInput = false;
+                if (ctx.started)
+                {
+                    ThrowInput = true;
+                }
+                if (ctx.canceled)
+                {
+                    ThrowInput = false;
+                }
             }
         }
 

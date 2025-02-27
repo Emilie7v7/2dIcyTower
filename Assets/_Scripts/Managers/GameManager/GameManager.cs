@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using _Scripts.JSON;
 using UnityEngine;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 
 namespace _Scripts.Managers.GameManager
 {
@@ -33,7 +31,6 @@ namespace _Scripts.Managers.GameManager
         {
             PlayerData.playerCoins += amount;
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
-            SaveGameData();
         }
 
         public bool TrySpendCoins(int cost)
@@ -87,6 +84,34 @@ namespace _Scripts.Managers.GameManager
             else
             {
                 Debug.Log("Magnet Duration already at the limit");
+            }
+        }
+
+        public void UpgradeRocketDuration(int amount)
+        {
+            if (PlayerData.rocketBoostDuration < 10)
+            {
+                PlayerData.rocketBoostDuration += amount;
+                SaveGameData();
+                Debug.Log($"Rocket Boost Duration Upgraded: {PlayerData.rocketBoostDuration}/10");
+            }
+            else
+            {
+                Debug.Log("Rocket Boost Duration already at the limit");
+            }
+        }
+
+        public void UpgradeImmortalityDuration(int amount)
+        {
+            if (PlayerData.immortalityDuration < 20)
+            {
+                PlayerData.immortalityDuration += amount;
+                SaveGameData();
+                Debug.Log($"Immortality Duration Upgraded: {PlayerData.immortalityDuration}/10");
+            }
+            else
+            {
+                Debug.Log("Immortality Duration already at the limit");
             }
         }
         

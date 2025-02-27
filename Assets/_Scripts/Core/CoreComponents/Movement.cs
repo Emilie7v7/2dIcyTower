@@ -4,7 +4,7 @@ namespace _Scripts.CoreSystem
 {
     public class Movement : CoreComponent
     {
-        public Rigidbody2D R2BD  { get; private set; }
+        public Rigidbody2D Rb2D  { get; private set; }
         
         public int FacingDirection { get; private set; }
         
@@ -18,7 +18,7 @@ namespace _Scripts.CoreSystem
         {
             base.Awake();
 
-            R2BD = GetComponentInParent<Rigidbody2D>();
+            Rb2D = GetComponentInParent<Rigidbody2D>();
 
             FacingDirection = 1;
             
@@ -27,7 +27,7 @@ namespace _Scripts.CoreSystem
 
         public override void LogicUpdate()
         {
-            CurrentVelocity = R2BD.velocity;
+            CurrentVelocity = Rb2D.velocity;
         }
 
         #region Set Velocity
@@ -65,20 +65,20 @@ namespace _Scripts.CoreSystem
 
         public void LaunchProjectile(Vector2 direction, float force)
         {
-            if (R2BD == null) return;
+            if (Rb2D == null) return;
 
             // Ensure the direction is normalized
             direction = direction.normalized;
 
             // Apply a force in the given direction with impulse mode
-            R2BD.velocity = Vector2.zero; // Reset velocity to avoid accumulation
-            R2BD.AddForce(direction * force, ForceMode2D.Impulse);
+            Rb2D.velocity = Vector2.zero; // Reset velocity to avoid accumulation
+            Rb2D.AddForce(direction * force, ForceMode2D.Impulse);
             //Debug.Log($"Projectile launched with force: {force}, direction: {direction}");
         }
         private void SetFinalVelocity()
         {
             if(!CanSetVelocity) return;
-            R2BD.velocity = _workspace;
+            Rb2D.velocity = _workspace;
             CurrentVelocity = _workspace;
         }
         
@@ -86,7 +86,7 @@ namespace _Scripts.CoreSystem
         {
             //Flips a sprite of a Player or an Entity whether they hit a detection for a flip
             FacingDirection *= -1;
-            R2BD.transform.Rotate(0f, 180f, 0f);
+            Rb2D.transform.Rotate(0f, 180f, 0f);
         }
 
         public void CheckIfShouldFlip(int xInput)

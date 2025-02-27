@@ -1,24 +1,22 @@
 using _Scripts.Entities.EntityStateMachine;
-using _Scripts.ScriptableObjects.ProjectileData;
-using UnityEngine;
 
 namespace _Scripts.Entities.EntitySpecific
 {
     public class Entity1 : Entity
     {
-        public E1_IdleState IdleState { get; private set; }
-        public E1_MoveState MoveState { get; private set; }
-        public E1_PlayerDetectedState PlayerDetectedState { get; private set; }
-        public E1_LongRangeAttackState LongRangeAttackState { get; private set; }
+        public E1IdleState IdleState { get; private set; }
+        public E1MoveState MoveState { get; private set; }
+        public E1PlayerDetectedState PlayerDetectedState { get; private set; }
+        public E1LongRangeAttackState LongRangeAttackState { get; private set; }
         
         public override void Awake()
         {
             base.Awake();
             
-            IdleState = new E1_IdleState(this, StateMachine, entityDataSo, "isIdle", this);
-            MoveState = new E1_MoveState(this, StateMachine, entityDataSo, "isMoving", this);
-            PlayerDetectedState = new E1_PlayerDetectedState(this, StateMachine, entityDataSo, "isPlayerDetected", this);
-            LongRangeAttackState = new E1_LongRangeAttackState(this, StateMachine, entityDataSo, "isLongRangeAttacking", this);
+            IdleState = new E1IdleState(this, StateMachine, entityDataSo, "isIdle", this);
+            MoveState = new E1MoveState(this, StateMachine, entityDataSo, "isMoving", this);
+            PlayerDetectedState = new E1PlayerDetectedState(this, StateMachine, entityDataSo, "isPlayerDetected", this);
+            LongRangeAttackState = new E1LongRangeAttackState(this, StateMachine, entityDataSo, "isLongRangeAttacking", this);
         }
 
         public override void Start()

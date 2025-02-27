@@ -56,7 +56,7 @@ namespace _Scripts.Player.Player_States.SubStates
             
             _isThrowing = Player.InputHandler.ThrowInput;
             
-            float verticalDistance = Movement.R2BD.position.y - _startingYPosition; // Measure height gained
+            float verticalDistance = Movement.Rb2D.position.y - _startingYPosition; // Measure height gained
 
             if (Movement != null)
             {
@@ -66,13 +66,13 @@ namespace _Scripts.Player.Player_States.SubStates
                     float heightFactor = Mathf.Pow(verticalDistance / PlayerData.maxUpwardDistance, PlayerData.gravityIncreaseFactor); // Slower gravity increase
                     float newGravity = Mathf.Lerp(PlayerData.gravityScaleUp, PlayerData.gravityScaleDown, heightFactor);
 
-                    Movement.R2BD.gravityScale = Mathf.Clamp(newGravity, PlayerData.gravityScaleUp, PlayerData.gravityScaleDown);
-                    Movement.R2BD.drag = PlayerData.dragUp;
+                    Movement.Rb2D.gravityScale = Mathf.Clamp(newGravity, PlayerData.gravityScaleUp, PlayerData.gravityScaleDown);
+                    Movement.Rb2D.drag = PlayerData.dragUp;
                 }
                 else if (Movement.CurrentVelocity.y < -0.1f) // Falling
                 {
-                    Movement.R2BD.gravityScale = PlayerData.gravityScaleDown;
-                    Movement.R2BD.drag = PlayerData.dragDown;
+                    Movement.Rb2D.gravityScale = PlayerData.gravityScaleDown;
+                    Movement.Rb2D.drag = PlayerData.dragDown;
                 }
             }
 
@@ -88,8 +88,8 @@ namespace _Scripts.Player.Player_States.SubStates
         
         private void ResetGravity()
         {
-            Movement.R2BD.gravityScale = PlayerData.defaultGravityScale; // Reset to normal gravity
-            Movement.R2BD.drag = 0f; // Reset drag
+            Movement.Rb2D.gravityScale = PlayerData.defaultGravityScale; // Reset to normal gravity
+            Movement.Rb2D.drag = 0f; // Reset drag
         }
     }
 }

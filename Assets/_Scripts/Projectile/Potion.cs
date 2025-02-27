@@ -1,38 +1,37 @@
 using _Scripts.CoreSystem;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace _Scripts.Projectile
 {
     public class Potion : CoreComponent
     {
-        public GameObject projectile;
+        [SerializeField] private GameObject projectile;
         [SerializeField] private float spawnOffset; // Offset for spawning the projectile
         [SerializeField] private float explosionForce = 10f;
 
-        public CollisionSenses collisionSenses { get; private set; }// Reference to CollisionSenses
-        public Core core { get; private set; } // Reference to Core
-        public Movement movement { get; private set; }
+        private CollisionSenses CollisionSenses { get; set; }// Reference to CollisionSenses
+        private new Core Core { get; set; } // Reference to Core
+        public Movement Movement { get; private set; }
 
         protected override void Awake()
         {
-            core = GetComponentInChildren<Core>();
-            collisionSenses = core.GetCoreComponent<CollisionSenses>();
-            movement = core.GetCoreComponent<Movement>();
+            Core = GetComponentInChildren<Core>();
+            CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
+            Movement = Core.GetCoreComponent<Movement>();
         }
         private void OnTriggerEnter2D(Collider2D collision)
         {
             Vector2 explosionPosition = transform.position;
 
             // Check if touching Enemy using CollisionSenses property
-            if (collisionSenses.Enemy)
+            if (CollisionSenses.Enemy)
             {
                 Destroy(gameObject);
                 Explosion(explosionPosition);
                 Debug.Log("Explosion caused by a detected Enemy.");
             }
 
-            if (collisionSenses.Grounded)
+            if (CollisionSenses.Grounded)
             {
                 Destroy(gameObject);
                 Explosion(explosionPosition);
@@ -43,42 +42,42 @@ namespace _Scripts.Projectile
         private void ApplyExplosionForce(Vector2 explosionPosition)
         {
             // Find players within the explosion radius
-            Collider2D[] playersInRadius = Physics2D.OverlapCircleAll(
+            var playersInRadius = Physics2D.OverlapCircleAll(
                 explosionPosition, 
-                collisionSenses.EntityCheckRadius, 
-                collisionSenses.WhatIsPlayer
+                CollisionSenses.EntityCheckRadius, 
+                CollisionSenses.WhatIsPlayer
             );
 
             // Find enemies within the explosion radius
-            Collider2D[] enemiesInRadius = Physics2D.OverlapCircleAll(
+            var enemiesInRadius = Physics2D.OverlapCircleAll(
                 explosionPosition, 
-                collisionSenses.EntityCheckRadius, 
-                collisionSenses.WhatIsEnemy
+                CollisionSenses.EntityCheckRadius, 
+                CollisionSenses.WhatIsEnemy
             );
             
             
 
             // Apply explosion force to players
-            foreach (Collider2D obj in playersInRadius)
+            foreach (var obj in playersInRadius)
             {
-                Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+                var rb = obj.GetComponent<Rigidbody2D>();
 
                 if (rb != null)
                 {
-                    Vector2 direction = (rb.position - explosionPosition).normalized;
+                    var direction = (rb.position - explosionPosition).normalized;
                     rb.AddForce(direction * explosionForce, ForceMode2D.Impulse);
                     Debug.Log($"Applied explosion force to Player: {obj.name}");
                 }
             }
         
             // Apply explosion force to enemies
-            foreach (Collider2D obj in enemiesInRadius)
+            foreach (var obj in enemiesInRadius)
             {
-                Rigidbody2D rb = obj.GetComponent<Rigidbody2D>();
+                var rb = obj.GetComponent<Rigidbody2D>();
 
                 if (rb != null)
                 {
-                    Vector2 direction = (rb.position - explosionPosition).normalized;
+                    var direction = (rb.position - explosionPosition).normalized;
                     rb.AddForce(direction * explosionForce, ForceMode2D.Impulse);
                     Debug.Log($"Applied explosion force to Enemy: {obj.name}");
                 }
@@ -93,10 +92,9 @@ namespace _Scripts.Projectile
 
         private void OnDrawGizmos()
         {
-            if (core == null) return;
+            if (Core == null) return;
                 Gizmos.color = Color.red;
-                Gizmos.DrawWireSphere(transform.position, collisionSenses.EntityCheckRadius);
-        
+                Gizmos.DrawWireSphere(transform.position, CollisionSenses.EntityCheckRadius);
         }
     }
 }

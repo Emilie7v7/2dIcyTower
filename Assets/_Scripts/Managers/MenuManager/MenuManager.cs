@@ -12,6 +12,7 @@ namespace _Scripts.Managers.MenuManager
 
         public void BackToMenu()
         {
+            GameManager.GameManager.Instance.SaveGameData();
             SceneManager.LoadScene("MenuScene");
         }
 

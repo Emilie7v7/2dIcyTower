@@ -7,7 +7,6 @@ using _Scripts.Player.Player_States.SubStates;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace _Scripts.PlayerComponent
 {
@@ -102,16 +101,16 @@ namespace _Scripts.PlayerComponent
         private IEnumerator SmoothFall(Movement movement, float transitionTime, float targetGravity)
         {
             float elapsedTime = 0f;
-            float initialGravity = movement.R2BD.gravityScale;
+            float initialGravity = movement.Rb2D.gravityScale;
 
             while (elapsedTime < transitionTime)
             {
                 elapsedTime += Time.deltaTime;
-                movement.R2BD.gravityScale = Mathf.Lerp(initialGravity, targetGravity, elapsedTime / transitionTime);
+                movement.Rb2D.gravityScale = Mathf.Lerp(initialGravity, targetGravity, elapsedTime / transitionTime);
                 yield return null;
             }
 
-            movement.R2BD.gravityScale = targetGravity;
+            movement.Rb2D.gravityScale = targetGravity;
         }
 
         private void OnDrawGizmos()

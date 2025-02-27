@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine.Serialization;
 
 namespace _Scripts.JSON
 {
@@ -12,7 +11,7 @@ namespace _Scripts.JSON
         public int explosionRadiusBonus;
         public int magnetDuration;
         public int killstreakMultiplier;
-        public int rocketBoostSpeed;
+        public int rocketBoostDuration;
         public int immortalityDuration;
         public Dictionary<string, int> UpgradeLevels;
 
@@ -22,6 +21,8 @@ namespace _Scripts.JSON
             maxHealth = 3;
             explosionRadiusBonus = 1;
             magnetDuration = 5;
+            rocketBoostDuration = 5;
+            immortalityDuration = 10;
             UpgradeLevels = new Dictionary<string, int>
             {
                 { "Health", 0 },

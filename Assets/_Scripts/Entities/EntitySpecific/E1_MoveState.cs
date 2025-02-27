@@ -1,19 +1,16 @@
 using _Scripts.Entities.EntityStateMachine;
-using _Scripts.Entities.EntityStates.EntitySubStates;
-using _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates;
 using _Scripts.ScriptableObjects.EntityData;
-using UnityEngine;
 using EntityMoveState = _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates.EntityMoveState;
 
 namespace _Scripts.Entities.EntitySpecific
 {
-    public class E1_MoveState : EntityMoveState
+    public class E1MoveState : EntityMoveState
     {
-        private Entity1 enemy;
+        private Entity1 _enemy;
         
-        public E1_MoveState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
+        public E1MoveState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
         {
-            this.enemy = enemy;
+            this._enemy = enemy;
         }
 
         public override void Enter()
@@ -29,12 +26,12 @@ namespace _Scripts.Entities.EntitySpecific
 
             if (IsPlayerInLineOfSight)
             {
-                StateMachine.ChangeState(enemy.PlayerDetectedState);
+                StateMachine.ChangeState(_enemy.PlayerDetectedState);
             }
             else if (!IsDetectingLedge)
             {
-                enemy.IdleState.SetFlipAfterIdle(true);
-                StateMachine.ChangeState(enemy.IdleState);
+                _enemy.IdleState.SetFlipAfterIdle(true);
+                StateMachine.ChangeState(_enemy.IdleState);
             }
         }
     }
