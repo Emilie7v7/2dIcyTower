@@ -13,7 +13,6 @@ namespace _Scripts.Managers.ScoreManager
         public event Action<float, float> OnKillstreakTimeUpdated;
         
         private int _score;
-        private int _consecutiveKills;
         private int _maxMultiplierLevel;
         
         private float _multiplier = 1.0f;
@@ -31,7 +30,6 @@ namespace _Scripts.Managers.ScoreManager
             else
             {
                 Destroy(gameObject);
-                return; 
             }
         }
 
@@ -83,7 +81,6 @@ namespace _Scripts.Managers.ScoreManager
         private void ResetMultiplier()
         {
             _multiplier = 1.0f;
-            _consecutiveKills = 0;
             OnMultiplierUpdated?.Invoke(_multiplier);
             OnKillstreakTimeUpdated?.Invoke(0, _baseMultiplierDuration);
         }
