@@ -108,7 +108,7 @@ namespace _Scripts.Upgrades
                     break;
                 
                 case "Killstreak":
-                    GameManager.Instance.PlayerData.killstreakMultiplier += increaseAmount; // Killstreak multiplier upgrade
+                    GameManager.Instance.UpgradeKillStreakMultiplier(increaseAmount);// Killstreak multiplier upgrade
                     break;
                 
                 case "RocketBoost":

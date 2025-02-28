@@ -1,6 +1,7 @@
 using System.Collections;
 using _Scripts.CoreSystem.StatSystem;
 using _Scripts.Managers.GameManager;
+using _Scripts.Managers.ScoreManager;
 using _Scripts.Managers.UI;
 using UnityEngine;
 
@@ -38,8 +39,18 @@ namespace _Scripts.CoreSystem
                 Health.OnValueChanged += UpdateHealthUI;
                 Health.OnCurrentValueZero += SaveDataUponDeath;
             }
+            else
+            {
+                Health.OnCurrentValueZero += HandleEnemyDeath;
+            }
         }
 
+
+        private void HandleEnemyDeath()
+        {   
+            ScoreManager.Instance.RegisterKill();
+        }
+        
         public void ActivateImmortality(float duration)
         {
             StartCoroutine(ImmortalityCoroutine(duration));

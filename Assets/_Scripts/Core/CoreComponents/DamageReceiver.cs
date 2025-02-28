@@ -20,10 +20,10 @@ namespace _Scripts.CoreSystem
 
         public void Damage(DamageData data)
         {
-            Debug.Log(Core.transform.parent.name + " Damage Dealt: " + data.Amount);
+            //Debug.Log(Core.transform.parent.name + " Damage Dealt: " + data.Amount);
             _stats.Health.DecreaseAmount(data.Amount);
             _particleManager.StartParticlesWithRandomRotation(damageParticle);
-            Debug.Log(_stats.Health.CurrentValue + " / " + _stats.Health.MaxValue);
+            //Debug.Log(_stats.Health.CurrentValue + " / " + _stats.Health.MaxValue);
         }
     }
 }

@@ -23,6 +23,7 @@ namespace _Scripts.JSON
             magnetDuration = 5;
             rocketBoostDuration = 5;
             immortalityDuration = 10;
+            killstreakMultiplier = 2;
             UpgradeLevels = new Dictionary<string, int>
             {
                 { "Health", 0 },

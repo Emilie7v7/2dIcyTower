@@ -114,6 +114,20 @@ namespace _Scripts.Managers.GameManager
                 Debug.Log("Immortality Duration already at the limit");
             }
         }
+
+        public void UpgradeKillStreakMultiplier(int amount)
+        {
+            if (PlayerData.killstreakMultiplier < 10)
+            {
+                PlayerData.killstreakMultiplier += amount;
+                SaveGameData();
+                Debug.Log($"Killstreak Multiplier Upgraded: {PlayerData.killstreakMultiplier}/10");
+            }
+            else
+            {
+                Debug.Log("Killstreak Multiplier already at the limit");
+            }
+        }
         
         #region Game Data
         

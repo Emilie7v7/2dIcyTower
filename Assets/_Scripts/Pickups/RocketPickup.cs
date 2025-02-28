@@ -29,7 +29,7 @@ namespace _Scripts.Pickups
             {
                 _playerRb = other.GetComponent<Rigidbody2D>();
                 _playerInput = other.GetComponent<PlayerInputHandler>();
-                _playerStats = other.GetComponent<Stats>();
+                _playerStats = other.GetComponentInChildren<Stats>();
                 
                 if (_playerRb != null)
                 {
