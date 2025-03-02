@@ -26,7 +26,7 @@ namespace _Scripts.Managers.SpawnManager
 
         [Header("Chunk Settings")]
         [SerializeField] private int chunkHeight = 50;
-        [SerializeField] private int activeChunkLimit = 3;
+        [SerializeField] private int activeChunkLimit = 6;
         
         [Header("Player Position")]
         [SerializeField] private Transform playerPosition;
@@ -42,10 +42,12 @@ namespace _Scripts.Managers.SpawnManager
 
         private void Update()
         {
-            var playerChunk = Mathf.FloorToInt(playerPosition.transform.position.y / chunkHeight);
+            int playerChunk = Mathf.FloorToInt(playerPosition.position.y / chunkHeight);
 
+            // 🔹 Only generate a chunk when the player TRULY enters a new one
             if (playerChunk > _lastGeneratedChunk)
             {
+                _lastGeneratedChunk = playerChunk; // ✅ Update last generated chunk
                 GenerateChunk(playerChunk);
             }
         }
@@ -54,55 +56,62 @@ namespace _Scripts.Managers.SpawnManager
         {
             if (_activeChunks.Contains(chunkIndex)) return;
             
-            Debug.Log($"Generating chunk {chunkIndex}");
-            
-            var chunkPosition = new Vector3Int(0, chunkIndex * chunkHeight, 0);
+            Debug.Log($"🆕 Generating chunk {chunkIndex} at Y = {chunkIndex * chunkHeight}");
+            Vector3Int chunkPosition = new Vector3Int(0, chunkIndex * chunkHeight, 0);
             _chunkPositions[chunkIndex] = chunkPosition;
-            
+
+            // 🔹 Ensure a full-width starting platform at 0m
             if (chunkIndex == 0)
             {
                 GenerateFullWidthPlatform(chunkPosition);
             }
+            if (_activeChunks.Contains(chunkIndex))
+            {
+                Debug.LogWarning($"⚠️ Skipping chunk {chunkIndex}, already exists!");
+                return;
+            }
             
-            //Generate Walls
+            
             GenerateWalls(chunkIndex, chunkPosition);
-            
-            //Generate Background
-            GenerateBackground(chunkIndex, chunkPosition);
-            
-            //Generate platforms
             GeneratePlatforms(chunkIndex, chunkPosition);
-            
-            //Generate Hazards
             GenerateHazards(chunkIndex, chunkPosition);
-            
-            //Generate Decorations
             GenerateDecorations(chunkIndex, chunkPosition);
-            
-            //Generate Objects
             GenerateObjects(chunkIndex, chunkPosition);
-            
-            
+            GenerateBackground(chunkIndex, chunkPosition);
+
             _activeChunks.Enqueue(chunkIndex);
             _lastGeneratedChunk = chunkIndex;
 
-            if (_activeChunks.Count > activeChunkLimit)
+            int playerChunk = Mathf.FloorToInt(playerPosition.position.y / chunkHeight);
+
+            while (_activeChunks.Count > 6)
             {
-                var oldChunk = _activeChunks.Dequeue();
-                ClearChunks(oldChunk);
+                int oldestChunk = _activeChunks.Peek();
+                if (oldestChunk < playerChunk - 3)
+                {
+                    Debug.Log($"❌ Clearing chunk {oldestChunk}");
+                    _activeChunks.Dequeue();
+                    ClearChunks(oldestChunk);
+                }
+                else
+                {
+                    break;
+                }
             }
         }
+
+        #region Generating tiles and Objects
         
         private void GenerateFullWidthPlatform(Vector3Int chunkPosition)
         {
             var startX = wallSettings.leftWallX + 1; // Avoid placing inside walls
             var endX = wallSettings.rightWallX - 1;  // Avoid placing inside walls
 
-            var platformY = chunkPosition.y - 1; // 🔹 Place slightly below the player
+            var platformY = chunkPosition.y - 1; //Place slightly below the player
 
             for (var x = startX; x <= endX; x++)
             {
-                TileBase selectedTile = platformSettings.platformTiles[Random.Range(0, platformSettings.platformTiles.Length)];
+                var selectedTile = platformSettings.platformTiles[Random.Range(0, platformSettings.platformTiles.Length)];
                 platformTilemap.SetTile(new Vector3Int(x, platformY, 0), selectedTile);
             }
         }
@@ -111,7 +120,6 @@ namespace _Scripts.Managers.SpawnManager
         {
             for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++)
             {
-                // Select correct RuleTile based on height
                 var selectedWallTile = wallSettings.wallRuleTiles[0];
 
                 if (wallSettings.changeWallStyleAtHeight && wallSettings.wallRuleTiles.Length > 1)
@@ -120,20 +128,95 @@ namespace _Scripts.Managers.SpawnManager
                     selectedWallTile = wallSettings.wallRuleTiles[styleIndex];
                 }
 
-                // Place 4 tiles wide on each side
                 for (var i = 0; i < 4; i++)
                 {
                     wallTilemap.SetTile(new Vector3Int(wallSettings.leftWallX + i, y, 0), selectedWallTile);
                     wallTilemap.SetTile(new Vector3Int(wallSettings.rightWallX - i, y, 0), selectedWallTile);
                 }
+        
+                //Debug.Log($"🧱 Wall at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
             }
         }
 
+        
+        private void GeneratePlatforms(int chunkIndex, Vector3Int chunkPosition)
+        {
+            int platformCount = Random.Range(5, 8);
+
+            for (int i = 0; i < platformCount; i++)
+            {
+                int width = Random.Range((int)platformSettings.minWidth + 2, (int)platformSettings.maxWidth + 3);
+                int x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - width - 2);
+                int y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); // 🔹 FIXED HEIGHT RANGE
+
+                //Debug.Log($"🟢 Platform at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+
+                for (int j = 0; j < width; j++)
+                {
+                    TileBase tile = platformSettings.platformTiles[Random.Range(0, platformSettings.platformTiles.Length)];
+                    platformTilemap.SetTile(new Vector3Int(x + j, y, 0), tile);
+                }
+            }
+        }
+        
+        private void GenerateHazards(int chunkIndex, Vector3Int chunkPosition)
+        {
+            if (Random.value <= hazardSettings.spawnProbability)
+            {
+                int x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
+                int y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); // 🔹 FIXED HEIGHT RANGE
+
+                //Debug.Log($"🔥 Hazard at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+
+                TileBase tile = hazardSettings.ruleTileHazards[Random.Range(0, hazardSettings.ruleTileHazards.Length)];
+                hazardTilemap.SetTile(new Vector3Int(x, y, 0), tile);
+            }
+        }
+        
+        private void GenerateDecorations(int chunkIndex, Vector3Int chunkPosition)
+        {
+            int decorationCount = Random.Range(1, decorationSettings.maxDecorationsPerChunk);
+
+            for (int i = 0; i < decorationCount; i++)
+            {
+                int x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
+                int y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); // 🔹 FIXED HEIGHT RANGE
+
+                //Debug.Log($"🌿 Decoration at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+
+                var spawnPosition = new Vector3Int(x, y, 0);
+
+                if (decorationSettings.platformRuleTileDecorations.Length > 0)
+                {
+                    int index = Random.Range(0, decorationSettings.platformRuleTileDecorations.Length);
+                    RuleTile selectedTile = decorationSettings.platformRuleTileDecorations[index];
+
+                    Vector3Int platformCheckPos = new Vector3Int(x, y - 1, 0);
+                    if (platformTilemap.HasTile(platformCheckPos))
+                    {
+                        decorationTilemap.SetTile(spawnPosition, selectedTile);
+                    }
+                }
+            }
+        }
+        
+        private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
+        {
+            if (Random.value <= objectSettings.spawnProbability)
+            {
+                GameObject objPrefab = objectSettings.objectPrefabs[Random.Range(0, objectSettings.objectPrefabs.Length)];
+                int x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
+                int y = Random.Range(chunkPosition.y + 2, chunkPosition.y + chunkHeight - 2); // 🔹 FIXED HEIGHT RANGE
+                
+                Instantiate(objPrefab, new Vector3(x, y, 0), Quaternion.identity);
+            }
+        }
+        
         private void GenerateBackground(int chunkIndex, Vector3Int chunkPosition)
         {
-            for (var x = -20; x <= 20; x++) // Covers the whole screen width
+            for (var x = -20; x <= 20; x++) 
             {
-                for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++)
+                for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++) // 🔹 FIXED HEIGHT RANGE
                 {
                     var selectedTile = backgroundSettings.backgroundTiles[0];
 
@@ -144,147 +227,62 @@ namespace _Scripts.Managers.SpawnManager
                     }
 
                     backgroundTilemap.SetTile(new Vector3Int(x, y, 0), selectedTile);
+                    //Debug.Log($"🌌 Background at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
                 }
             }
         }
         
-        private void GeneratePlatforms(int chunkIndex, Vector3Int chunkPosition)
-        {
-            var platformCount = Random.Range(2, 5);
-
-            // Randomly select a platform type (RuleTile) for this chunk
-            var selectedPlatform = platformSettings.platformTiles[Random.Range(0, platformSettings.platformTiles.Length)];
-
-            for (var i = 0; i < platformCount; i++)
-            {
-                var width = Random.Range((int) platformSettings.minWidth, (int) platformSettings.maxWidth);
-                var x = Random.Range(-5, 5);
-                var y = chunkPosition.y + Random.Range(5, chunkHeight - 5);
-
-                // Place tiles using RuleTile
-                for (var j = 0; j < width; j++)
-                {
-                    platformTilemap.SetTile(new Vector3Int(x + j, y, 0), selectedPlatform);
-                }
-            }
-        }
-
-        private void GenerateHazards(int chunkIndex, Vector3Int chunkPosition)
-        {
-            if (Random.value <= hazardSettings.spawnProbability)
-            {
-                var x = Random.Range(-5, 5);
-                var y = chunkPosition.y + Random.Range(5, chunkHeight - 5);
-
-                if (hazardSettings.ruleTileHazards.Length > 0 && Random.value < 0.5f) // 50% chance to use RuleTile hazard
-                {
-                    var ruleTile = hazardSettings.ruleTileHazards[Random.Range(0, hazardSettings.ruleTileHazards.Length)];
-                    hazardTilemap.SetTile(new Vector3Int(x, y, 0), ruleTile);
-                }
-                else if (hazardSettings.singleTileHazards.Length > 0)
-                {
-                    var singleTile = hazardSettings.singleTileHazards[Random.Range(0, hazardSettings.singleTileHazards.Length)];
-                    hazardTilemap.SetTile(new Vector3Int(x, y, 0), singleTile);
-                }
-            }
-        }
-        private void GenerateDecorations(int chunkIndex, Vector3Int chunkPosition)
-        {   
-            var decorationCount = Random.Range(1, decorationSettings.maxDecorationsPerChunk);
-
-            for (var i = 0; i < decorationCount; i++)
-            {
-                    var x = Random.Range(-5, 5);
-                    var y = chunkPosition.y + Random.Range(5, chunkHeight - 5);
-                    var spawnPosition = new Vector3Int(x, y, 0);
-
-                // Platform Decorations (RuleTile)
-                if (decorationSettings.platformRuleTileDecorations.Length > 0)
-                {
-                    int index = Random.Range(0, decorationSettings.platformRuleTileDecorations.Length);
-                    RuleTile selectedTile = decorationSettings.platformRuleTileDecorations[index];
-
-                    Vector3Int platformCheckPos = new Vector3Int(x, y - 1, 0);
-                    if (platformTilemap.HasTile(platformCheckPos)) 
-                    {
-                        decorationTilemap.SetTile(spawnPosition, selectedTile);
-                    }
-                }
-
-                // Platform Decorations (Single Tile)
-                if (decorationSettings.platformSingleTileDecorations.Length > 0)
-                {
-                    int index = Random.Range(0, decorationSettings.platformSingleTileDecorations.Length);
-                    TileBase selectedTile = decorationSettings.platformSingleTileDecorations[index];
-
-                    Vector3Int platformCheckPos = new Vector3Int(x, y - 1, 0);
-                    if (platformTilemap.HasTile(platformCheckPos)) 
-                    {
-                        decorationTilemap.SetTile(spawnPosition, selectedTile);
-                    }
-                }
-
-                // Air Decorations (RuleTile)
-                if (decorationSettings.airRuleTileDecorations.Length > 0)
-                {
-                    int index = Random.Range(0, decorationSettings.airRuleTileDecorations.Length);
-                    RuleTile selectedTile = decorationSettings.airRuleTileDecorations[index];
-
-                    // No platform check needed for air decorations
-                    decorationTilemap.SetTile(spawnPosition, selectedTile);
-                }
-
-                // Air Decorations (Single Tile)
-                if (decorationSettings.airSingleTileDecorations.Length > 0)
-                {
-                    int index = Random.Range(0, decorationSettings.airSingleTileDecorations.Length);
-                    TileBase selectedTile = decorationSettings.airSingleTileDecorations[index];
-
-                    // No platform check needed for air decorations
-                    decorationTilemap.SetTile(spawnPosition, selectedTile);
-                }
-            }
-        }
-
-        private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
-        {
-            if (Random.value <= objectSettings.spawnProbability)
-            {
-                var objPrefab = objectSettings.objectPrefabs[Random.Range(0, objectSettings.objectPrefabs.Length)];
-                var x = Random.Range(-4f, 4f);
-                var y = chunkPosition.y + Random.Range(5f, chunkHeight - 5f);
-                var spawnPosition = new Vector3(x, y, 0);
-
-                if (objectSettings.objectType == ObjectType.Enemy)
-                {
-                    // If it's an enemy, it must spawn on a platform
-                    var platformCheckPosition = new Vector3Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y - 1), 0);
-                    if (!platformTilemap.HasTile(platformCheckPosition)) return; // Skip spawn if no platform
-                }
-
-                Instantiate(objPrefab, spawnPosition, Quaternion.identity);
-            }
-        }
-
-        
+        #endregion
         
         private void ClearChunks(int chunkIndex)
         {
-            if(!_chunkPositions.ContainsKey(chunkIndex)) return;
-            
-            var chunkPosition = _chunkPositions[chunkIndex];
+            if (!_chunkPositions.ContainsKey(chunkIndex)) return;
 
-            for (var x = -10; x <= 10 ; x++)
+            Vector3Int chunkPosition = _chunkPositions[chunkIndex];
+
+            Debug.Log($"🗑 Clearing chunk {chunkIndex} (Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight})");
+
+            for (var x = wallSettings.leftWallX; x <= wallSettings.rightWallX; x++)
             {
-                for (var j = 0; j < chunkHeight; j++)
+                for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++)
                 {
-                    platformTilemap.SetTile(new Vector3Int(x, chunkPosition.y + j, 0), null);
-                    hazardTilemap.SetTile(new Vector3Int(x, chunkPosition.y + j, 0), null);
-                    decorationTilemap.SetTile(new Vector3Int(x, chunkPosition.y + j, 0), null);
+                    platformTilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    hazardTilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    decorationTilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    wallTilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    backgroundTilemap.SetTile(new Vector3Int(x, y, 0), null);
                 }
             }
-            
+
+            platformTilemap.RefreshAllTiles();
+            hazardTilemap.RefreshAllTiles();
+            decorationTilemap.RefreshAllTiles();
+            wallTilemap.RefreshAllTiles();
+            backgroundTilemap.RefreshAllTiles();
+
+            Debug.Log($"✅ Successfully cleared chunk {chunkIndex}");
             _chunkPositions.Remove(chunkIndex);
+        }
+        
+        private void OnDrawGizmos()
+        {
+            if (_chunkPositions == null) return;
+
+            Gizmos.color = Color.green; // ✅ Color for active chunks
+
+            foreach (var chunk in _chunkPositions)
+            {
+                Vector3 chunkBottomLeft = new Vector3(-10, chunk.Value.y, 0); // Left boundary
+                Vector3 chunkBottomRight = new Vector3(10, chunk.Value.y, 0); // Right boundary
+                Vector3 chunkTopLeft = new Vector3(-10, chunk.Value.y + chunkHeight, 0); // Upper left
+                Vector3 chunkTopRight = new Vector3(10, chunk.Value.y + chunkHeight, 0); // Upper right
+
+                // ✅ Draw chunk boundaries in Scene View
+                Gizmos.DrawLine(chunkBottomLeft, chunkBottomRight); // Bottom
+                Gizmos.DrawLine(chunkBottomRight, chunkTopRight); // Right side
+                Gizmos.DrawLine(chunkTopRight, chunkTopLeft); // Top
+                Gizmos.DrawLine(chunkTopLeft, chunkBottomLeft); // Left side
+            }
         }
     }
 }
