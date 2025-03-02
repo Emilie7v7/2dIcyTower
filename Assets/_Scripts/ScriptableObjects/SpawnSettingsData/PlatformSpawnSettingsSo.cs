@@ -7,7 +7,7 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
     public class PlatformSpawnSettingsSo : ScriptableObject
     {
         [Header("Platform Settings")]
-        public TileBase[] platformTiles; // Different tile types
+        public RuleTile[] platformTiles; // Different tile types
         public float minWidth = 2f;
         public float maxWidth = 5f;
         public float spawnProbability = 0.8f; // 80% spawn chance

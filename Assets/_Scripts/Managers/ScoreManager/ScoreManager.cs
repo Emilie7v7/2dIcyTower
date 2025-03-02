@@ -39,7 +39,6 @@ namespace _Scripts.Managers.ScoreManager
             _maxMultiplierLevel = GameManager.GameManager.Instance.PlayerData.killstreakMultiplier;
             
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
-            Debug.Log(_maxMultiplierLevel);
         }
 
         private void Update()

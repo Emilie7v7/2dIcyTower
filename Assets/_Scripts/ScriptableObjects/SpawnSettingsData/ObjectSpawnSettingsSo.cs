@@ -2,16 +2,22 @@ using UnityEngine;
 
 namespace _Scripts.ScriptableObjects.SpawnSettingsData
 {
+    public enum ObjectType
+    {
+        Enemy,      // Must spawn on a platform
+        PowerUp,    // Can spawn in the air
+        Coin        // Can spawn in the air
+    }
+
     [CreateAssetMenu(menuName = "Data/Object Spawn Data/Base Data", fileName = "newObjectSpawnData")]
     public class ObjectSpawnSettingsSo : ScriptableObject
     {
         [Header("Object Spawn Settings")]
         public GameObject[] objectPrefabs;
-        public float spawnProbability = 0.5f; // Default 50% chance
-        public bool mustSpawnOnPlatform;
-        public bool canSpawnMidAir;
-        public int maxObjectsPerChunk = 3; // Max objects per chunk
-        public float spawnCooldown = 2f; // Default cooldown between spawns
-        public Vector2 spawnHeightRange = new Vector2(0, 10000); // Restrict object spawn height
+        [HideInInspector] public ObjectType objectType; // NEW: Defines the type of object
+        public float spawnProbability = 0.5f;
+        public int maxObjectsPerChunk = 3;
+        public float spawnCooldown = 2f;
+        public Vector2 spawnHeightRange = new Vector2(0, 10000);
     }
 }
