@@ -14,7 +14,6 @@ namespace _Scripts.Camera
         [SerializeField] private Vector3 trackedObjectOffset;
 
         private CinemachineFramingTransposer _framingTransposer;
-        //private float _defaultOrthoSize = 5f;
         
         private void Start()
         {

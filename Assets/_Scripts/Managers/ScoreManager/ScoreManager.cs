@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Managers.ScoreManager
 {
@@ -17,9 +18,10 @@ namespace _Scripts.Managers.ScoreManager
         
         private float _multiplier = 1.0f;
         private float _multiplierTimeLeft;
-        private float _baseMultiplierDuration = 5.0f;
-        
-        private Transform _playerTransform;
+        private float _initialPosition;
+        private const float BaseMultiplierDuration = 5.0f;
+
+        [SerializeField] private Transform playerTransform;
 
         private void Awake()
         {
@@ -35,7 +37,6 @@ namespace _Scripts.Managers.ScoreManager
 
         private void Start()
         {
-            _playerTransform = GameObject.FindGameObjectWithTag("Player").transform;
             _maxMultiplierLevel = GameManager.GameManager.Instance.PlayerData.killstreakMultiplier;
             
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
@@ -46,7 +47,7 @@ namespace _Scripts.Managers.ScoreManager
             if (_multiplier > 1f)
             {
                 _multiplierTimeLeft -= Time.deltaTime;
-                OnKillstreakTimeUpdated?.Invoke(_multiplierTimeLeft, _baseMultiplierDuration);
+                OnKillstreakTimeUpdated?.Invoke(_multiplierTimeLeft, BaseMultiplierDuration);
                 if (_multiplierTimeLeft <= 0)
                 {
                     ResetMultiplier();
@@ -56,7 +57,7 @@ namespace _Scripts.Managers.ScoreManager
 
         private void UpdateScore()
         {
-            var newScore = Mathf.FloorToInt(_playerTransform.position.y * 10 * _multiplier);
+            var newScore = Mathf.FloorToInt((playerTransform.position.y - 0.2974851f) * 10 * _multiplier);
             if (newScore > _score)
             {
                 _score = newScore;
@@ -71,17 +72,17 @@ namespace _Scripts.Managers.ScoreManager
                 _multiplier += 0.25f; // Increase multiplier only if it's below max
             }
 
-            _multiplierTimeLeft = _baseMultiplierDuration; // Always reset timer
+            _multiplierTimeLeft = BaseMultiplierDuration; // Always reset timer
 
             OnMultiplierUpdated?.Invoke(_multiplier);
-            OnKillstreakTimeUpdated?.Invoke(_multiplierTimeLeft, _baseMultiplierDuration);
+            OnKillstreakTimeUpdated?.Invoke(_multiplierTimeLeft, BaseMultiplierDuration);
         }
 
         private void ResetMultiplier()
         {
             _multiplier = 1.0f;
             OnMultiplierUpdated?.Invoke(_multiplier);
-            OnKillstreakTimeUpdated?.Invoke(0, _baseMultiplierDuration);
+            OnKillstreakTimeUpdated?.Invoke(0, BaseMultiplierDuration);
         }
         
         public int GetScore()
