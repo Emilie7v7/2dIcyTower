@@ -52,12 +52,12 @@ namespace _Scripts.Managers.SpawnManager
                 GenerateChunk(playerChunk + 3);
             }
 
-            while (_activeChunks.Count > 7) // Maintain 7 active chunks
+            while (_activeChunks.Count > 7) //Maintain 7 active chunks
             {
                 var oldestChunk = _activeChunks.Peek();
                 if (oldestChunk < playerChunk - 3)
                 {
-                    //Debug.Log($"❌ Clearing chunk {oldestChunk}");
+                    //Debug.Log($"Clearing chunk {oldestChunk}");
                     _activeChunks.Dequeue();
                     ClearChunks(oldestChunk);
                 }
@@ -72,7 +72,7 @@ namespace _Scripts.Managers.SpawnManager
         {
             if (_activeChunks.Contains(chunkIndex)) return;
             
-            //Debug.Log($"🆕 Generating chunk {chunkIndex} at Y = {chunkIndex * chunkHeight}");
+            //Debug.Log($"Generating chunk {chunkIndex} at Y = {chunkIndex * chunkHeight}");
             var chunkPosition = new Vector3Int(0, (chunkIndex * chunkHeight) - 1, 0);
             _chunkPositions[chunkIndex] = chunkPosition;
             
@@ -93,7 +93,7 @@ namespace _Scripts.Managers.SpawnManager
                 var oldestChunk = _activeChunks.Peek();
                 if (oldestChunk < playerChunk - 3)
                 {
-                    //Debug.Log($"❌ Clearing chunk {oldestChunk}");
+                    //Debug.Log($"Clearing chunk {oldestChunk}");
                     _activeChunks.Dequeue();
                     ClearChunks(oldestChunk);
                 }
@@ -124,22 +124,22 @@ namespace _Scripts.Managers.SpawnManager
                     wallTilemap.SetTile(new Vector3Int(wallSettings.rightWallX - i, y, 0), selectedWallTile);
                 }
         
-                //Debug.Log($"🧱 Wall at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+                //Debug.Log($"Wall at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
             }
         }
 
         
         private void GeneratePlatforms(int chunkIndex, Vector3Int chunkPosition)
         {
-            var platformSpacing = 5; // 🔹 Platforms are spaced every 5 Y units
-            var numPlatforms = chunkHeight / platformSpacing; // 🔹 Ensure spacing aligns with full-width platforms
+            const int platformSpacing = 5; //Platforms are spaced every 5 Y units
+            var numPlatforms = chunkHeight / platformSpacing; //Ensure spacing aligns with full-width platforms
             
             //Generate a full-width platform at chunk 0 and every second chunk
             if (chunkIndex % 2 == 0)
             {
-                var startX = wallSettings.leftWallX + 4; // Avoid placing inside walls
-                var endX = wallSettings.rightWallX - 4;  // Avoid placing inside walls
-                var platformY = chunkPosition.y; // Place at the bottom of the chunk
+                var startX = wallSettings.leftWallX + 4; //Avoid placing inside walls
+                var endX = wallSettings.rightWallX - 4;  //Avoid placing inside walls
+                var platformY = chunkPosition.y; //Place at the bottom of the chunk
 
                 for (var x = startX; x <= endX; x++)
                 {
@@ -150,16 +150,16 @@ namespace _Scripts.Managers.SpawnManager
             
             for (var i = 0; i < numPlatforms; i++)
             {
-                var width = Random.Range((int)platformSettings.minWidth, (int)platformSettings.maxWidth);
+                var width = Random.Range(platformSettings.minWidth, platformSettings.maxWidth);
                 var x = Random.Range(wallSettings.leftWallX + 4, wallSettings.rightWallX - width - 4);
-                var y = chunkPosition.y + (i * platformSpacing);
+                var y = chunkPosition.y + i * platformSpacing;
 
-                //Debug.Log($"🟢 Platform at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+                //Debug.Log($"Platform at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
 
-                // Adjust for chunks without full-width platforms
+                //Adjust for chunks without full-width platforms
                 if (chunkIndex % 2 != 0 && i == numPlatforms - 1) 
                 {
-                    y = chunkPosition.y + chunkHeight - platformSpacing; // Ensure last platform aligns before new chunk
+                    y = chunkPosition.y + chunkHeight - platformSpacing; //Ensure last platform aligns before new chunk
                 }
                 
                 for (var j = 0; j < width; j++)
@@ -177,7 +177,7 @@ namespace _Scripts.Managers.SpawnManager
                 var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
                 var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); // 🔹 FIXED HEIGHT RANGE
 
-                //Debug.Log($"🔥 Hazard at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+                //Debug.Log($"Hazard at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
 
                 var tile = hazardSettings.ruleTileHazards[Random.Range(0, hazardSettings.ruleTileHazards.Length)];
                 hazardTilemap.SetTile(new Vector3Int(x, y, 0), tile);
@@ -191,9 +191,9 @@ namespace _Scripts.Managers.SpawnManager
             for (var i = 0; i < decorationCount; i++)
             {
                 var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
-                var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); // 🔹 FIXED HEIGHT RANGE
+                var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); //FIXED HEIGHT RANGE
 
-                //Debug.Log($"🌿 Decoration at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+                //Debug.Log($"Decoration at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
 
                 var spawnPosition = new Vector3Int(x, y, 0);
 
@@ -213,21 +213,21 @@ namespace _Scripts.Managers.SpawnManager
         
         private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
         {
-            if (Random.value <= objectSettings.spawnProbability)
-            {
-                var objPrefab = objectSettings.objectPrefabs[Random.Range(0, objectSettings.objectPrefabs.Length)];
-                var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
-                var y = Random.Range(chunkPosition.y + 2, chunkPosition.y + chunkHeight - 2); // 🔹 FIXED HEIGHT RANGE
-                
-                Instantiate(objPrefab, new Vector3(x, y, 0), Quaternion.identity);
-            }
+            // if ()
+            // {
+            //     
+            //     var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
+            //     var y = Random.Range(chunkPosition.y + 2, chunkPosition.y + chunkHeight - 2); //FIXED HEIGHT RANGE
+            //     
+            //     Instantiate(objPrefab, new Vector3(x, y, 0), Quaternion.identity);
+            // }
         }
         
         private void GenerateBackground(int chunkIndex, Vector3Int chunkPosition)
         {
             for (var x = wallSettings.leftWallX; x <= wallSettings.rightWallX; x++) 
             {
-                for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++) // 🔹 FIXED HEIGHT RANGE
+                for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++) //FIXED HEIGHT RANGE
                 {
                     var selectedTile = backgroundSettings.backgroundTiles[0];
 
@@ -238,7 +238,7 @@ namespace _Scripts.Managers.SpawnManager
                     }
 
                     backgroundTilemap.SetTile(new Vector3Int(x, y, 0), selectedTile);
-                    //Debug.Log($"🌌 Background at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
+                    //Debug.Log($"Background at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
                 }
             }
         }
@@ -267,7 +267,7 @@ namespace _Scripts.Managers.SpawnManager
         {
             if (_chunkPositions == null) return;
 
-            Gizmos.color = Color.green; // ✅ Color for active chunks
+            Gizmos.color = Color.green; //Color for active chunks
 
             foreach (var chunk in _chunkPositions)
             {
@@ -276,7 +276,7 @@ namespace _Scripts.Managers.SpawnManager
                 var chunkTopLeft = new Vector3(-10, chunk.Value.y + chunkHeight, 0); // Upper left
                 var chunkTopRight = new Vector3(10, chunk.Value.y + chunkHeight, 0); // Upper right
 
-                // ✅ Draw chunk boundaries in Scene View
+                //Draw chunk boundaries in Scene View
                 Gizmos.DrawLine(chunkBottomLeft, chunkBottomRight); // Bottom
                 Gizmos.DrawLine(chunkBottomRight, chunkTopRight); // Right side
                 Gizmos.DrawLine(chunkTopRight, chunkTopLeft); // Top
