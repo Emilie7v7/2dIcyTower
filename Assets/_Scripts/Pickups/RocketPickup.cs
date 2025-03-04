@@ -66,7 +66,7 @@ namespace _Scripts.Pickups
             }
             
             _playerInput.CanThrow = true;
-            _playerRb.velocity = new Vector2(_playerRb.velocity.x, 0);
+            _playerRb.velocity = new Vector2(_playerRb.velocity.x, _playerRb.velocity.y);
             _isRocketActive = false;
             Destroy(gameObject);
         }
