@@ -213,6 +213,7 @@ namespace _Scripts.Managers.SpawnManager
         
         private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
         {
+            var coins = objectSettings.GetRandomCoinsPerChunk();
             // if ()
             // {
             //     
