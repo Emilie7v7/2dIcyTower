@@ -172,13 +172,20 @@ namespace _Scripts.Managers.SpawnManager
         private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
         {
             var coinsToSpawn = objectSettings.GetRandomCoinsPerChunk();
+            const int bottomOffset = 5;
+            const int startOffset = 30;
+            
             for (var i = 0; i < coinsToSpawn; i++)
             {
                 var x = Random.Range(wallSettings.leftWallX + 4, wallSettings.rightWallX - 4);
-                var y = chunkPosition.y + i * coinsToSpawn;
+                var y = chunkPosition.y + bottomOffset + (i * (chunkHeight - bottomOffset) / coinsToSpawn);
+                if (chunkIndex == 0)
+                {
+                    y = chunkPosition.y + startOffset + (i * (chunkHeight - bottomOffset) / coinsToSpawn);
+                }
                 if (i == coinsToSpawn - 1)
                 {
-                    y = chunkPosition.y + chunkHeight - coinsToSpawn;
+                    y = chunkPosition.y + chunkHeight - (bottomOffset * 2);
                 }
 
                 var coinPrefab = objectSettings.coinsPrefab[0];
