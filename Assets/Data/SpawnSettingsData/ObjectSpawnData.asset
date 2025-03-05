@@ -12,20 +12,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c2e92ebd3e2cf74a8c60d1124ea0f68, type: 3}
   m_Name: ObjectSpawnData
   m_EditorClassIdentifier: 
-  coinsPrefab:
-  - {fileID: 3846677220728009989, guid: 24b74c69e6f7d164d961fad608a42b4c, type: 3}
-  minCoinsPerChunk: 4
-  maxCoinsPerChunk: 9
+  coinsPrefab: []
+  minCoinsPerChunk: 5
+  maxCoinsPerChunk: 10
   enemiesPrefab:
   - {fileID: 1168502171279386623, guid: 98c85749b3b2eac4c97deeb734602622, type: 3}
   minEnemiesPerChunk: 3
   maxEnemiesPerChunk: 8
-  boostsPrefab:
-  - {fileID: 2961405728326684828, guid: 45079eabcd6a10b45993a0eb1788061a, type: 3}
-  - {fileID: 6709257324937666934, guid: 3d0680fbf27ffaf4b9cbe3898d642f4b, type: 3}
-  - {fileID: 8864114719132273481, guid: d1f755463407b47468199e95a52e5eb9, type: 3}
-  - {fileID: 8033619726045604398, guid: d4ab15c6d1db2164c88945a4e53113b5, type: 3}
-  dropBoostsChanceFromEnemy: 0.5
+  boosts:
+  - boostName: Health drop chance
+    dropChance: 25
+    boostPrefab: {fileID: 2961405728326684828, guid: 45079eabcd6a10b45993a0eb1788061a, type: 3}
+  - boostName: Magnet drop chance
+    dropChance: 25
+    boostPrefab: {fileID: 8864114719132273481, guid: d1f755463407b47468199e95a52e5eb9, type: 3}
+  - boostName: Rocket drop chance
+    dropChance: 25
+    boostPrefab: {fileID: 8033619726045604398, guid: d4ab15c6d1db2164c88945a4e53113b5, type: 3}
+  - boostName: Immortality drop chance
+    dropChance: 25
+    boostPrefab: {fileID: 6709257324937666934, guid: 3d0680fbf27ffaf4b9cbe3898d642f4b, type: 3}
   mustSpawnOnPlatform: 0
   canSpawnAnywhere: 0
   spawnHeightRange: {x: 0, y: 10000}

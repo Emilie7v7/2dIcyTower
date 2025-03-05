@@ -7,16 +7,15 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
     public class ObjectSpawnSettingsSo : ScriptableObject
     {
         [HideInInspector] public GameObject[] coinsPrefab;
-        
-        [HideInInspector] public int minCoinsPerChunk = 5;  // Minimum value
-        [HideInInspector] public int maxCoinsPerChunk = 10; // Maximum value
+
+        [HideInInspector] public int minCoinsPerChunk;
+        [HideInInspector] public int maxCoinsPerChunk;
 
         [HideInInspector] public GameObject[] enemiesPrefab;
-        [HideInInspector] public int minEnemiesPerChunk = 1;
-        [HideInInspector] public int maxEnemiesPerChunk = 3;
+        [HideInInspector] public int minEnemiesPerChunk;
+        [HideInInspector] public int maxEnemiesPerChunk;
         
-        [HideInInspector] public GameObject[] boostsPrefab;
-        [HideInInspector] public float dropBoostsChanceFromEnemy = 0.5f;
+        public BoostInfo[] boosts;
         
         [HideInInspector] public bool mustSpawnOnPlatform = false;
         [HideInInspector] public bool canSpawnAnywhere = false;
@@ -25,7 +24,20 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
         
         public int GetRandomCoinsPerChunk()
         {
-            return Random.Range(minCoinsPerChunk, maxCoinsPerChunk + 1); // Inclusive max
+            return Random.Range(minCoinsPerChunk, maxCoinsPerChunk + 1);
         }
+        public int GetRandomEnemiesPerChunk()
+        {
+            return Random.Range(minEnemiesPerChunk, maxEnemiesPerChunk + 1);
+        }
+    }
+
+    [System.Serializable]
+    public class BoostInfo
+    {
+        public string boostName;
+        [Range(0,100)]
+        public float dropChance;
+        public GameObject boostPrefab;
     }
 }

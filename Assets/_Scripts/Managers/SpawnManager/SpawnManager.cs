@@ -157,7 +157,7 @@ namespace _Scripts.Managers.SpawnManager
                 //Debug.Log($"Platform at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
 
                 //Adjust for chunks without full-width platforms
-                if (chunkIndex % 2 != 0 && i == numPlatforms - 1) 
+                if (chunkIndex % 2 != 0 && i == numPlatforms - 1)
                 {
                     y = chunkPosition.y + chunkHeight - platformSpacing; //Ensure last platform aligns before new chunk
                 }
@@ -169,7 +169,22 @@ namespace _Scripts.Managers.SpawnManager
                 }
             }
         }
-        
+        private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
+        {
+            var coinsToSpawn = objectSettings.GetRandomCoinsPerChunk();
+            for (var i = 0; i < coinsToSpawn; i++)
+            {
+                var x = Random.Range(wallSettings.leftWallX + 4, wallSettings.rightWallX - 4);
+                var y = chunkPosition.y + i * coinsToSpawn;
+                if (i == coinsToSpawn - 1)
+                {
+                    y = chunkPosition.y + chunkHeight - coinsToSpawn;
+                }
+
+                var coinPrefab = objectSettings.coinsPrefab[0];
+                Instantiate(coinPrefab, new Vector3Int(x, y, 0), Quaternion.identity);
+            }
+        }
         private void GenerateHazards(int chunkIndex, Vector3Int chunkPosition)
         {
             if (Random.value <= hazardSettings.spawnProbability)
@@ -209,19 +224,6 @@ namespace _Scripts.Managers.SpawnManager
                     }
                 }
             }
-        }
-        
-        private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
-        {
-            var coins = objectSettings.GetRandomCoinsPerChunk();
-            // if ()
-            // {
-            //     
-            //     var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
-            //     var y = Random.Range(chunkPosition.y + 2, chunkPosition.y + chunkHeight - 2); //FIXED HEIGHT RANGE
-            //     
-            //     Instantiate(objPrefab, new Vector3(x, y, 0), Quaternion.identity);
-            // }
         }
         
         private void GenerateBackground(int chunkIndex, Vector3Int chunkPosition)
