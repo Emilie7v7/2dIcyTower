@@ -6,10 +6,11 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
     [CreateAssetMenu(menuName = "Data/Object Spawn Data/Base Data", fileName = "newObjectSpawnData")]
     public class ObjectSpawnSettingsSo : ScriptableObject
     {
-        [HideInInspector] public GameObject[] coinsPrefab;
+        [HideInInspector] public GameObject coinsPrefab;
 
         [HideInInspector] public int minCoinsPerChunk;
         [HideInInspector] public int maxCoinsPerChunk;
+        [HideInInspector] public int coinValue;
 
         [HideInInspector] public GameObject[] enemiesPrefab;
         [HideInInspector] public int minEnemiesPerChunk;
@@ -17,7 +18,7 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
         
         public BoostInfo[] boosts;
         
-        [HideInInspector] public bool mustSpawnOnPlatform = false;
+        [HideInInspector] public bool enemiesMustSpawnOnPlatform = false;
         [HideInInspector] public bool canSpawnAnywhere = false;
         
         [HideInInspector] public Vector2 spawnHeightRange = new Vector2(0, 10000);

@@ -2,6 +2,7 @@ using System.Collections;
 using _Scripts.Managers.GameManager;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Pickups
 {
@@ -11,11 +12,10 @@ namespace _Scripts.Pickups
         [SerializeField] private float verticalMagnetRange = 50f; // Shorter vertical range
         private float _magnetDuration; // Will be fetched from PlayerData
         private bool _isMagnetActive = false;
-        private Transform _player;
+        [SerializeField] private Transform player;
 
         private void Start()
         {
-            _player = GameObject.FindGameObjectWithTag("Player").transform;
             _magnetDuration = GameManager.Instance.PlayerData.magnetDuration;
         }
 
@@ -26,7 +26,7 @@ namespace _Scripts.Pickups
             if (_isMagnetActive) return;
 
             _isMagnetActive = true;
-            transform.SetParent(_player); // Attach to the player
+            transform.SetParent(player); // Attach to the player
             transform.localPosition = Vector3.zero; // Center it on the player
 
             GetComponent<Collider2D>().enabled = false; // Disable pickup collider
@@ -67,10 +67,7 @@ namespace _Scripts.Pickups
                 if (colliders.CompareTag("Coin"))
                 {
                     var coinScript = colliders.GetComponent<CoinPickup>();
-                    if (coinScript != null)
-                    {
-                        coinScript.StartPulling();
-                    }
+                    coinScript?.StartPulling();
                 }
             }
         }

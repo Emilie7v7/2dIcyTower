@@ -20,10 +20,7 @@ namespace _Scripts.Pickups
             if (other.CompareTag("Player"))
             {
                 var stats = other.GetComponentInChildren<Stats>();
-                if (stats != null)
-                {
-                    stats.ActivateImmortality(_immortalityDuration);
-                }
+                stats?.ActivateImmortality(_immortalityDuration);
 
                 PowerUpPool.Instance.ReturnObject(this);
             }

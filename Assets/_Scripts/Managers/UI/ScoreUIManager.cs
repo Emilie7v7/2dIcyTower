@@ -26,12 +26,12 @@ namespace _Scripts.Managers.UI
 
         private void UpdateScore(int score)
         {
-            scoreText.text = $"Score: {score}";
+            scoreText.text = score.ToString();
         }
 
         private void UpdateMultiplier(float multiplier)
         {
-            multiplierText.text = $"Multiplier: x{multiplier:F2}";
+            multiplierText.text = multiplier.ToString();
         }
 
         private void UpdateKillStreakTimer(float timeLeft, float timeMax)

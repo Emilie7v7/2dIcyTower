@@ -5,6 +5,7 @@ using _Scripts.InputHandler;
 using _Scripts.Managers.GameManager;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Pickups
 {
@@ -17,12 +18,10 @@ namespace _Scripts.Pickups
         private Rigidbody2D _playerRb;
         private PlayerInputHandler _playerInput;
         private Stats _playerStats;
-        private Transform _player;
-
-
+        [SerializeField] private Transform player;
+        
         private void Start()
         {
-            _player = GameObject.FindGameObjectWithTag("Player").transform;
             _rocketDuration = GameManager.Instance.PlayerData.rocketBoostDuration;
         }
 
@@ -34,7 +33,7 @@ namespace _Scripts.Pickups
                 _playerInput = other.GetComponent<PlayerInputHandler>();
                 _playerStats = other.GetComponentInChildren<Stats>();
                 
-                if (_playerRb != null)
+                if (_playerRb is not null)
                 {
                     Activate();
                     _playerStats.ActivateImmortality(_rocketDuration);

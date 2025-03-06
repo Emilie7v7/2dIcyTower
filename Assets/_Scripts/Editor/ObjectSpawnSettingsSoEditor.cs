@@ -10,10 +10,11 @@ namespace _Scripts.Editor
         private SerializedProperty _coinsPrefab;
         private SerializedProperty _minCoinsPerChunk;
         private SerializedProperty _maxCoinsPerChunk;
+        private SerializedProperty _coinValue;
         private SerializedProperty _enemiesPrefab;
         private SerializedProperty _minEnemiesPerChunk;
         private SerializedProperty _maxEnemiesPerChunk;
-        private SerializedProperty _mustSpawnOnPlatform;
+        private SerializedProperty _enemiesMustSpawnOnPlatform;
         private SerializedProperty _canSpawnAnywhere;
         private SerializedProperty _spawnHeightRange;
         private SerializedProperty _boostsProperty;
@@ -34,16 +35,14 @@ namespace _Scripts.Editor
             _coinsPrefab = serializedObject.FindProperty("coinsPrefab");
             _minCoinsPerChunk = serializedObject.FindProperty("minCoinsPerChunk");
             _maxCoinsPerChunk = serializedObject.FindProperty("maxCoinsPerChunk");
+            _coinValue = serializedObject.FindProperty("coinValue");
             _enemiesPrefab = serializedObject.FindProperty("enemiesPrefab");
             _minEnemiesPerChunk = serializedObject.FindProperty("minEnemiesPerChunk");
             _maxEnemiesPerChunk = serializedObject.FindProperty("maxEnemiesPerChunk");
-            _mustSpawnOnPlatform = serializedObject.FindProperty("mustSpawnOnPlatform");
+            _enemiesMustSpawnOnPlatform = serializedObject.FindProperty("enemiesMustSpawnOnPlatform");
             _canSpawnAnywhere = serializedObject.FindProperty("canSpawnAnywhere");
             _spawnHeightRange = serializedObject.FindProperty("spawnHeightRange");
             _boostsProperty = serializedObject.FindProperty("boosts");
-            
-            
-            
 
             #region Custom Styles
 
@@ -118,7 +117,6 @@ namespace _Scripts.Editor
                     new GUIStyle(EditorStyles.label) { normal = { textColor = new Color(0f, 1f, 0.5f) } },
                     GUILayout.Width(170)
                 );
-                // Minus button for decreasing the min enemies value
                 if (GUILayout.Button("-", new GUIStyle(EditorStyles.miniButton) { normal = { textColor = Color.red } },
                         GUILayout.Width(25)))
                 {
@@ -129,7 +127,6 @@ namespace _Scripts.Editor
 
                 _minCoinsPerChunk.intValue = EditorGUILayout.IntField(_minCoinsPerChunk.intValue, GUILayout.Width(50));
 
-                // Plus button for increasing the min enemies value
                 if (GUILayout.Button("+",
                         new GUIStyle(EditorStyles.miniButton) { normal = { textColor = Color.green } },
                         GUILayout.Width(25)))
@@ -147,7 +144,6 @@ namespace _Scripts.Editor
                     new GUIStyle(EditorStyles.label) { normal = { textColor = new Color(1f, 0.73f, 0f) } },
                     GUILayout.Width(170)
                 );
-                // Minus button for decreasing the min enemies value
                 if (GUILayout.Button("-", new GUIStyle(EditorStyles.miniButton) { normal = { textColor = Color.red } },
                         GUILayout.Width(25)))
                 {
@@ -158,7 +154,6 @@ namespace _Scripts.Editor
 
                 _maxCoinsPerChunk.intValue = EditorGUILayout.IntField(_maxCoinsPerChunk.intValue, GUILayout.Width(50));
 
-                // Plus button for increasing the min enemies value
                 if (GUILayout.Button("+",
                         new GUIStyle(EditorStyles.miniButton) { normal = { textColor = Color.green } },
                         GUILayout.Width(25)))
@@ -167,6 +162,32 @@ namespace _Scripts.Editor
                 }
 
                 EditorGUILayout.EndHorizontal();
+                
+                GUILayout.Space(5);
+                
+                EditorGUILayout.BeginHorizontal();
+                
+                EditorGUILayout.LabelField("Coin value", new GUIStyle(EditorStyles.label){normal = {textColor = new Color(1f, 1f, 0.2f)}},
+                    GUILayout.Width(100));
+                if (GUILayout.Button("-", new GUIStyle(EditorStyles.miniButton) { normal = { textColor = Color.red } },
+                        GUILayout.Width(25)))
+                {
+                    _coinValue.intValue = Mathf.Max(0, _coinValue.intValue - 1);
+                }
+
+                GUILayout.Space(-15);
+
+                EditorGUILayout.IntField(_coinValue.intValue, GUILayout.Width(50));
+
+                if (GUILayout.Button("+",
+                        new GUIStyle(EditorStyles.miniButton) { normal = { textColor = Color.green } },
+                        GUILayout.Width(25)))
+                {
+                    _coinValue.intValue++;
+                }
+                
+                EditorGUILayout.EndHorizontal();
+                
                 GUILayout.Space(5);
             });
             EditorHelper.EditorHelper.DrawUiLine(color: Color.yellow);
@@ -324,7 +345,7 @@ namespace _Scripts.Editor
                 
                 EditorHelper.EditorHelper.DrawFoldout(ref _showOtherSettings, "   Other Settings", _blackStyle, () =>
                 {
-                    EditorGUILayout.PropertyField(_mustSpawnOnPlatform);
+                    EditorGUILayout.PropertyField(_enemiesMustSpawnOnPlatform, GUILayout.Width(150));
                     EditorGUILayout.PropertyField(_canSpawnAnywhere);
                     EditorGUILayout.PropertyField(_spawnHeightRange);
                 });

@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
+using _Scripts.Entities.EntitySpecific;
+using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ObjectPool.ObjectsToPool;
+using _Scripts.Pickups;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -58,7 +61,6 @@ namespace _Scripts.Managers.SpawnManager
                 var oldestChunk = _activeChunks.Peek();
                 if (oldestChunk < playerChunk - 3)
                 {
-                    //Debug.Log($"Clearing chunk {oldestChunk}");
                     _activeChunks.Dequeue();
                     ClearChunks(oldestChunk);
                 }
@@ -73,7 +75,6 @@ namespace _Scripts.Managers.SpawnManager
         {
             if (_activeChunks.Contains(chunkIndex)) return;
             
-            //Debug.Log($"Generating chunk {chunkIndex} at Y = {chunkIndex * chunkHeight}");
             var chunkPosition = new Vector3Int(0, (chunkIndex * chunkHeight) - 1, 0);
             _chunkPositions[chunkIndex] = chunkPosition;
             
@@ -94,7 +95,6 @@ namespace _Scripts.Managers.SpawnManager
                 var oldestChunk = _activeChunks.Peek();
                 if (oldestChunk < playerChunk - 3)
                 {
-                    //Debug.Log($"Clearing chunk {oldestChunk}");
                     _activeChunks.Dequeue();
                     ClearChunks(oldestChunk);
                 }
@@ -124,12 +124,8 @@ namespace _Scripts.Managers.SpawnManager
                     wallTilemap.SetTile(new Vector3Int(wallSettings.leftWallX + i, y, 0), selectedWallTile);
                     wallTilemap.SetTile(new Vector3Int(wallSettings.rightWallX - i, y, 0), selectedWallTile);
                 }
-        
-                //Debug.Log($"Wall at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
             }
         }
-
-        
         private void GeneratePlatforms(int chunkIndex, Vector3Int chunkPosition)
         {
             const int platformSpacing = 5; //Platforms are spaced every 5 Y units
@@ -154,9 +150,7 @@ namespace _Scripts.Managers.SpawnManager
                 var width = Random.Range(platformSettings.minWidth, platformSettings.maxWidth);
                 var x = Random.Range(wallSettings.leftWallX + 4, wallSettings.rightWallX - width - 4);
                 var y = chunkPosition.y + i * platformSpacing;
-
-                //Debug.Log($"Platform at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
-
+                
                 //Adjust for chunks without full-width platforms
                 if (chunkIndex % 2 != 0 && i == numPlatforms - 1)
                 {
@@ -170,15 +164,18 @@ namespace _Scripts.Managers.SpawnManager
                 }
             }
         }
+        //Work in progress------------------------------------------------------------
         private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
         {
+            #region Coins Spawner
+
             var coinsToSpawn = objectSettings.GetRandomCoinsPerChunk();
             const int bottomOffset = 5;
             const int startOffset = 30;
-            
+
             for (var i = 0; i < coinsToSpawn; i++)
             {
-                var x = Random.Range(wallSettings.leftWallX + 4, wallSettings.rightWallX - 4);
+                var x = Random.Range(wallSettings.leftWallX + 5, wallSettings.rightWallX - 5);
                 var y = chunkPosition.y + bottomOffset + (i * (chunkHeight - bottomOffset) / coinsToSpawn);
                 if (chunkIndex == 0)
                 {
@@ -189,24 +186,54 @@ namespace _Scripts.Managers.SpawnManager
                     y = chunkPosition.y + chunkHeight - (bottomOffset * 2);
                 }
 
-                var coinPrefab = objectSettings.coinsPrefab[0];
-                CoinPool.Instance.GetObject(new Vector3Int(x, y, 0));
+                var coin = CoinPool.Instance.GetObject(new Vector3Int(x, y, 0));
+                coin?.gameObject.SetActive(true);
             }
+
+            #endregion
+
+            #region Enemy Spawner On Platforms
+
+            var enemiesToSpawn = objectSettings.GetRandomEnemiesPerChunk();
+            var mustSpawnOnPlatform = objectSettings.enemiesMustSpawnOnPlatform;
+            
+            if(chunkIndex == 0) return;
+            if (!mustSpawnOnPlatform) return;
+            {
+                //Get all valid spawn positions on platforms
+                var availableSpawnPositions = GetPlatformSpawnPositions(chunkPosition, enemiesToSpawn);
+
+                for (var i = 0; i < enemiesToSpawn; i++)
+                {
+                    if (availableSpawnPositions.Count == 0)
+                    {
+                        break;
+                    }
+
+                    //Select a random platform position and remove it to prevent stacking
+                    var randomIndex = Random.Range(0, availableSpawnPositions.Count);
+                    var spawnPosition = availableSpawnPositions[randomIndex];
+                    availableSpawnPositions.RemoveAt(randomIndex);
+
+                    var enemy = EnemyPool.Instance.GetObject(spawnPosition);
+
+                    enemy?.gameObject.SetActive(true);
+                }
+            }
+
+            #endregion
         }
         private void GenerateHazards(int chunkIndex, Vector3Int chunkPosition)
         {
             if (Random.value <= hazardSettings.spawnProbability)
             {
                 var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
-                var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); // 🔹 FIXED HEIGHT RANGE
-
-                //Debug.Log($"Hazard at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
-
+                var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); //FIXED HEIGHT RANGE
+                
                 var tile = hazardSettings.ruleTileHazards[Random.Range(0, hazardSettings.ruleTileHazards.Length)];
                 hazardTilemap.SetTile(new Vector3Int(x, y, 0), tile);
             }
         }
-        
         private void GenerateDecorations(int chunkIndex, Vector3Int chunkPosition)
         {
             var decorationCount = Random.Range(1, decorationSettings.maxDecorationsPerChunk);
@@ -215,9 +242,7 @@ namespace _Scripts.Managers.SpawnManager
             {
                 var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
                 var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); //FIXED HEIGHT RANGE
-
-                //Debug.Log($"Decoration at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
-
+                
                 var spawnPosition = new Vector3Int(x, y, 0);
 
                 if (decorationSettings.platformRuleTileDecorations.Length > 0)
@@ -233,7 +258,7 @@ namespace _Scripts.Managers.SpawnManager
                 }
             }
         }
-        
+        //-----------------------------------------------------------------------------
         private void GenerateBackground(int chunkIndex, Vector3Int chunkPosition)
         {
             for (var x = wallSettings.leftWallX; x <= wallSettings.rightWallX; x++) 
@@ -249,7 +274,6 @@ namespace _Scripts.Managers.SpawnManager
                     }
 
                     backgroundTilemap.SetTile(new Vector3Int(x, y, 0), selectedTile);
-                    //Debug.Log($"Background at Y={y}, Chunk {chunkIndex} (Chunk Y range: {chunkPosition.y} to {chunkPosition.y + chunkHeight - 1})");
                 }
             }
         }
@@ -271,7 +295,81 @@ namespace _Scripts.Managers.SpawnManager
                     backgroundTilemap.SetTile(new Vector3Int(x, y, 0), null);
                 }
             }
+            ReturnObjectsInChunk(chunkPosition);
             _chunkPositions.Remove(chunkIndex);
+        }
+        private void ReturnObjectsInChunk(Vector3Int chunkPosition)
+        {
+            var objectsInChunk = Physics2D.OverlapBoxAll(
+                new Vector2(0, chunkPosition.y + (chunkHeight / 2f)), //Check center of chunk
+                new Vector2(wallSettings.rightWallX * 2, chunkHeight), //Cover full chunk size
+                0f);
+
+            foreach (var obj in objectsInChunk)
+            {
+                if (obj.CompareTag("Coin"))
+                {
+                    var coin = obj.GetComponent<CoinPickup>();
+                    if (coin != null)
+                    {
+                        CoinPool.Instance.ReturnObject(coin);
+                    }
+                }
+                else if (obj.CompareTag("Enemy"))
+                {
+                    var enemy = obj.GetComponent<Entity>(); // Adjust if you have multiple enemy types
+                    if (enemy != null)
+                    {
+                        EnemyPool.Instance.ReturnObject(enemy);
+                    }
+                }
+                else if (obj.CompareTag("PowerUp"))
+                {
+                    var powerUp = obj.GetComponent<PowerUp>();
+                    if (powerUp != null)
+                    {
+                        PowerUpPool.Instance.ReturnObject(powerUp);
+                    }
+                }
+            }
+        }
+        private List<Vector3Int> GetPlatformSpawnPositions(Vector3Int chunkPosition, int maxPositions)
+        {
+            var platformPositions = new List<Vector3Int>();
+            
+            for (var x = wallSettings.leftWallX + 5; x <= wallSettings.rightWallX - 5; x += 3) //Spread search horizontally
+            {
+                for (var y = chunkPosition.y + 1; y <= chunkPosition.y + chunkHeight - 1; y++) //Iterate over all Y positions
+                {
+                    var checkPosition = new Vector3Int(x, y - 1, 0); //Check if a platform exists BELOW
+
+                    if (platformTilemap.HasTile(checkPosition)) //If platform exists at y - 1
+                    {
+                        //Find platform width & center
+                        var left = x;
+                        var right = x;
+
+                        //Expand left until no tile is found
+                        while (platformTilemap.HasTile(new Vector3Int(left - 1, y - 1, 0)))
+                        {
+                            left--;
+                        }
+
+                        //Expand right until no tile is found
+                        while (platformTilemap.HasTile(new Vector3Int(right + 1, y - 1, 0)))
+                        {
+                            right++;
+                        }
+
+                        //Calculate center of the platform
+                        var centerX = (left + right) / 2;
+
+                        platformPositions.Add(new Vector3Int(centerX, y, 0)); //Enemy spawns exactly in the center
+                    }
+                }
+            }
+
+            return platformPositions; // Returns all valid spawn positions
         }
         
         private void OnDrawGizmos()

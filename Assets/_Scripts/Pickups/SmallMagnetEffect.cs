@@ -22,15 +22,14 @@ public class SmallMagnetEffect : MonoBehaviour
         foreach (var hitCollider in hitColliders)
         {
             // Get the object's sprite renderer to check its sorting layer
-            SpriteRenderer renderer = hitCollider.GetComponent<SpriteRenderer>();
-            if (renderer != null && renderer.sortingLayerName == "Pickups")
-            {
-                // Move the object closer to the player
-                Transform pickup = hitCollider.transform;
+            var renderer = hitCollider.GetComponent<SpriteRenderer>();
+            if (renderer is null || renderer.sortingLayerName != "Pickups") continue;
+            
+            // Move the object closer to the player
+            var pickup = hitCollider.transform;
 
-                Vector3 direction = (player.position - pickup.position).normalized;
-                pickup.position += direction * pullSpeed * Time.deltaTime;
-            }
+            var direction = (player.position - pickup.position).normalized;
+            pickup.position += direction * (pullSpeed * Time.deltaTime);
         }
     }
 

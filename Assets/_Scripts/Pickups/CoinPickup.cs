@@ -1,25 +1,23 @@
 using _Scripts.Managers.GameManager;
+using _Scripts.ObjectPool.ObjectsToPool;
+using _Scripts.ScriptableObjects.SpawnSettingsData;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Pickups
 {
     public class CoinPickup : MonoBehaviour
     {
-        [SerializeField] private int coinValue = 1;
+        [SerializeField] private ObjectSpawnSettingsSo settings;
+        [SerializeField] private Transform player;
         private bool _isBeingPulled = false;
-        private Transform _player;
-
-        private void Start()
-        {
-            _player = GameObject.FindGameObjectWithTag("Player").transform;
-        }
 
         private void Update()
         {
             if (_isBeingPulled)
             {
-                var direction = (_player.position - transform.position).normalized;
-                var distance = Vector3.Distance(_player.position, transform.position);
+                var direction = (player.position - transform.position).normalized;
+                var distance = Vector3.Distance(player.position, transform.position);
                 
                 // Normalize distance (0 = near player, 1 = far from player)
                 var distanceFromPlayer = Mathf.Clamp01(1 - (distance / 300));
@@ -42,8 +40,12 @@ namespace _Scripts.Pickups
         {
             if (other.CompareTag("Player"))
             {
-                GameManager.Instance.AddCoins(coinValue);
-                Destroy(gameObject);
+                GameManager.Instance.AddCoins(settings.coinValue);
+
+                if (CoinPool.Instance != null) 
+                {
+                    CoinPool.Instance.ReturnObject(this);
+                }
             }
         }
     }
