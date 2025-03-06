@@ -3,11 +3,12 @@ using System.Collections;
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
 using _Scripts.Managers.GameManager;
+using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
 namespace _Scripts.Pickups
 {
-    public class RocketPickup : MonoBehaviour
+    public class RocketPickup : PowerUp
     {
         private float _rocketDuration;
         private const float RocketSpeed = 100f;
@@ -16,10 +17,12 @@ namespace _Scripts.Pickups
         private Rigidbody2D _playerRb;
         private PlayerInputHandler _playerInput;
         private Stats _playerStats;
+        private Transform _player;
 
 
         private void Start()
         {
+            _player = GameObject.FindGameObjectWithTag("Player").transform;
             _rocketDuration = GameManager.Instance.PlayerData.rocketBoostDuration;
         }
 
@@ -33,18 +36,20 @@ namespace _Scripts.Pickups
                 
                 if (_playerRb != null)
                 {
-                    ActivateRocketBoost(other.transform);
+                    Activate();
                     _playerStats.ActivateImmortality(_rocketDuration);
                 }
             }
         }
 
-        private void ActivateRocketBoost(Transform playerTransform)
+        protected override void Activate()
         {
+            base.Activate();
+            
             if(_isRocketActive) return;
             
             _isRocketActive = true;
-            transform.SetParent(playerTransform);
+            transform.SetParent(_playerRb.transform);
             transform.localPosition = Vector3.zero;
             
             GetComponent<SpriteRenderer>().enabled = false;
@@ -68,7 +73,7 @@ namespace _Scripts.Pickups
             _playerInput.CanThrow = true;
             _playerRb.velocity = new Vector2(_playerRb.velocity.x, _playerRb.velocity.y);
             _isRocketActive = false;
-            Destroy(gameObject);
+            PowerUpPool.Instance.ReturnObject(this);
         }
     }
 }

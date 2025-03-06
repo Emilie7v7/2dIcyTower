@@ -1,11 +1,12 @@
 using System;
 using _Scripts.CoreSystem;
 using _Scripts.Managers.GameManager;
+using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
 namespace _Scripts.Pickups
 {
-    public class ImmortalityPickup : MonoBehaviour
+    public class ImmortalityPickup : PowerUp
     {
         private float _immortalityDuration;
 
@@ -24,7 +25,7 @@ namespace _Scripts.Pickups
                     stats.ActivateImmortality(_immortalityDuration);
                 }
 
-                Destroy(gameObject); // Remove pickup after activation
+                PowerUpPool.Instance.ReturnObject(this);
             }
         }
     }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -189,7 +190,7 @@ namespace _Scripts.Managers.SpawnManager
                 }
 
                 var coinPrefab = objectSettings.coinsPrefab[0];
-                Instantiate(coinPrefab, new Vector3Int(x, y, 0), Quaternion.identity);
+                CoinPool.Instance.GetObject(new Vector3Int(x, y, 0));
             }
         }
         private void GenerateHazards(int chunkIndex, Vector3Int chunkPosition)

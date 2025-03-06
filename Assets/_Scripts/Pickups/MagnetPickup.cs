@@ -1,10 +1,11 @@
 using System.Collections;
 using _Scripts.Managers.GameManager;
+using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
 namespace _Scripts.Pickups
 {
-    public class MagnetPickup : MonoBehaviour
+    public class MagnetPickup : PowerUp
     {
         [SerializeField] private float horizontalMagnetRange = 300f; // Wider horizontal range
         [SerializeField] private float verticalMagnetRange = 50f; // Shorter vertical range
@@ -18,26 +19,28 @@ namespace _Scripts.Pickups
             _magnetDuration = GameManager.Instance.PlayerData.magnetDuration;
         }
 
-        private void OnTriggerEnter2D(Collider2D other)
+        protected override void Activate()
         {
-            if (other.CompareTag("Player"))
-            {
-                ActivateMagnet(other.transform);
-            }
-        }
-
-        private void ActivateMagnet(Transform playerTransform)
-        {
+            Debug.Log("Magnet Power-Up Activated!");
+            
             if (_isMagnetActive) return;
 
             _isMagnetActive = true;
-            transform.SetParent(playerTransform); // Attach to the player
+            transform.SetParent(_player); // Attach to the player
             transform.localPosition = Vector3.zero; // Center it on the player
 
             GetComponent<Collider2D>().enabled = false; // Disable pickup collider
             GetComponent<SpriteRenderer>().enabled = false; // Hide visual magnet
 
             StartCoroutine(MagnetEffect());
+        }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                Activate();
+            }
         }
 
         private IEnumerator MagnetEffect()
@@ -52,7 +55,7 @@ namespace _Scripts.Pickups
             }
 
             _isMagnetActive = false; // Deactivate after duration ends
-            Destroy(gameObject); // Destroy the magnet pickup
+            PowerUpPool.Instance.ReturnObject(this);
         }
 
         private void PullCoinsTowardsPlayer()

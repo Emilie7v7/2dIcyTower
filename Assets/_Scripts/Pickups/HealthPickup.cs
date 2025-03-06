@@ -1,9 +1,10 @@
 using _Scripts.CoreSystem;
+using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
 namespace _Scripts.Pickups
 {
-    public class HealthPickup : MonoBehaviour
+    public class HealthPickup : PowerUp
     {
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -14,7 +15,7 @@ namespace _Scripts.Pickups
                 {
                     player.Health.IncreaseAmount(1);
                 }
-                Destroy(gameObject);
+                PowerUpPool.Instance.ReturnObject(this);
             }
         }
     }
