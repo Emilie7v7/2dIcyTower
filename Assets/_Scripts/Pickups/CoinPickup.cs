@@ -2,33 +2,42 @@ using _Scripts.Managers.GameManager;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.Pickups
 {
     public class CoinPickup : MonoBehaviour
     {
         [SerializeField] private ObjectSpawnSettingsSo settings;
-        [SerializeField] private Transform player;
-        private bool _isBeingPulled = false;
+        [SerializeField] private float getPulledDistance = 5f;
+        private bool _isBeingPulled;
+        private Transform _player;
 
         private void Update()
         {
+            if (_player == null) return; // Avoid null reference errors
+
+            var distance = Vector3.Distance(_player.position, transform.position);
+            
+            if (distance < getPulledDistance)
+                _isBeingPulled = true;
+
             if (_isBeingPulled)
-            {
-                var direction = (player.position - transform.position).normalized;
-                var distance = Vector3.Distance(player.position, transform.position);
-                
-                // Normalize distance (0 = near player, 1 = far from player)
-                var distanceFromPlayer = Mathf.Clamp01(1 - (distance / 300));
+                MoveTowardsPlayer(distance);
+        }
 
-                // Ease-in, ease-out using cosine function
-                const float maxPullSpeed = 80f; // Maximum pull speed
-                var smoothPullSpeed = maxPullSpeed * (0.5f * (1 - Mathf.Cos(distanceFromPlayer * Mathf.PI)));
+        private void MoveTowardsPlayer(float distance)
+        {
+            var direction = (_player.position - transform.position).normalized;
 
-                // Apply movement
-                transform.position += smoothPullSpeed * Time.deltaTime * direction;
-            }
+            // Normalize distance (0 = near player, 1 = far from player)
+            var distanceFactor = Mathf.Clamp01(1 - (distance / 300));
+
+            // Ease-in, ease-out using cosine function
+            const float maxPullSpeed = 50f;
+            var smoothPullSpeed = maxPullSpeed * (0.5f * (1 - Mathf.Cos(distanceFactor * Mathf.PI)));
+
+            // Apply movement
+            transform.position += smoothPullSpeed * Time.deltaTime * direction;
         }
 
         public void StartPulling()
@@ -38,15 +47,19 @@ namespace _Scripts.Pickups
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (other.CompareTag("Player"))
-            {
-                GameManager.Instance.AddCoins(settings.coinValue);
+            if (!other.CompareTag("Player")) return;
 
-                if (CoinPool.Instance != null) 
-                {
-                    CoinPool.Instance.ReturnObject(this);
-                }
+            GameManager.Instance.AddCoins(settings.coinValue);
+            CoinPool.Instance?.ReturnObject(this);
+        }
+
+        private void OnEnable()
+        {
+            if (_player == null)
+            {
+                _player = GameManager.Instance?.Player;
             }
+            _isBeingPulled = false; // Reset pull state when re-enabled
         }
     }
 }

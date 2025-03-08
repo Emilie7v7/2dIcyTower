@@ -1,5 +1,8 @@
 using _Scripts.Entities.EntityStateMachine;
+using _Scripts.ObjectPool.ObjectsToPool;
+using _Scripts.Projectiles;
 using _Scripts.ScriptableObjects.EntityData;
+using _Scripts.ScriptableObjects.ProjectileData;
 using UnityEngine;
 
 namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
@@ -14,25 +17,19 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
         {
             base.AnimationAttackTrigger();
             
-            // Find the player
-            var player = GameObject.FindGameObjectWithTag("Player"); 
+            var player = GameObject.FindGameObjectWithTag("Player");
 
-            // Instantiate the projectile
-            var projectileInstance = Object.Instantiate(EntityData.projectilePrefab, Entity.transform.position, Quaternion.identity);
+            var projectilePrefab = EnemyProjectilePool.Instance.GetObject(Entity.transform.position);
+            if (projectilePrefab is null) return;
             
-            // Get the Projectile component
-            var projectileScript = projectileInstance.GetComponent<Projectile.Projectile>();
-
-            // Calculate direction towards the player
+            projectilePrefab.SetProjectileOwner(false);
+            projectilePrefab.transform.position = Entity.transform.position;
+            
             Vector2 direction = (player.transform.position - Entity.transform.position).normalized;
 
-            // Add an upward bias to create an arc
-            direction += projectileScript.ProjectileData.projectileArc;
+            direction += projectilePrefab.ProjectileData.projectileArc;
 
-            //Debug.Log($"Projectile will move towards direction: {direction}");
-            
-            // Launch the projectile with force (allowing for an arc due to gravity)
-            projectileScript.Movement.LaunchProjectile(direction, projectileScript.ProjectileData.projectileSpeed);
+            projectilePrefab.Movement.LaunchProjectile(direction, projectilePrefab.ProjectileData.projectileSpeed);
         }       
     }
 }

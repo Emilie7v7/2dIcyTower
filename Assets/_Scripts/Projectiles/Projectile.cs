@@ -1,12 +1,13 @@
 using _Scripts.CoreSystem;
+using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.ProjectileData;
 using UnityEngine;
+using UnityEngine.Serialization;
 
-namespace _Scripts.Projectile
+namespace _Scripts.Projectiles
 {
     public class Projectile : MonoBehaviour
     {
-        private bool _hasExploded;
         private Collider2D[] _results;
         private Vector2 _spawnPosition;
 
@@ -16,6 +17,8 @@ namespace _Scripts.Projectile
         private Core _core;
         public Movement Movement { get; private set; }
 
+        private bool _isPlayerProjectile;
+
         private void Awake()
         {
             _core = GetComponentInChildren<Core>();
@@ -24,28 +27,23 @@ namespace _Scripts.Projectile
             _results = new Collider2D[ProjectileData.maxHitsRayForProjectile];
         }
 
-
-        private void Start()
+        public void SetProjectileOwner(bool isPlayer)
         {
-            _spawnPosition = transform.position; // Save initial position
+            _isPlayerProjectile = isPlayer;
         }
 
         private void FixedUpdate()
         {
-            //ProjectileRaycastCheck();
             ProjectileHitDetection();
 
-            // Destroy projectile if it has traveled too far
             if (Vector2.Distance(_spawnPosition, transform.position) >= ProjectileData.maxTravelDistance)
             {
-                Destroy(gameObject);
+                ReturnToPool();
             }
         }
 
         private void ProjectileHitDetection()
         {
-            if (_hasExploded) return; // Prevents multiple explosions
-
             var detectedCollisions = Physics2D.OverlapCircleNonAlloc(
                 new Vector2(DetectionPosition.position.x, DetectionPosition.position.y),
                 ProjectileData.projectileRadius,
@@ -61,36 +59,34 @@ namespace _Scripts.Projectile
 
                     if (hit)
                     {
-                        _hasExploded = true; // Prevents multiple explosions
-
                         var hitPosition = hit.ClosestPoint(transform.position);
                         
                         Instantiate(ProjectileData.explosionPrefab, hitPosition, Quaternion.identity);
-                        Destroy(gameObject);
-                        break; // Stops loop after first valid collision
+                        ReturnToPool(); //Ensure projectile is returned properly
+                        break;
                     }
                 }
             }
         }
-        private void ProjectileRaycastCheck()
+        
+        public void SetSpawnPosition(Vector3 position)
         {
-            Vector2 position = transform.position;
-            Vector2 velocity = Movement.CurrentVelocity.normalized;
-            float distance = ProjectileData.projectileSpeed * Time.fixedDeltaTime; 
+            _spawnPosition = position; //Updates spawn point to new position
+        }
 
-            RaycastHit2D hit = Physics2D.Raycast(position, velocity, distance, ProjectileData.targetLayer);
-
-            if (hit.collider != null)
+        private void ReturnToPool()
+        {
+            if (_isPlayerProjectile)
             {
-                Debug.Log("Raycast hit: " + hit.collider.gameObject.name);
-
-                _hasExploded = true;
-                Instantiate(ProjectileData.explosionPrefab, hit.point, Quaternion.identity);
-                Destroy(gameObject);
+                PlayerProjectilePool.Instance.ReturnObject(this);
+            }
+            else
+            {
+                EnemyProjectilePool.Instance.ReturnObject(this);
             }
         }
 
-    private void OnDrawGizmos()
+        private void OnDrawGizmos()
         {
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(DetectionPosition.position, ProjectileData.projectileRadius);

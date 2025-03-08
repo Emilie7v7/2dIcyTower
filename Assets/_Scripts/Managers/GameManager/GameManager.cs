@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using _Scripts.JSON;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Scripts.Managers.GameManager
 {
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
+        public Transform Player { get; private set; }
         public PlayerData PlayerData { get; private set; }
 
         public event Action<int> OnCoinsUpdated;
@@ -27,6 +29,29 @@ namespace _Scripts.Managers.GameManager
             }
         }
 
+        private void Start()
+        {
+            SceneManager.sceneLoaded += OnSceneLoaded; //Listen for scene changes
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            FindPlayer(); //When a new scene is loaded, find the player
+        }
+
+        private void FindPlayer()
+        {
+            var playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                Player = playerObj.transform;
+            }
+            else
+            {
+                Debug.LogWarning("⚠ Player not found in scene!");
+            }
+        }
+        
         public void AddCoins(int amount)
         {
             PlayerData.playerCoins += amount;

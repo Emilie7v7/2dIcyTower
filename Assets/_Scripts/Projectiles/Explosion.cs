@@ -4,7 +4,7 @@ using _Scripts.Managers.GameManager;
 using _Scripts.ScriptableObjects.ExplosionData;
 using UnityEngine;
 
-namespace _Scripts.Projectile
+namespace _Scripts.Projectiles
 {
     public class Explosion : MonoBehaviour
     {

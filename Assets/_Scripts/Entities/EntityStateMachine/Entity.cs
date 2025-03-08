@@ -1,5 +1,7 @@
+using System;
 using _Scripts.CoreSystem;
 using _Scripts.Intermediaries;
+using _Scripts.Managers.ScoreManager;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;
 
@@ -15,13 +17,15 @@ namespace _Scripts.Entities.EntityStateMachine
         public Core Core { get; private set; }
         public Animator MyAnimator { get; private set; }
         public AnimationToStateMachine AnimationToStateMachine { get; private set; }
-        
-        public CollisionSenses CollisionSenses { get; private set; }
+
+        private CollisionSenses CollisionSenses { get; set; }
+        private Stats Stats { get; set; }
 
         public virtual void Awake()
         {
             Core = GetComponentInChildren<Core>();
             CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
+            Stats = Core.GetCoreComponent<Stats>();
             StateMachine = new EntityStateMachine();
         }
 
@@ -40,6 +44,15 @@ namespace _Scripts.Entities.EntityStateMachine
         public virtual void FixedUpdate()
         {
             StateMachine.CurrentState.PhysicsUpdate();
+        }
+
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if (other.gameObject.CompareTag("Player"))
+            {
+                ScoreManager.Instance.RegisterKill();
+                Stats.Health.CurrentValue = 0;
+            }
         }
 
         public virtual void OnDrawGizmos()

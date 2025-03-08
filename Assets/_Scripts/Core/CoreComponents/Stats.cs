@@ -84,6 +84,8 @@ namespace _Scripts.CoreSystem
         private void OnDestroy()
         {
             Health.OnValueChanged -= UpdateHealthUI;
+            Health.OnCurrentValueZero -= SaveDataUponDeath;
+            Health.OnCurrentValueZero -= HandleEnemyDeath;
         }
     }
 }

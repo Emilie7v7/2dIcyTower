@@ -12,10 +12,11 @@ namespace _Scripts.Pickups
         [SerializeField] private float verticalMagnetRange = 50f; // Shorter vertical range
         private float _magnetDuration; // Will be fetched from PlayerData
         private bool _isMagnetActive = false;
-        [SerializeField] private Transform player;
-
+        private Transform _player;
+        
         private void Start()
         {
+            _player = GameObject.FindGameObjectWithTag("Player").transform;
             _magnetDuration = GameManager.Instance.PlayerData.magnetDuration;
         }
 
@@ -26,7 +27,7 @@ namespace _Scripts.Pickups
             if (_isMagnetActive) return;
 
             _isMagnetActive = true;
-            transform.SetParent(player); // Attach to the player
+            transform.SetParent(_player.transform); // Attach to the player
             transform.localPosition = Vector3.zero; // Center it on the player
 
             GetComponent<Collider2D>().enabled = false; // Disable pickup collider
@@ -72,6 +73,14 @@ namespace _Scripts.Pickups
             }
         }
 
+        private void OnEnable()
+        {
+            if (_player == null && GameManager.Instance != null)
+            {
+                _player = GameManager.Instance.Player;
+            }
+        }
+        
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.yellow;

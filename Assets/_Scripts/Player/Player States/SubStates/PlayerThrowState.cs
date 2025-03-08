@@ -1,6 +1,9 @@
+using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.Player.Player_States.SuperStates;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
+using _Scripts.Projectiles;
+using _Scripts.ScriptableObjects.ProjectileData;
 using UnityEngine;
 
 namespace _Scripts.Player.Player_States.SubStates
@@ -18,12 +21,15 @@ namespace _Scripts.Player.Player_States.SubStates
         {
             base.AnimationTrigger();
             
-            var projectilePrefab = Object.Instantiate(PlayerData.projectilePrefab, Player.transform.position, Quaternion.identity);
-            var projectileScript = projectilePrefab.GetComponent<Projectile.Projectile>();
+            var projectilePrefab = PlayerProjectilePool.Instance.GetObject(Player.transform.position);
+            if (projectilePrefab is null) return;
+            
+            projectilePrefab.SetProjectileOwner(true);
+            projectilePrefab.transform.position = Player.transform.position;
             
             Vector2 launchDirection = CorrectionRotation * Player.ThrowDirectionIndicator.transform.right; 
 
-            projectileScript.Movement.LaunchProjectile(launchDirection, projectileScript.ProjectileData.projectileSpeed);
+            projectilePrefab.Movement.LaunchProjectile(launchDirection, projectilePrefab.ProjectileData.projectileSpeed);
         }
     }
 }

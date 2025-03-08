@@ -1,3 +1,5 @@
+using _Scripts.Entities.EntityStateMachine;
+using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
 namespace _Scripts.CoreSystem
@@ -8,6 +10,7 @@ namespace _Scripts.CoreSystem
         
         private ParticleManager _particleManager;
         private Stats _stats;
+        private bool _isPlayer;
 
         protected override void Awake()
         {
@@ -23,8 +26,24 @@ namespace _Scripts.CoreSystem
             {
                 _particleManager.StartParticles(particle);
             }
-            
-            Core.transform.parent.gameObject.SetActive(false);
+
+            _isPlayer = gameObject.CompareTag("Player");
+            if (_isPlayer)
+            {
+                Core.transform.parent.gameObject.SetActive(false);
+            }
+            else
+            {
+                var enemy = Core.GetComponentInParent<Entity>(); //Ensure you get the correct Entity component
+                if (enemy is not null)
+                {
+                    EnemyPool.Instance.ReturnObject(enemy); //Return the whole enemy entity
+                }
+                else
+                {
+                    Debug.LogError("⚠ Enemy entity not found when trying to return to pool!");
+                }
+            }
         }
         private void OnEnable()
         {

@@ -18,7 +18,6 @@ namespace _Scripts.Pickups
         private Rigidbody2D _playerRb;
         private PlayerInputHandler _playerInput;
         private Stats _playerStats;
-        [SerializeField] private Transform player;
         
         private void Start()
         {

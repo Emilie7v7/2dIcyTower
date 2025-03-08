@@ -1,7 +1,6 @@
-using System;
 using System.Collections.Generic;
+using _Scripts.Projectiles;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace _Scripts.ObjectPool
 {
@@ -15,15 +14,21 @@ namespace _Scripts.ObjectPool
         protected abstract void Awake();
         protected abstract void InitializePool();
 
-        public T GetObject(Vector3Int position)
+        public T GetObject(Vector3 position)
         {
             while (Pool.Count > 0)
             {
                 var obj = Pool.Dequeue();
 
-                if (obj is null) //Check if the object was destroyed
+                switch (obj)
                 {
-                    continue; //Skip destroyed objects
+                    //Check if the object was destroyed
+                    case null:
+                        continue; //Skip destroyed objects
+                    //If it's a projectile, update its spawn position
+                    case Projectile projectile:
+                        projectile.SetSpawnPosition(position);
+                        break;
                 }
 
                 obj.transform.position = position;
@@ -41,6 +46,7 @@ namespace _Scripts.ObjectPool
             }
             obj.gameObject.SetActive(false);
             obj.transform.SetParent(PoolParent);
+            obj.transform.position = Vector3.zero;
             Pool.Enqueue(obj);
         }
     }
