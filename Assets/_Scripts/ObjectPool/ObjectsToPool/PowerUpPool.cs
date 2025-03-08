@@ -49,5 +49,23 @@ namespace _Scripts.ObjectPool.ObjectsToPool
                 }
             }
         }
+        
+        public PowerUp GetSpecificPowerUp(GameObject requestedPrefab, Vector3 position)
+        {
+            foreach (var powerUp in Pool)
+            {
+                if (powerUp.gameObject.name.Contains(requestedPrefab.name))
+                {
+                    Pool.Dequeue(); //Remove from pool
+                    powerUp.transform.position = position;
+                    powerUp.gameObject.SetActive(true);
+                    return powerUp;
+                }
+            }
+
+            Debug.LogWarning($"⚠ No available {requestedPrefab.name} in the pool!");
+            return null; // No power-up found
+        }
+        
     }
 }

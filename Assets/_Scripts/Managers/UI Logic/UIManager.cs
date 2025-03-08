@@ -1,3 +1,4 @@
+using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,7 +15,7 @@ namespace _Scripts.Managers.UI
 
         private static void ResetGameData()
         {
-            var gameManager = FindObjectOfType<GameManager.GameManager>();
+            var gameManager = FindObjectOfType<GameManager>();
 
             if (gameManager != null)
             {

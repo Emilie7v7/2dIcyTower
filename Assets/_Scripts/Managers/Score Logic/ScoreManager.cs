@@ -1,4 +1,5 @@
 using System;
+using _Scripts.Managers.Game_Manager_Logic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -37,7 +38,7 @@ namespace _Scripts.Managers.ScoreManager
 
         private void Start()
         {
-            _maxMultiplierLevel = GameManager.GameManager.Instance.PlayerData.killstreakMultiplier;
+            _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier;
             
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
         }

@@ -1,6 +1,6 @@
 using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
-using _Scripts.Managers.GameManager;
+using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ScriptableObjects.ExplosionData;
 using UnityEngine;
 

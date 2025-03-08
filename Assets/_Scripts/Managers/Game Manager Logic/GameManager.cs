@@ -5,7 +5,7 @@ using _Scripts.JSON;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace _Scripts.Managers.GameManager
+namespace _Scripts.Managers.Game_Manager_Logic
 {
     public class GameManager : MonoBehaviour
     {

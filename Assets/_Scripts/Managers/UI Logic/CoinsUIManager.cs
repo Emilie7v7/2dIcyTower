@@ -1,3 +1,4 @@
+using _Scripts.Managers.Game_Manager_Logic;
 using TMPro;
 using UnityEngine;
 
@@ -9,18 +10,18 @@ namespace _Scripts.Managers.UI
 
         private void Start()
         {
-            UpdateCoinText(GameManager.GameManager.Instance.PlayerData.playerCoins);
-            GameManager.GameManager.Instance.OnCoinsUpdated += UpdateCoinText;
+            UpdateCoinText(GameManager.Instance.PlayerData.playerCoins);
+            GameManager.Instance.OnCoinsUpdated += UpdateCoinText;
         }
 
         private void UpdateCoinText(int currentCoins)
         {
-            coinText.text = GameManager.GameManager.Instance.PlayerData.playerCoins.ToString();
+            coinText.text = GameManager.Instance.PlayerData.playerCoins.ToString();
         }
 
         private void OnDestroy()
         {
-            GameManager.GameManager.Instance.OnCoinsUpdated -= UpdateCoinText;
+            GameManager.Instance.OnCoinsUpdated -= UpdateCoinText;
         }
     }
 }

@@ -1,4 +1,4 @@
-using _Scripts.Managers.GameManager;
+using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
 using UnityEngine;
@@ -9,6 +9,7 @@ namespace _Scripts.Pickups
     {
         [SerializeField] private ObjectSpawnSettingsSo settings;
         [SerializeField] private float getPulledDistance = 5f;
+        [SerializeField] private float maxPullSpeed = 30f;
         private bool _isBeingPulled;
         private Transform _player;
 
@@ -33,7 +34,6 @@ namespace _Scripts.Pickups
             var distanceFactor = Mathf.Clamp01(1 - (distance / 300));
 
             // Ease-in, ease-out using cosine function
-            const float maxPullSpeed = 50f;
             var smoothPullSpeed = maxPullSpeed * (0.5f * (1 - Mathf.Cos(distanceFactor * Mathf.PI)));
 
             // Apply movement

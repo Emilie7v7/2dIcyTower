@@ -1,5 +1,5 @@
 using System.Collections;
-using _Scripts.Managers.GameManager;
+using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -12,22 +12,39 @@ namespace _Scripts.Pickups
         [SerializeField] private float verticalMagnetRange = 50f; // Shorter vertical range
         private float _magnetDuration; // Will be fetched from PlayerData
         private bool _isMagnetActive = false;
-        private Transform _player;
         
         private void Start()
         {
-            _player = GameObject.FindGameObjectWithTag("Player").transform;
             _magnetDuration = GameManager.Instance.PlayerData.magnetDuration;
         }
 
+        private void Update()
+        {
+            if(Player is null) return;
+
+            MoveTowardsPlayer();
+        }
+        private void MoveTowardsPlayer()
+        {
+            var direction = (Player.position - transform.position).normalized;
+            var distance = Vector3.Distance(Player.position, transform.position);
+            
+            // Normalize distance (0 = near player, 1 = far from player)
+            var distanceFromPlayer = Mathf.Clamp01(1 - (distance / 300));
+
+            // Ease-in, ease-out using cosine function
+            var smoothPullSpeed = maxPullSpeed * (0.5f * (1 - Mathf.Cos(distanceFromPlayer * Mathf.PI)));
+
+            // Apply movement
+            transform.position += smoothPullSpeed * Time.deltaTime * direction;
+        }
+        
         protected override void Activate()
         {
-            Debug.Log("Magnet Power-Up Activated!");
-            
             if (_isMagnetActive) return;
 
             _isMagnetActive = true;
-            transform.SetParent(_player.transform); // Attach to the player
+            transform.SetParent(Player.transform); // Attach to the player
             transform.localPosition = Vector3.zero; // Center it on the player
 
             GetComponent<Collider2D>().enabled = false; // Disable pickup collider
@@ -75,9 +92,9 @@ namespace _Scripts.Pickups
 
         private void OnEnable()
         {
-            if (_player == null && GameManager.Instance != null)
+            if (Player == null && GameManager.Instance != null)
             {
-                _player = GameManager.Instance.Player;
+                Player = GameManager.Instance.Player;
             }
         }
         

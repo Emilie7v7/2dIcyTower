@@ -1,3 +1,4 @@
+using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -12,7 +13,7 @@ namespace _Scripts.Managers.MenuManager
 
         public void BackToMenu()
         {
-            GameManager.GameManager.Instance.SaveGameData();
+            GameManager.Instance.SaveGameData();
             SceneManager.LoadScene("MenuScene");
         }
 

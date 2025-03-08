@@ -1,6 +1,6 @@
 using System.Collections;
 using _Scripts.CoreSystem.StatSystem;
-using _Scripts.Managers.GameManager;
+using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.Managers.ScoreManager;
 using _Scripts.Managers.UI;
 using UnityEngine;

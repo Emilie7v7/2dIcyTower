@@ -1,6 +1,6 @@
+using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
 using TMPro;
-using _Scripts.Managers.GameManager;
 using UnityEngine.UI;
 
 namespace _Scripts.Upgrades

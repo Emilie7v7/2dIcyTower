@@ -4,9 +4,8 @@ namespace _Scripts.Pickups
 {
     public class PowerUp : MonoBehaviour
     {
-        protected virtual void Activate()
-        {
-            Debug.Log("PowerUp Activated!");
-        }
+        protected Transform Player;
+        [SerializeField] protected float maxPullSpeed = 20f;
+        protected virtual void Activate() { }
     }
 }

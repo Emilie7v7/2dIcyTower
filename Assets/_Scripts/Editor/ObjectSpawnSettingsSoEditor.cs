@@ -14,6 +14,7 @@ namespace _Scripts.Editor
         private SerializedProperty _enemiesPrefab;
         private SerializedProperty _minEnemiesPerChunk;
         private SerializedProperty _maxEnemiesPerChunk;
+        private SerializedProperty _dropChanceEnemy;
         private SerializedProperty _enemiesMustSpawnOnPlatform;
         private SerializedProperty _canSpawnAnywhere;
         private SerializedProperty _spawnHeightRange;
@@ -39,6 +40,7 @@ namespace _Scripts.Editor
             _enemiesPrefab = serializedObject.FindProperty("enemiesPrefab");
             _minEnemiesPerChunk = serializedObject.FindProperty("minEnemiesPerChunk");
             _maxEnemiesPerChunk = serializedObject.FindProperty("maxEnemiesPerChunk");
+            _dropChanceEnemy = serializedObject.FindProperty("dropChanceEnemy");
             _enemiesMustSpawnOnPlatform = serializedObject.FindProperty("enemiesMustSpawnOnPlatform");
             _canSpawnAnywhere = serializedObject.FindProperty("canSpawnAnywhere");
             _spawnHeightRange = serializedObject.FindProperty("spawnHeightRange");
@@ -332,6 +334,18 @@ namespace _Scripts.Editor
 
                     EditorGUILayout.EndHorizontal();
                 }
+
+                EditorGUILayout.Space(10);
+
+                EditorGUILayout.BeginHorizontal();
+
+                EditorGUILayout.LabelField("Drop chance from enemy",new GUIStyle(EditorStyles.label) {normal = {textColor = new Color(0.66f, 0.51f, 0.02f)}} ,GUILayout.Width(200));
+                EditorGUILayout.PropertyField(_dropChanceEnemy, GUIContent.none,GUILayout.Width(65));
+                GUILayout.Space(-33);
+                EditorGUILayout.LabelField("%", new GUIStyle(EditorStyles.label) {normal = {textColor = new Color(0.66f, 0.51f, 0.02f)}}, GUILayout.Width(50));
+
+                
+                EditorGUILayout.EndHorizontal();
             });
                 EditorHelper.EditorHelper.DrawUiLine(color: Color.green);
 

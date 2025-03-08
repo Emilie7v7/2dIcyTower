@@ -15,8 +15,10 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
         [HideInInspector] public GameObject[] enemiesPrefab;
         [HideInInspector] public int minEnemiesPerChunk;
         [HideInInspector] public int maxEnemiesPerChunk;
+        [Range(0f, 100f)] 
+        [HideInInspector] public float dropChanceEnemy;
         
-        public BoostInfo[] boosts;
+        [HideInInspector] public BoostInfo[] boosts;
         
         [HideInInspector] public bool enemiesMustSpawnOnPlatform = false;
         [HideInInspector] public bool canSpawnAnywhere = false;
@@ -41,4 +43,6 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
         public float dropChance;
         public GameObject boostPrefab;
     }
+    
+    
 }

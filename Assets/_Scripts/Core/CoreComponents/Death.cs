@@ -1,4 +1,5 @@
 using _Scripts.Entities.EntityStateMachine;
+using _Scripts.Managers.Drop_Items_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
@@ -37,6 +38,7 @@ namespace _Scripts.CoreSystem
                 var enemy = Core.GetComponentInParent<Entity>(); //Ensure you get the correct Entity component
                 if (enemy is not null)
                 {
+                    DropManager.Instance.SpawnDroppedItem(transform.position);
                     EnemyPool.Instance.ReturnObject(enemy); //Return the whole enemy entity
                 }
                 else
