@@ -46,13 +46,17 @@ namespace _Scripts.InputHandler
             NormInputY = Mathf.RoundToInt(RawMovementInput.y);
         }
 
+        private bool _throwLocked = false; // Lock to prevent double throws
+
         public void SetThrow(InputAction.CallbackContext ctx)
         {
-            if (CanThrow)
+            if (CanThrow && !_throwLocked) // Prevents multiple throws per tap
             {
-                if (ctx.performed) // Change from started to performed
+                if (ctx.performed)
                 {
+                    Debug.Log("Throw Input Performed");
                     ThrowInput = true;
+                    _throwLocked = true; // Lock throwing until reset
 
                     // Reset ThrowInput AFTER state change
                     StartCoroutine(ResetThrowInput());
@@ -62,8 +66,9 @@ namespace _Scripts.InputHandler
 
         private IEnumerator ResetThrowInput()
         {
-            yield return new WaitForSeconds(0.05f); // Delays one frame to ensure the state switch happens
+            yield return new WaitForEndOfFrame(); // Waits one frame
             ThrowInput = false;
+            _throwLocked = false; // Unlock throw after reset
         }
 
         public void SetThrowDirection(InputAction.CallbackContext ctx)
