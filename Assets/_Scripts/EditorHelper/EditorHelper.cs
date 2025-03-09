@@ -1,10 +1,13 @@
+#if UNITY_EDITOR
 using UnityEditor;
+#endif
 using UnityEngine;
 
 namespace _Scripts.EditorHelper
 {
     public static class EditorHelper
     {
+#if UNITY_EDITOR
         public static void DrawFoldout(ref bool foldoutState, string title, GUIStyle foldoutStyle, System.Action drawAction)
         {
             foldoutState = EditorGUILayout.Foldout(foldoutState, title, true, foldoutStyle);
@@ -23,5 +26,6 @@ namespace _Scripts.EditorHelper
             rect.y += padding * 0.5f;
             EditorGUI.DrawRect(rect, color);
         }
+#endif
     }
 }

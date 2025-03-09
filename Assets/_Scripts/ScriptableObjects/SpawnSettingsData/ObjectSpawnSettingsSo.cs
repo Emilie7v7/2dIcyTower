@@ -1,4 +1,3 @@
-using _Scripts.Attributes;
 using UnityEngine;
 
 namespace _Scripts.ScriptableObjects.SpawnSettingsData
