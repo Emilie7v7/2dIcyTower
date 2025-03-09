@@ -1,7 +1,9 @@
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Drop_Items_Logic;
+using _Scripts.Managers.GameOver_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.CoreSystem
 {
@@ -11,7 +13,7 @@ namespace _Scripts.CoreSystem
         
         private ParticleManager _particleManager;
         private Stats _stats;
-        private bool _isPlayer;
+        [SerializeField] private bool isPlayer;
 
         protected override void Awake()
         {
@@ -27,10 +29,10 @@ namespace _Scripts.CoreSystem
             {
                 _particleManager.StartParticles(particle);
             }
-
-            _isPlayer = gameObject.CompareTag("Player");
-            if (_isPlayer)
+            
+            if (isPlayer)
             {
+                GameOverManager.Instance.TriggerGameOver();
                 Core.transform.parent.gameObject.SetActive(false);
             }
             else
@@ -43,7 +45,7 @@ namespace _Scripts.CoreSystem
                 }
                 else
                 {
-                    Debug.LogError("⚠ Enemy entity not found when trying to return to pool!");
+                    Debug.LogError("Enemy entity not found when trying to return to pool!");
                 }
             }
         }

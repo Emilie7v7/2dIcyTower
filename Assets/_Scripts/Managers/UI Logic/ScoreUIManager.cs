@@ -1,27 +1,28 @@
+using _Scripts.Managers.Score_Logic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Scripts.Managers.UI
+namespace _Scripts.Managers.UI_Logic
 {
     public class ScoreUIManager : MonoBehaviour
     {
         [SerializeField] private TMP_Text scoreText;
         [SerializeField] private TMP_Text multiplierText;
-        [SerializeField] private Image killStreakTimerImage;
+        [SerializeField] private Slider killStreakTimerSlider;
         
         private void OnEnable()
         {
-            ScoreManager.ScoreManager.Instance.OnScoreUpdated += UpdateScore;
-            ScoreManager.ScoreManager.Instance.OnMultiplierUpdated += UpdateMultiplier;
-            ScoreManager.ScoreManager.Instance.OnKillstreakTimeUpdated += UpdateKillStreakTimer;
+            ScoreManager.Instance.OnScoreUpdated += UpdateScore;
+            ScoreManager.Instance.OnMultiplierUpdated += UpdateMultiplier;
+            ScoreManager.Instance.OnKillstreakTimeUpdated += UpdateKillStreakTimer;
         }
 
         private void OnDisable()
         {
-            ScoreManager.ScoreManager.Instance.OnScoreUpdated -= UpdateScore;
-            ScoreManager.ScoreManager.Instance.OnMultiplierUpdated -= UpdateMultiplier;
-            ScoreManager.ScoreManager.Instance.OnKillstreakTimeUpdated -= UpdateKillStreakTimer;
+            ScoreManager.Instance.OnScoreUpdated -= UpdateScore;
+            ScoreManager.Instance.OnMultiplierUpdated -= UpdateMultiplier;
+            ScoreManager.Instance.OnKillstreakTimeUpdated -= UpdateKillStreakTimer;
         }
 
         private void UpdateScore(int score)
@@ -36,7 +37,7 @@ namespace _Scripts.Managers.UI
 
         private void UpdateKillStreakTimer(float timeLeft, float timeMax)
         {
-            killStreakTimerImage.fillAmount = timeLeft / timeMax;
+            killStreakTimerSlider.value = timeLeft / timeMax;
         }
     }
 }

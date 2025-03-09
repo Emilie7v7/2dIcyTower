@@ -9,13 +9,20 @@ namespace _Scripts.CoreSystem
         protected override void Awake()
         {
             base.Awake();
-            
-            _particleManager = GameObject.FindGameObjectWithTag("ParticleManager").transform;
+    
+            var particleManagerObj = GameObject.FindGameObjectWithTag("ParticleManager");
+            if (particleManagerObj == null)
+            {
+                return;
+            }
+            _particleManager = particleManagerObj.transform;
         }
 
-        public GameObject StartParticles(GameObject particlePrefab, Vector2 position, Quaternion rotation)
+        private static GameObject StartParticles(GameObject particlePrefab, Vector2 position, Quaternion rotation)
         {
-            return Instantiate(particlePrefab, position, rotation, _particleManager);
+            var particleInstance = Instantiate(particlePrefab, position, rotation);
+            particleInstance.transform.parent = null;
+            return particleInstance;
         }
 
         public GameObject StartParticles(GameObject particlePrefab)

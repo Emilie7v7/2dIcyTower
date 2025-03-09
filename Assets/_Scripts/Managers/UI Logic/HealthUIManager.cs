@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace _Scripts.Managers.UI
+namespace _Scripts.Managers.UI_Logic
 {
     public class HealthUIManager : MonoBehaviour
     {

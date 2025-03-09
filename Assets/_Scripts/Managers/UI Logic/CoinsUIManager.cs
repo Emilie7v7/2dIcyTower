@@ -2,7 +2,7 @@ using _Scripts.Managers.Game_Manager_Logic;
 using TMPro;
 using UnityEngine;
 
-namespace _Scripts.Managers.UI
+namespace _Scripts.Managers.UI_Logic
 {
     public class CoinsUIManager : MonoBehaviour
     {

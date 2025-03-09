@@ -5,7 +5,7 @@ using _Scripts.JSON;
 using Newtonsoft.Json;
 using UnityEngine;
 
-namespace _Scripts.Managers
+namespace _Scripts.Managers.Save_System_Logic
 {
     public static class SaveSystem
     {

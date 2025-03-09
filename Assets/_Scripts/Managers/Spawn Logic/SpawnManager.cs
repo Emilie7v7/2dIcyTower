@@ -1,16 +1,12 @@
-using System;
 using System.Collections.Generic;
-using _Scripts.Entities.EntitySpecific;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.Pickups;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using Random = UnityEngine.Random;
 
-namespace _Scripts.Managers.SpawnManager
+namespace _Scripts.Managers.Spawn_Logic
 {
     public class SpawnManager : MonoBehaviour
     {
@@ -45,6 +41,7 @@ namespace _Scripts.Managers.SpawnManager
             {
                 GenerateChunk(i);
             }
+            
         }
 
         private void Update()
@@ -56,7 +53,7 @@ namespace _Scripts.Managers.SpawnManager
                 GenerateChunk(playerChunk + 3);
             }
 
-            while (_activeChunks.Count > 7) //Maintain 7 active chunks
+            while (_activeChunks.Count > 7)
             {
                 var oldestChunk = _activeChunks.Peek();
                 if (oldestChunk < playerChunk - 3)
@@ -70,7 +67,7 @@ namespace _Scripts.Managers.SpawnManager
                 }
             }
         }
-
+        
         private void GenerateChunk(int chunkIndex)
         {
             if (_activeChunks.Contains(chunkIndex)) return;
@@ -164,7 +161,6 @@ namespace _Scripts.Managers.SpawnManager
                 }
             }
         }
-        //Work in progress------------------------------------------------------------
         private void GenerateObjects(int chunkIndex, Vector3Int chunkPosition)
         {
             #region Coins Spawner
@@ -223,41 +219,82 @@ namespace _Scripts.Managers.SpawnManager
 
             #endregion
         }
+        //Work in progress------------------------------------------------------------
         private void GenerateHazards(int chunkIndex, Vector3Int chunkPosition)
         {
-            if (Random.value <= hazardSettings.spawnProbability)
-            {
-                var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
-                var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); //FIXED HEIGHT RANGE
-                
-                var tile = hazardSettings.ruleTileHazards[Random.Range(0, hazardSettings.ruleTileHazards.Length)];
-                hazardTilemap.SetTile(new Vector3Int(x, y, 0), tile);
-            }
+            
         }
-        private void GenerateDecorations(int chunkIndex, Vector3Int chunkPosition)
+        private void GenerateDecorations(int chunkIndex, Vector3Int chunkPosition) 
         {
-            var decorationCount = Random.Range(1, decorationSettings.maxDecorationsPerChunk);
+            var decorationsToSpawn = Random.Range(decorationSettings.minDecorationsPerChunk, decorationSettings.maxDecorationsPerChunk);
 
-            for (var i = 0; i < decorationCount; i++)
+            // Get platform positions within this chunk (assumes we already track platforms)
+            var validPlatformPositions = GetPlatformSpawnPositions(chunkPosition, chunkHeight);
+
+            for (var i = 0; i < decorationsToSpawn; i++)
             {
-                var x = Random.Range(wallSettings.leftWallX + 2, wallSettings.rightWallX - 2);
-                var y = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight - 1); //FIXED HEIGHT RANGE
-                
-                var spawnPosition = new Vector3Int(x, y, 0);
+                var placeOnPlatform = Random.value > 0.5f; // 50% chance to be on platform vs air
 
-                if (decorationSettings.platformRuleTileDecorations.Length > 0)
+                if (placeOnPlatform && validPlatformPositions.Count > 0)
                 {
-                    var index = Random.Range(0, decorationSettings.platformRuleTileDecorations.Length);
-                    var selectedTile = decorationSettings.platformRuleTileDecorations[index];
+                    // Select a random platform position
+                    var platformPos = validPlatformPositions[Random.Range(0, validPlatformPositions.Count)];
 
-                    var platformCheckPos = new Vector3Int(x, y - 1, 0);
-                    if (platformTilemap.HasTile(platformCheckPos))
+                    // Extract left and right bounds from existing function
+                    var left = platformPos.x;
+                    var right = platformPos.x;
+
+                    // Expand left
+                    while (platformTilemap.HasTile(new Vector3Int(left - 1, platformPos.y - 1, 0)))
                     {
-                        decorationTilemap.SetTile(spawnPosition, selectedTile);
+                        left--;
+                    }
+
+                    // Expand right
+                    while (platformTilemap.HasTile(new Vector3Int(right + 1, platformPos.y - 1, 0)))
+                    {
+                        right++;
+                    }
+
+                    // Pick a random X position **within platform bounds**
+                    var randomX = Random.Range(left, right + 1);
+                    var decorationPos = new Vector3Int(randomX, platformPos.y, 0);
+
+                    // Randomly choose between RuleTile or SingleTile decoration
+                    if (decorationSettings.platformRuleTileDecorations.Length > 0 && Random.value > 0.5f)
+                    {
+                        var selectedTile = decorationSettings.platformRuleTileDecorations[Random.Range(0, decorationSettings.platformRuleTileDecorations.Length)];
+                        decorationTilemap.SetTile(decorationPos, selectedTile);
+                    }
+                    else if (decorationSettings.platformSingleTileDecorations.Length > 0)
+                    {
+                        var selectedTile = decorationSettings.platformSingleTileDecorations[Random.Range(0, decorationSettings.platformSingleTileDecorations.Length)];
+                        decorationTilemap.SetTile(decorationPos, selectedTile);
+                    }
+                    else
+                    {
+                        //Place in the air
+                        var airX = Random.Range(wallSettings.leftWallX + 5, wallSettings.rightWallX - 5);
+                        var airY = Random.Range(chunkPosition.y, chunkPosition.y + chunkHeight);
+
+                        var airDecorationPos = new Vector3Int(airX, airY, 0);
+
+                        // Randomly choose between RuleTile or SingleTile decoration
+                        if (decorationSettings.airRuleTileDecorations.Length > 0 && Random.value > 0.5f)
+                        {
+                            var selectedTile = decorationSettings.airRuleTileDecorations[Random.Range(0, decorationSettings.airRuleTileDecorations.Length)];
+                            decorationTilemap.SetTile(airDecorationPos, selectedTile);
+                        }
+                        else if (decorationSettings.airSingleTileDecorations.Length > 0)
+                        {
+                            var selectedTile = decorationSettings.airSingleTileDecorations[Random.Range(0, decorationSettings.airSingleTileDecorations.Length)];
+                            decorationTilemap.SetTile(airDecorationPos, selectedTile);
+                        }
                     }
                 }
             }
         }
+        
         //-----------------------------------------------------------------------------
         private void GenerateBackground(int chunkIndex, Vector3Int chunkPosition)
         {
@@ -283,16 +320,17 @@ namespace _Scripts.Managers.SpawnManager
         private void ClearChunks(int chunkIndex)
         {
             if (!_chunkPositions.TryGetValue(chunkIndex, out var chunkPosition)) return;
-            
+
             for (var x = wallSettings.leftWallX; x <= wallSettings.rightWallX; x++)
             {
                 for (var y = chunkPosition.y; y < chunkPosition.y + chunkHeight; y++)
                 {
+
                     platformTilemap.SetTile(new Vector3Int(x, y, 0), null);
-                    hazardTilemap.SetTile(new Vector3Int(x, y, 0), null);
                     decorationTilemap.SetTile(new Vector3Int(x, y, 0), null);
                     wallTilemap.SetTile(new Vector3Int(x, y, 0), null);
                     backgroundTilemap.SetTile(new Vector3Int(x, y, 0), null);
+                    hazardTilemap.SetTile(new Vector3Int(x, y, 0), null);
                 }
             }
             ReturnObjectsInChunk(chunkPosition);
@@ -310,15 +348,15 @@ namespace _Scripts.Managers.SpawnManager
                 if (obj.CompareTag("Coin"))
                 {
                     var coin = obj.GetComponent<CoinPickup>();
-                    if (coin != null)
+                    if (coin is not null)
                     {
                         CoinPool.Instance.ReturnObject(coin);
                     }
                 }
                 else if (obj.CompareTag("Enemy"))
                 {
-                    var enemy = obj.GetComponent<Entity>(); // Adjust if you have multiple enemy types
-                    if (enemy != null)
+                    var enemy = obj.GetComponent<Entity>();
+                    if (enemy is not null)
                     {
                         EnemyPool.Instance.ReturnObject(enemy);
                     }
@@ -326,7 +364,7 @@ namespace _Scripts.Managers.SpawnManager
                 else if (obj.CompareTag("PowerUp"))
                 {
                     var powerUp = obj.GetComponent<PowerUp>();
-                    if (powerUp != null)
+                    if (powerUp is not null)
                     {
                         PowerUpPool.Instance.ReturnObject(powerUp);
                     }
@@ -363,14 +401,16 @@ namespace _Scripts.Managers.SpawnManager
 
                         //Calculate center of the platform
                         var centerX = (left + right) / 2;
-
+                        
                         platformPositions.Add(new Vector3Int(centerX, y, 0)); //Enemy spawns exactly in the center
                     }
                 }
             }
 
-            return platformPositions; // Returns all valid spawn positions
+            return platformPositions; //Returns all valid spawn positions
         }
+        
+        
         
         private void OnDrawGizmos()
         {

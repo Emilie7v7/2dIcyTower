@@ -1,10 +1,8 @@
 using System;
 using _Scripts.Managers.Game_Manager_Logic;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace _Scripts.Managers.ScoreManager
+namespace _Scripts.Managers.Score_Logic
 {
     public class ScoreManager : MonoBehaviour
     {
@@ -20,7 +18,7 @@ namespace _Scripts.Managers.ScoreManager
         private float _multiplier = 1.0f;
         private float _multiplierTimeLeft;
         private float _initialPosition;
-        private const float BaseMultiplierDuration = 5.0f;
+        private const float BaseMultiplierDuration = 6.5f;
 
         [SerializeField] private Transform playerTransform;
 
@@ -58,7 +56,7 @@ namespace _Scripts.Managers.ScoreManager
 
         private void UpdateScore()
         {
-            var newScore = Mathf.FloorToInt((playerTransform.position.y - 0.2974851f) * 10 * _multiplier);
+            var newScore = Mathf.FloorToInt((playerTransform.position.y - 0.8897043f) * 10 * _multiplier);
             if (newScore > _score)
             {
                 _score = newScore;

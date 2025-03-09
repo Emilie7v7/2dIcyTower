@@ -21,8 +21,8 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
         public TileBase[] airSingleTileDecorations;
 
         [Header("Spawn Settings")]
-        public float spawnProbability = 0.7f; // Overall decoration spawn chance
         public Vector2 decorationHeightRange = new Vector2(0, 10000); // Where decorations spawn
-        public int maxDecorationsPerChunk = 5; // Max decorations per chunk
+        public int minDecorationsPerChunk = 5; // Max decorations per chunk
+        public int maxDecorationsPerChunk = 20; // Max decorations per chunk
     }
 }

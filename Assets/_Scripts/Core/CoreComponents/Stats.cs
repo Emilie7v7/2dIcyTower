@@ -1,8 +1,8 @@
 using System.Collections;
 using _Scripts.CoreSystem.StatSystem;
 using _Scripts.Managers.Game_Manager_Logic;
-using _Scripts.Managers.ScoreManager;
-using _Scripts.Managers.UI;
+using _Scripts.Managers.Score_Logic;
+using _Scripts.Managers.UI_Logic;
 using UnityEngine;
 
 namespace _Scripts.CoreSystem

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using _Scripts.JSON;
+using _Scripts.Managers.Save_System_Logic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -42,7 +43,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
         private void FindPlayer()
         {
             var playerObj = GameObject.FindGameObjectWithTag("Player");
-            if (playerObj != null)
+            if (playerObj is not null)
             {
                 Player = playerObj.transform;
             }

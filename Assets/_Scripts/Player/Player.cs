@@ -1,4 +1,4 @@
-using System.Collections;
+using System;
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
 using _Scripts.Player;
@@ -28,6 +28,7 @@ namespace _Scripts.PlayerComponent
         
         public Core Core { get; private set; }
         public CollisionSenses CollisionSenses { get; private set; }
+        public Stats Stats { get; private set; }
         public Movement Movement { get; private set; }
         public PlayerInputHandler InputHandler { get; private set; }
         public Animator MyAnimator { get; private set; }
@@ -45,11 +46,11 @@ namespace _Scripts.PlayerComponent
             Core = GetComponentInChildren<Core>();
             CollisionSenses = Core.GetCoreComponent<CollisionSenses>();
             Movement = Core.GetCoreComponent<Movement>();
+            Stats = Core.GetCoreComponent<Stats>();
             
             StateMachine = new PlayerStateMachine();
             
             IdleState = new PlayerIdleState(this, StateMachine, playerData, "isIdle");
-            //MoveState = new PlayerMoveState(this, StateMachine, playerData, "isMoving");
             ThrowState = new PlayerThrowState(this, StateMachine, playerData, "isThrowing");
             InAirState = new PlayerInAirState(this, StateMachine, playerData, "isInAir");
         }
@@ -86,6 +87,15 @@ namespace _Scripts.PlayerComponent
         {
             StateMachine.CurrentState.PhysicsUpdate();
         }
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (other.CompareTag("Lava"))
+            {
+                Stats.Health.CurrentValue = 0;
+            }
+        }
+
         #endregion
 
         private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
@@ -93,25 +103,6 @@ namespace _Scripts.PlayerComponent
         private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
         
         // Method to start the smooth fall transition
-        public void StartFallTransition(Movement movement, float transitionTime, float targetGravity)
-        {
-            StartCoroutine(SmoothFall(movement, transitionTime, targetGravity));
-        }
-
-        private IEnumerator SmoothFall(Movement movement, float transitionTime, float targetGravity)
-        {
-            float elapsedTime = 0f;
-            float initialGravity = movement.Rb2D.gravityScale;
-
-            while (elapsedTime < transitionTime)
-            {
-                elapsedTime += Time.deltaTime;
-                movement.Rb2D.gravityScale = Mathf.Lerp(initialGravity, targetGravity, elapsedTime / transitionTime);
-                yield return null;
-            }
-
-            movement.Rb2D.gravityScale = targetGravity;
-        }
 
         private void OnDrawGizmos()
         {

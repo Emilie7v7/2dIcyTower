@@ -1,7 +1,7 @@
 using System;
 using _Scripts.CoreSystem;
 using _Scripts.Intermediaries;
-using _Scripts.Managers.ScoreManager;
+using _Scripts.Managers.Score_Logic;
 using _Scripts.ScriptableObjects.EntityData;
 using UnityEngine;
 
