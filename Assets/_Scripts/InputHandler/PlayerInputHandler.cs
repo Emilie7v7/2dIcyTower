@@ -1,5 +1,7 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 
 namespace _Scripts.InputHandler
 {
@@ -23,7 +25,17 @@ namespace _Scripts.InputHandler
         {
             playerInput = GetComponent<PlayerInput>();
         }
+        
+        private void OnEnable()
+        {
+            EnhancedTouchSupport.Enable(); // Enable Enhanced Touch for better touch detection
+        }
 
+        private void OnDisable()
+        {
+            EnhancedTouchSupport.Disable(); // Disable it when the object is disabled/destroyed
+        }
+        
         public void SetMove(InputAction.CallbackContext ctx)
         {
             //Reads the Vector2 x,y for movement input
@@ -38,15 +50,20 @@ namespace _Scripts.InputHandler
         {
             if (CanThrow)
             {
-                if (ctx.started)
+                if (ctx.performed) // Change from started to performed
                 {
                     ThrowInput = true;
-                }
-                if (ctx.canceled)
-                {
-                    ThrowInput = false;
+
+                    // Reset ThrowInput AFTER state change
+                    StartCoroutine(ResetThrowInput());
                 }
             }
+        }
+
+        private IEnumerator ResetThrowInput()
+        {
+            yield return new WaitForSeconds(0.05f); // Delays one frame to ensure the state switch happens
+            ThrowInput = false;
         }
 
         public void SetThrowDirection(InputAction.CallbackContext ctx)

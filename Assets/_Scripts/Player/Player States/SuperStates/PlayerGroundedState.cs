@@ -1,15 +1,12 @@
 using _Scripts.CoreSystem;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
+using UnityEngine;
 
 namespace _Scripts.Player.Player_States.SuperStates
 {
     public class PlayerGroundedState : PlayerState.PlayerState
     {
-        //Input
-        //protected int XInput;
-        //protected int YInput;
-    
         private bool _jumpInput;
     
         //Checks
@@ -45,9 +42,7 @@ namespace _Scripts.Player.Player_States.SuperStates
         public override void LogicUpdate()
         {
             base.LogicUpdate();
-        
-            //XInput = Player.InputHandler.NormInputX;
-            //YInput = Player.InputHandler.NormInputY;
+    
             _isThrowing = Player.InputHandler.ThrowInput;
 
             if (_isThrowing)

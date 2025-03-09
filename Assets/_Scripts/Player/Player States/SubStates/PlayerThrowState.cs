@@ -21,8 +21,13 @@ namespace _Scripts.Player.Player_States.SubStates
         {
             base.AnimationTrigger();
             
+
             var projectilePrefab = PlayerProjectilePool.Instance.GetObject(Player.transform.position);
-            if (projectilePrefab is null) return;
+            if (projectilePrefab is null)
+            {
+                Debug.LogError("Projectile is NULL! Pool might be empty.");
+                return;
+            }
             
             projectilePrefab.SetProjectileOwner(true);
             projectilePrefab.transform.position = Player.transform.position;

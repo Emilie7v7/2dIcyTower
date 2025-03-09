@@ -40,14 +40,23 @@ namespace _Scripts.ObjectPool
 
         public void ReturnObject(T obj)
         {
-            if (obj is null)
-            {
-                return;
-            }
+            if (obj is null) return;
+
             obj.gameObject.SetActive(false);
             obj.transform.SetParent(PoolParent);
-            obj.transform.position = Vector3.zero;
+            obj.transform.position = Vector3.zero; // Reset position to avoid falling
             Pool.Enqueue(obj);
         }
+        public void DisableAllObjects()
+        {
+            foreach (var obj in Pool)
+            {
+                obj.gameObject.SetActive(false);
+                obj.transform.SetParent(PoolParent);
+                obj.transform.position = Vector3.zero;
+            }
+        }
+        
+        
     }
 }

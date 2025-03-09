@@ -1,4 +1,7 @@
+using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Game_Manager_Logic;
+using _Scripts.ObjectPool.ObjectsToPool;
+using _Scripts.Pickups;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -15,10 +18,73 @@ namespace _Scripts.Managers.Menu_Logic
         public void BackToMenu()
         {
             GameManager.Instance.SaveGameData();
+
+            // ✅ Ensure all pooled objects return before switching scenes
+            ResetPooledObjects();
+
             Time.timeScale = 1;
             SceneManager.LoadScene("MenuScene");
         }
-        
+
+        private void ResetPooledObjects()
+        {
+            if (EnemyPool.Instance != null)
+            {
+                ReturnActiveEnemies();
+            }
+
+            if (CoinPool.Instance != null)
+            {
+                ReturnActiveCoins();
+            }
+
+            if (PowerUpPool.Instance != null)
+            {
+                ReturnActivePowerUps();
+            }
+        }
+
+// Return all active enemies to the pool
+        private void ReturnActiveEnemies()
+        {
+            var activeEnemies = GameObject.FindGameObjectsWithTag("Enemy"); // Find all active enemies
+            foreach (var enemy in activeEnemies)
+            {
+                var enemyComponent = enemy.GetComponent<Entity>(); // Ensure it has the entity component
+                if (enemyComponent != null)
+                {
+                    EnemyPool.Instance.ReturnObject(enemyComponent);
+                }
+            }
+        }
+
+// Return all active coins to the pool
+        private void ReturnActiveCoins()
+        {
+            var activeCoins = GameObject.FindGameObjectsWithTag("Coin"); // Find all active coins
+            foreach (var coin in activeCoins)
+            {
+                var coinComponent = coin.GetComponent<CoinPickup>(); // Ensure it has the coin component
+                if (coinComponent != null)
+                {
+                    CoinPool.Instance.ReturnObject(coinComponent);
+                }
+            }
+        }
+
+        // Return all active power-ups to the pool
+        private void ReturnActivePowerUps()
+        {
+            var activePowerUps = GameObject.FindGameObjectsWithTag("PowerUp"); // Find all active power-ups
+            foreach (var powerUp in activePowerUps)
+            {
+                var powerUpComponent = powerUp.GetComponent<PowerUp>(); // Ensure it has the power-up component
+                if (powerUpComponent != null)
+                {
+                    PowerUpPool.Instance.ReturnObject(powerUpComponent);
+                }
+            }
+        }
         public void RestartGame()
         {
             Time.timeScale = 1;

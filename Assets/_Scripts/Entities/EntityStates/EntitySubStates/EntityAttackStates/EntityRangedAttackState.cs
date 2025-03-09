@@ -9,6 +9,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
 {
     public class EntityRangedAttackState : EntityAttackState
     {
+        private GameObject _player;
         protected EntityRangedAttackState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName) : base(entity, stateMachine, entityData, animBoolName)
         {
         }
@@ -17,15 +18,16 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
         {
             base.AnimationAttackTrigger();
             
-            var player = GameObject.FindGameObjectWithTag("Player");
-
+            if(_player is null) return;
+            _player = GameObject.FindGameObjectWithTag("Player");
+            
             var projectilePrefab = EnemyProjectilePool.Instance.GetObject(Entity.transform.position);
             if (projectilePrefab is null) return;
             
             projectilePrefab.SetProjectileOwner(false);
             projectilePrefab.transform.position = Entity.transform.position;
             
-            Vector2 direction = (player.transform.position - Entity.transform.position).normalized;
+            Vector2 direction = (_player.transform.position - Entity.transform.position).normalized;
 
             direction += projectilePrefab.ProjectileData.projectileArc;
 
