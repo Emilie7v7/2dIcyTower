@@ -21,6 +21,7 @@ namespace _Scripts.Managers.Score_Logic
         private const float BaseMultiplierDuration = 6.5f;
 
         [SerializeField] private Transform playerTransform;
+        private float _lastRecordedHeight;
 
         private void Awake()
         {
@@ -33,11 +34,11 @@ namespace _Scripts.Managers.Score_Logic
                 Destroy(gameObject);
             }
         }
-
+        
         private void Start()
         {
             _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier;
-            
+            _lastRecordedHeight = playerTransform.position.y; // Initialize height tracking
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
         }
 
@@ -53,14 +54,22 @@ namespace _Scripts.Managers.Score_Logic
                 }
             }
         }
-
         private void UpdateScore()
         {
-            var newScore = Mathf.FloorToInt((playerTransform.position.y - 0.8897043f) * 10 * _multiplier);
-            if (newScore > _score)
+            var currentHeight = playerTransform.position.y;
+
+            // Calculate height difference
+            var heightDifference = currentHeight - _lastRecordedHeight;
+    
+            // If the player moved up, accumulate score
+            if (heightDifference > 0)
             {
-                _score = newScore;
+                var scoreIncrease = Mathf.FloorToInt(heightDifference * 10 * _multiplier);
+                _score += scoreIncrease;
                 OnScoreUpdated?.Invoke(_score);
+        
+                // Update last recorded height
+                _lastRecordedHeight = currentHeight;
             }
         }
 
@@ -82,6 +91,7 @@ namespace _Scripts.Managers.Score_Logic
             _multiplier = 1.0f;
             OnMultiplierUpdated?.Invoke(_multiplier);
             OnKillstreakTimeUpdated?.Invoke(0, BaseMultiplierDuration);
+
         }
         
         public int GetScore()

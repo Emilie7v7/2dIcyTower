@@ -27,12 +27,6 @@ namespace _Scripts.Projectiles
             _hasExploded = false;
         }
 
-        private void Start()
-        {
-            Debug.Log("Explode");
-            Explode();
-        }
-        
         public void ActivateExplosion(Vector3 position, bool isPlayer)
         {
             isPlayerExplosion = isPlayer;
