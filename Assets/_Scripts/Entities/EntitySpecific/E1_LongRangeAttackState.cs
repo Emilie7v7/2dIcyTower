@@ -6,11 +6,11 @@ namespace _Scripts.Entities.EntitySpecific
 {
     public class E1LongRangeAttackState : EntityRangedAttackState
     {
-        private Entity1 _enemy;
+        private readonly Entity1 _enemy;
     
         public E1LongRangeAttackState(Entity entity, EntityStateMachine.EntityStateMachine stateMachine, EntityDataSo entityData, string animBoolName, Entity1 enemy) : base(entity, stateMachine, entityData, animBoolName)
         {
-            this._enemy = enemy;
+            _enemy = enemy;
         }
 
         public override void Enter()

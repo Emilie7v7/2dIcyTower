@@ -64,18 +64,6 @@ namespace _Scripts.Managers.Save_System_Logic
                 return Encoding.UTF8.GetString(output.ToArray());
             }
         }
-
-        // public static void DeleteData()
-        // {
-        //     if (File.Exists(SavePath))
-        //     {
-        //         File.Delete(SavePath);
-        //         Debug.Log("Save Data Deleted: " + SavePath);
-        //     }
-        //
-        //     //Immediately create a new default save to prevent issues
-        //     SaveData(new PlayerData());
-        // }
         
         public static void DeleteData()
         {
@@ -89,11 +77,8 @@ namespace _Scripts.Managers.Save_System_Logic
                 Debug.Log("No Save Data Found to Delete.");
             }
         }
-    
-        /// <summary>
-        /// Function that can be used for debugging, because right now the save file JSON is saved as encoded file so it is not readable for person
-        /// </summary>
-        /// <returns></returns>
+        
+        // Function that can be used for debugging, because right now the save file JSON is saved as encoded file so it is not readable for person
         public static string GetReadableSaveData()
         {
             if (!File.Exists(SavePath)) return "No Save File Found.";

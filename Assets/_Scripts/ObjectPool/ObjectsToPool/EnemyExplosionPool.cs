@@ -1,13 +1,13 @@
 using _Scripts.Projectiles;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.ObjectPool.ObjectsToPool
 {
-    public class EnemyProjectilePool : ObjectPool<Projectile>
+    public class EnemyExplosionPool : ObjectPool<Explosion>
     {
-        [SerializeField] private Projectile enemyProjectilePrefab;
-        public static EnemyProjectilePool Instance { get; private set; }
+        [SerializeField] private Explosion enemyExplosion;
+        
+        public static EnemyExplosionPool Instance { get; private set; }
 
         protected override void Awake()
         {
@@ -25,7 +25,7 @@ namespace _Scripts.ObjectPool.ObjectsToPool
 
         protected override void InitializePool()
         {
-            if (enemyProjectilePrefab is null) return;
+            if (enemyExplosion is null) return;
 
             var parentObj = GameObject.Find("PooledObjects");
             if (parentObj == null)
@@ -33,13 +33,13 @@ namespace _Scripts.ObjectPool.ObjectsToPool
                 parentObj = new GameObject("PooledObjects");
             }
             PoolParent = parentObj.transform;
-            DontDestroyOnLoad(parentObj);
+            DontDestroyOnLoad(gameObject);
 
             for (var i = 0; i < poolSize; i++)
             {
-                var projectile = Instantiate(enemyProjectilePrefab, PoolParent);
-                projectile.gameObject.SetActive(false);
-                Pool.Enqueue(projectile);
+                var newExplosion = Instantiate(enemyExplosion, PoolParent);
+                newExplosion.gameObject.SetActive(false);
+                Pool.Enqueue(newExplosion);
             }
         }
     }

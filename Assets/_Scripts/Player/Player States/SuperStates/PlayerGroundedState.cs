@@ -53,7 +53,7 @@ namespace _Scripts.Player.Player_States.SuperStates
         
         private void ResetGravity()
         {
-            if (Movement != null)
+            if (Movement is not null)
             {
                 Movement.Rb2D.gravityScale = PlayerData.defaultGravityScale; // Reset gravity scale
                 Movement.Rb2D.drag = 0f; // Reset drag

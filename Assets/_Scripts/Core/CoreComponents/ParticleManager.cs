@@ -11,7 +11,7 @@ namespace _Scripts.CoreSystem
             base.Awake();
     
             var particleManagerObj = GameObject.FindGameObjectWithTag("ParticleManager");
-            if (particleManagerObj == null)
+            if (particleManagerObj is null)
             {
                 return;
             }

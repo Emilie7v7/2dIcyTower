@@ -12,13 +12,6 @@ namespace _Scripts.Entities.EntitySpecific
             this._enemy = enemy;
         }
 
-        public override void Enter()
-        {
-            base.Enter();
-            
-            //Debug.Log("We have entered the player detected state");
-        }
-
         public override void LogicUpdate()
         {
             base.LogicUpdate();

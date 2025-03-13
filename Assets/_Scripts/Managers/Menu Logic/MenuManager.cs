@@ -18,15 +18,12 @@ namespace _Scripts.Managers.Menu_Logic
         public void BackToMenu()
         {
             GameManager.Instance.SaveGameData();
-
-            // ✅ Ensure all pooled objects return before switching scenes
-            ResetPooledObjects();
-
             Time.timeScale = 1;
+            ResetPooledObjects();
             SceneManager.LoadScene("MenuScene");
         }
 
-        private void ResetPooledObjects()
+        private static void ResetPooledObjects()
         {
             if (EnemyPool.Instance != null)
             {
@@ -44,8 +41,8 @@ namespace _Scripts.Managers.Menu_Logic
             }
         }
 
-// Return all active enemies to the pool
-        private void ReturnActiveEnemies()
+        // Return all active enemies to the pool
+        private static void ReturnActiveEnemies()
         {
             var activeEnemies = GameObject.FindGameObjectsWithTag("Enemy"); // Find all active enemies
             foreach (var enemy in activeEnemies)
@@ -58,8 +55,8 @@ namespace _Scripts.Managers.Menu_Logic
             }
         }
 
-// Return all active coins to the pool
-        private void ReturnActiveCoins()
+        // Return all active coins to the pool
+        private static void ReturnActiveCoins()
         {
             var activeCoins = GameObject.FindGameObjectsWithTag("Coin"); // Find all active coins
             foreach (var coin in activeCoins)
@@ -73,7 +70,7 @@ namespace _Scripts.Managers.Menu_Logic
         }
 
         // Return all active power-ups to the pool
-        private void ReturnActivePowerUps()
+        private static void ReturnActivePowerUps()
         {
             var activePowerUps = GameObject.FindGameObjectsWithTag("PowerUp"); // Find all active power-ups
             foreach (var powerUp in activePowerUps)
@@ -88,6 +85,7 @@ namespace _Scripts.Managers.Menu_Logic
         public void RestartGame()
         {
             Time.timeScale = 1;
+            ResetPooledObjects();
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         

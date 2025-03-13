@@ -186,10 +186,8 @@ namespace _Scripts.Managers.Game_Manager_Logic
             // Ensure all upgrades exist in the dictionary
             foreach (var upgrade in defaultUpgrades)
             {
-                if (!PlayerData.UpgradeLevels.ContainsKey(upgrade))
-                {
-                    PlayerData.UpgradeLevels[upgrade] = 0; // Set to default level
-                }
+                PlayerData.UpgradeLevels.TryAdd(upgrade, 0);
+                // Set to default level
             }
 
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins);

@@ -18,6 +18,12 @@ namespace _Scripts.Managers.GameOver_Logic
             else
             {
                 Destroy(gameObject);
+                return;
+            }
+
+            if (gameOverUI == null) // Ensure UI reference is valid
+            {
+                gameOverUI = GameObject.Find("GameOverCanvas"); // Adjust name if necessary
             }
         }
 

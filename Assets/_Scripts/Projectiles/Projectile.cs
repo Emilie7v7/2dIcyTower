@@ -1,8 +1,8 @@
 using _Scripts.CoreSystem;
+using _Scripts.ObjectPool;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.ProjectileData;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.Projectiles
 {
@@ -61,8 +61,17 @@ namespace _Scripts.Projectiles
                     {
                         var hitPosition = hit.ClosestPoint(transform.position);
                         
-                        Instantiate(ProjectileData.explosionPrefab, hitPosition, Quaternion.identity);
-                        ReturnToPool(); //Ensure projectile is returned properly
+                        // Get explosion from the correct pool
+                        var explosion = _isPlayerProjectile
+                            ? PlayerExplosionPool.Instance?.GetObject(hitPosition)
+                            : EnemyExplosionPool.Instance?.GetObject(hitPosition);
+
+                        if (explosion is not null)
+                        {
+                            explosion.ActivateExplosion(hitPosition, _isPlayerProjectile); // ✅ Trigger explosion properly
+                        }
+
+                        ReturnToPool(); // Ensure projectile is returned properly
                         break;
                     }
                 }
@@ -71,7 +80,7 @@ namespace _Scripts.Projectiles
         
         public void SetSpawnPosition(Vector3 position)
         {
-            _spawnPosition = position; //Updates spawn point to new position
+            _spawnPosition = position; // Updates spawn point to new position
         }
 
         private void ReturnToPool()

@@ -1,6 +1,8 @@
+using System.Collections;
 using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
 using _Scripts.Managers.Game_Manager_Logic;
+using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.ExplosionData;
 using UnityEngine;
 
@@ -10,6 +12,7 @@ namespace _Scripts.Projectiles
     {
         [SerializeField] private ExplosionDataSo explosionDataSo;
         [SerializeField] private bool isPlayerExplosion = false;
+        [SerializeField] private ParticleSystem explosionParticles; // Reference to the Particle System
         [field: SerializeField] public Transform DetectionPosition { get; private set; }
         private Collider2D[] _colliders;
 
@@ -26,14 +29,30 @@ namespace _Scripts.Projectiles
 
         private void Start()
         {
+            Debug.Log("Explode");
             Explode();
         }
+        
+        public void ActivateExplosion(Vector3 position, bool isPlayer)
+        {
+            isPlayerExplosion = isPlayer;
+            transform.position = position;
 
+            //Debug.Log("Explosion Activated at: " + position);
+
+            Explode(); //Manually trigger explosion effect every time it's retrieved
+        }
         private void Explode()
         {
-            if (_hasExploded) return;
-            _hasExploded = true; // Ensure explosion happens only once
-
+            if(_hasExploded) return;
+            _hasExploded = true;
+            // Play the explosion particle effect manually
+            if (explosionParticles is not null)
+            {
+                explosionParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); //Ensure old particles are cleared
+                explosionParticles.Play(); //Start explosion effect again
+            }
+            
             // Calculate effective explosion radius
             var effectiveRadius = explosionDataSo.explosionRadius;
             if (isPlayerExplosion && GameManager.Instance?.PlayerData != null)
@@ -41,6 +60,8 @@ namespace _Scripts.Projectiles
                 effectiveRadius += GameManager.Instance.PlayerData.explosionRadiusBonus;
                 //Debug.Log("Player Explosion Radius is: " + effectiveRadius);
             }
+
+            #region Damage Collision
 
             // Detect colliders for damage application
             var detectedColliders = Physics2D.OverlapCircleNonAlloc(
@@ -58,7 +79,7 @@ namespace _Scripts.Projectiles
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
                         var stats = hit.GetComponentInChildren<Stats>();
-                        if (stats != null && !stats.IsImmortal)
+                        if (stats is not null && !stats.IsImmortal)
                         {
                             stats.Health.DecreaseAmount(explosionDataSo.explosionDamage);
                         }
@@ -71,6 +92,10 @@ namespace _Scripts.Projectiles
                     }
                 }
             }
+
+            #endregion
+
+            #region No Damage Collision
 
             // Detect colliders for no-damage effects (e.g., applying impulse force)
             var noDamageDetectedColliders = Physics2D.OverlapCircleNonAlloc(
@@ -88,13 +113,13 @@ namespace _Scripts.Projectiles
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
                         var rb = hit.GetComponent<Rigidbody2D>(); 
-                        if (rb != null)
+                        if (rb is not null)
                         {
-                            Vector2 explosionDirection = (hit.transform.position - DetectionPosition.position).normalized;
-                            float distance = Vector2.Distance(hit.transform.position, DetectionPosition.position);
+                            var explosionDirection = (hit.transform.position - DetectionPosition.position).normalized;
+                            var distance = Vector2.Distance(hit.transform.position, DetectionPosition.position);
 
                             // Scale force magnitude based on distance relative to effectiveRadius
-                            float forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x,
+                            var forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x,
                                 distance / effectiveRadius) * 1.8f;
 
                             rb.velocity = Vector2.zero;
@@ -104,8 +129,38 @@ namespace _Scripts.Projectiles
                     }
                 }
             }
+
+            #endregion
+            
+
+            // Start coroutine to return to pool after particle system finishes
+            StartCoroutine(WaitForParticlesToEnd());
         }
 
+        
+        private IEnumerator WaitForParticlesToEnd()
+        {
+            if (explosionParticles is not null)
+            {
+                yield return new WaitUntil(() => !explosionParticles.IsAlive(true)); // Wait for the effect to finish
+            }
+
+            ReturnToPool();
+        }
+
+        private void ReturnToPool()
+        {
+            if (isPlayerExplosion)
+            {
+                _hasExploded = false;
+                PlayerExplosionPool.Instance.ReturnObject(this);
+            }
+            else
+            {
+                _hasExploded = false;
+                EnemyExplosionPool.Instance.ReturnObject(this);
+            }
+        }
         private void OnDrawGizmos()
         {
             // Draw the effective explosion radius for debugging

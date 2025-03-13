@@ -46,53 +46,53 @@ namespace _Scripts.Managers.Lava_Logic
         {
             _lavaHeight = Mathf.FloorToInt(player.position.y) - startOffset; // Start below player
 
-            for (int y = _lavaHeight; y < _lavaHeight + startOffset; y++)
+            for (var y = _lavaHeight; y < _lavaHeight + startOffset; y++)
             {
-                for (int x = wallLeft; x <= wallRight; x++) // Adjust for walls
+                for (var x = wallLeft; x <= wallRight; x++) // Adjust for walls
                 {
                     hazardTilemap.SetTile(new Vector3Int(x, y, 0), lavaTile);
                 }
             }
 
-            _lavaHeight += startOffset - 1; // 🔹 FIX: Ensure lavaHeight starts at the topmost lava row
+            _lavaHeight += startOffset - 1; //FIX: Ensure lavaHeight starts at the topmost lava row
         }
 
         private void UpdateLava()
         {
-            int playerY = Mathf.FloorToInt(player.position.y);
+            var playerY = Mathf.FloorToInt(player.position.y);
 
-            // 🔹 Adjust Lava Speed: Faster if far, slower if close
+            //Adjust Lava Speed: Faster if far, slower if close
             float distanceFromPlayer = playerY - _lavaHeight;
             const float maxLavaCatchupDistance = 15f;
-            float lavaSpeed = Mathf.Lerp(minLavaSpeed, maxLavaSpeed, Mathf.Clamp01(distanceFromPlayer / maxLavaCatchupDistance));
+            var lavaSpeed = Mathf.Lerp(minLavaSpeed, maxLavaSpeed, Mathf.Clamp01(distanceFromPlayer / maxLavaCatchupDistance));
 
             if (Time.time >= _nextLavaRiseTime)
             {
                 _nextLavaRiseTime = Time.time + (1f / lavaSpeed);
 
-                _lavaHeight++; // 🔹 Move lava up by 1 tile
+                _lavaHeight++; //Move lava up by 1 tile
 
-                for (int x = wallLeft; x <= wallRight; x++) // Adjust for walls
+                for (int x = wallLeft; x <= wallRight; x++) //Adjust for walls
                 {
                     hazardTilemap.SetTile(new Vector3Int(x, _lavaHeight, 0), lavaTile);
                 }
 
-                // 🔹 FIX: Ensure old lava is removed properly
+                //FIX: Ensure old lava is removed properly
                 ClearOldLava();
             }
         }
 
         private void ClearOldLava()
         {
-            int clearY = _lavaHeight - maxLavaTiles;
+            var clearY = _lavaHeight - maxLavaTiles;
 
-            // 🔹 FIX: Ensure it clears the initial lava rows as well
+            //FIX: Ensure it clears the initial lava rows as well
             if (clearY < _lavaHeight - startOffset) 
             {
-                clearY = _lavaHeight - startOffset; // Start clearing from the first placed lava row
+                clearY = _lavaHeight - startOffset; //Start clearing from the first placed lava row
             }
 
-            for (int x = wallLeft; x <= wallRight; x++)
+            for (var x = wallLeft; x <= wallRight; x++)
             {
                 hazardTilemap.SetTile(new Vector3Int(x, clearY, 0), null);
             }

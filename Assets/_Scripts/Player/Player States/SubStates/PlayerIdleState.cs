@@ -24,7 +24,7 @@ namespace _Scripts.Player.Player_States
             // Gradually reduce movement velocity instead of setting it to zero instantly
             if (Movement.CurrentVelocity.magnitude > 0.1f) // Allow a small threshold to avoid floating values
             {
-                float newVelocityX = Mathf.Lerp(Movement.CurrentVelocity.x, 0f, PlayerData.decelerationRate * Time.deltaTime);
+                var newVelocityX = Mathf.Lerp(Movement.CurrentVelocity.x, 0f, PlayerData.decelerationRate * Time.deltaTime);
                 Movement.SetVelocityX(newVelocityX);
             }
             else

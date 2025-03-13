@@ -50,7 +50,7 @@ namespace _Scripts.Camera
 
         private void LockCameraX()
         {
-            if (playerTransform == null) return;
+            if (playerTransform is null) return;
 
             var camPos = virtualCamera.transform.position;
             camPos.x = 0; // Locks X position

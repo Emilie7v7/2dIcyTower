@@ -58,7 +58,7 @@ namespace _Scripts.Player.Player_States.SubStates
             
             float verticalDistance = Movement.Rb2D.position.y - _startingYPosition; // Measure height gained
 
-            if (Movement != null)
+            if (Movement is not null)
             {
                 if (Movement.CurrentVelocity.y > 0.1f) // Moving Up
                 {

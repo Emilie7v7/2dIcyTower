@@ -19,7 +19,7 @@ public class PlayerHealth : MonoBehaviour
     private void InitializeHealthUI()
     {
         // Ensure the slider is properly set up
-        if (healthSlider != null)
+        if (healthSlider is not null)
         {
             healthSlider.minValue = 0;
             healthSlider.maxValue = maxHealth; 

@@ -15,7 +15,7 @@ namespace _Scripts.Pickups
 
         private void Update()
         {
-            if (_player == null) return; // Avoid null reference errors
+            if (_player is null) return; // Avoid null reference errors
 
             var distance = Vector3.Distance(_player.position, transform.position);
             

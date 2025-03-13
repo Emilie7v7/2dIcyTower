@@ -12,7 +12,7 @@ namespace _Scripts.CoreSystem
 
         public CoreComp(Core core)
         {
-            if (core == null)
+            if (core is null)
             {
                 Debug.LogWarning($"Core is Null for component {typeof(T)}");
             }

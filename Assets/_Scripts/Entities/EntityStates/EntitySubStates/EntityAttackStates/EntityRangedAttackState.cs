@@ -17,12 +17,21 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
         public override void AnimationAttackTrigger()
         {
             base.AnimationAttackTrigger();
-            
-            if(_player is null) return;
+
             _player = GameObject.FindGameObjectWithTag("Player");
             
+            if (_player is null)
+            {
+                Debug.Log("Player is null");
+                return;
+            }
+            
             var projectilePrefab = EnemyProjectilePool.Instance.GetObject(Entity.transform.position);
-            if (projectilePrefab is null) return;
+            if (projectilePrefab is null)
+            {
+                Debug.Log("Something is wrong with the projectile pool");
+                return;
+            }
             
             projectilePrefab.SetProjectileOwner(false);
             projectilePrefab.transform.position = Entity.transform.position;
