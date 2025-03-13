@@ -33,6 +33,8 @@ namespace _Scripts.Managers.Game_Manager_Logic
         private void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded; //Listen for scene changes
+            Application.targetFrameRate = 60; // Adjust to 120 if needed
+            QualitySettings.vSyncCount = 0; // Disable VSync to avoid FPS limitations
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
