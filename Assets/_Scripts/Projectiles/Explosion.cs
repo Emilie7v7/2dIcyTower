@@ -117,7 +117,7 @@ namespace _Scripts.Projectiles
                                 distance / effectiveRadius) * 1.8f;
 
                             rb.velocity = Vector2.zero;
-                            rb.AddForce(explosionDirection * forceMagnitude * 1.5f, ForceMode2D.Impulse);
+                            rb.AddForce(explosionDirection * (forceMagnitude * 1.5f), ForceMode2D.Impulse);
                             rb.gravityScale = 0.5f;
                         }
                     }
