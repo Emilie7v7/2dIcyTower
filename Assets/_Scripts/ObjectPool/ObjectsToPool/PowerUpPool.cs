@@ -62,8 +62,6 @@ namespace _Scripts.ObjectPool.ObjectsToPool
                     return powerUp;
                 }
             }
-
-            Debug.LogWarning($"⚠ No available {requestedPrefab.name} in the pool!");
             return null; // No power-up found
         }
         

@@ -38,7 +38,7 @@ namespace _Scripts.Managers.Score_Logic
         private void Start()
         {
             _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier;
-            _lastRecordedHeight = playerTransform.position.y; // Initialize height tracking
+            _lastRecordedHeight = playerTransform.position.y + 1; // Initialize height tracking
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
         }
 

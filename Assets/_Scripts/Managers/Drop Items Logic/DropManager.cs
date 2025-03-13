@@ -31,8 +31,6 @@ namespace _Scripts.Managers.Drop_Items_Logic
             foreach (var boosts in settings.boosts)
             {
                 totalWeight += boosts.dropChance;
-                var stringName = $"{boosts.boostName}: {boosts.dropChance}";
-                Debug.Log(stringName);
             }
             
             var randomValue = Random.Range(0, totalWeight);
@@ -43,11 +41,9 @@ namespace _Scripts.Managers.Drop_Items_Logic
                 cumulativeWeight += boosts.dropChance;
                 if (randomValue <= cumulativeWeight)
                 {
-                    //Debug.Log($"Random value is: {randomValue} \n Dropping this boost: {boosts.boostName}");
                     return boosts.boostPrefab;
                 }
             }
-            Debug.LogWarning($"⚠ No boost was selected! (Random: {randomValue}, TotalWeight: {totalWeight})");
             return null;
         }
 
@@ -66,10 +62,6 @@ namespace _Scripts.Managers.Drop_Items_Logic
                     {
                         boost.transform.position = dropPosition;
                         boost.gameObject.SetActive(true);
-                    }
-                    else
-                    {
-                        Debug.LogWarning($"⚠ PowerUp Pool Empty! Could not drop {boostPrefab.name}");
                     }
                 }
             }
