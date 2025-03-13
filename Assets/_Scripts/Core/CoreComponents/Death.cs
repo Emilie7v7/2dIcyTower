@@ -3,7 +3,6 @@ using _Scripts.Managers.Drop_Items_Logic;
 using _Scripts.Managers.GameOver_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.CoreSystem
 {
