@@ -87,7 +87,7 @@ namespace _Scripts.Projectiles
                         
                         if (rb is not null)
                         {
-                            Debug.Log("Player Hit");
+                            //Debug.Log("Player Hit");
                             var explosionDirection = (hit.transform.position - DetectionPosition.position).normalized;
                             var distance = Vector2.Distance(hit.transform.position, DetectionPosition.position);
 
