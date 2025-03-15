@@ -13,6 +13,10 @@ namespace _Scripts.Projectiles
         [SerializeField] private ExplosionDataSo explosionDataSo;
         [SerializeField] private bool isPlayerExplosion = false;
         [SerializeField] private ParticleSystem explosionParticles;
+        
+        [SerializeField] private AudioSource audioSource;
+        [SerializeField] private AudioClip hitClip;
+        
         [field: SerializeField] public Transform DetectionPosition { get; private set; }
         private Collider2D[] _colliders;
 
@@ -74,6 +78,12 @@ namespace _Scripts.Projectiles
                     {
                         var rb = hit.GetComponent<Rigidbody2D>();
                         var stats = hit.GetComponentInChildren<Stats>();
+                        
+                        // Play hit sound
+                        if (audioSource != null && hitClip != null)
+                        {
+                            audioSource.PlayOneShot(hitClip);
+                        }
                         
                         if (rb is not null)
                         {
