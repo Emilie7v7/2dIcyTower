@@ -1,12 +1,14 @@
 using System;
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
+using _Scripts.Managers.Spawn_Logic;
 using _Scripts.Player;
 using _Scripts.Player.Player_States;
 using _Scripts.Player.Player_States.SubStates;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.PlayerComponent
 {
@@ -34,6 +36,9 @@ namespace _Scripts.PlayerComponent
         public Animator MyAnimator { get; private set; }
         public AnimationEventHandler AnimationEventHandler { get; private set; }
         public Transform ThrowDirectionIndicator { get; private set; }
+        
+        public SpawnManager SpawnManager { get; private set; }
+
     
         #endregion
         
@@ -93,6 +98,7 @@ namespace _Scripts.PlayerComponent
                 _hasBeenHit = true; // Mark as hit
             }
         }
+        
 
         #endregion
 

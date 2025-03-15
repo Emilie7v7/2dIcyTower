@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.Pickups;
@@ -11,7 +12,9 @@ namespace _Scripts.Managers.Spawn_Logic
     public class SpawnManager : MonoBehaviour
     {
         [Header("Tilemap References")]
-        [SerializeField] private Tilemap platformTilemap, hazardTilemap, decorationTilemap, wallTilemap, backgroundTilemap;
+        [SerializeField] private Tilemap hazardTilemap, decorationTilemap, wallTilemap, backgroundTilemap;
+        
+        [field: SerializeField] public Tilemap platformTilemap { get; set; }
         
         [Header("Spawn Settings")]
         [SerializeField] private PlatformSpawnSettingsSo platformSettings;
