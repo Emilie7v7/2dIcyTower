@@ -13,7 +13,7 @@ namespace _Scripts.Managers.Main_Menu_UI_Logic
         private void Start()
         {
             var highScore = SaveSystem.LoadData().highScore;
-            Debug.Log(highScore);
+            highScoreText.text = $"High Score: {highScore}";
         }
     }
 }
