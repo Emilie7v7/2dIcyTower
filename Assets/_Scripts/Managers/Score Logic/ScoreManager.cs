@@ -1,5 +1,6 @@
 using System;
 using _Scripts.Managers.Game_Manager_Logic;
+using _Scripts.Managers.Save_System_Logic;
 using UnityEngine;
 
 namespace _Scripts.Managers.Score_Logic
@@ -11,6 +12,7 @@ namespace _Scripts.Managers.Score_Logic
         public event Action<int> OnScoreUpdated;
         public event Action<float> OnMultiplierUpdated;
         public event Action<float, float> OnKillstreakTimeUpdated;
+        public event Action<int, int> OnDeathScoreUpdated;
         
         private int _score;
         private int _maxMultiplierLevel;
@@ -19,7 +21,7 @@ namespace _Scripts.Managers.Score_Logic
         private float _multiplierTimeLeft;
         private float _initialPosition;
         private const float BaseMultiplierDuration = 6.5f;
-
+        
         [SerializeField] private Transform playerTransform;
         private float _lastRecordedHeight;
 
@@ -37,8 +39,7 @@ namespace _Scripts.Managers.Score_Logic
         
         private void Start()
         {
-            _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier;
-            _lastRecordedHeight = playerTransform.position.y + 1; // Initialize height tracking
+            RunStarted();
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
         }
 
@@ -54,6 +55,7 @@ namespace _Scripts.Managers.Score_Logic
                 }
             }
         }
+        
         private void UpdateScore()
         {
             var currentHeight = playerTransform.position.y;
@@ -91,17 +93,26 @@ namespace _Scripts.Managers.Score_Logic
             _multiplier = 1.0f;
             OnMultiplierUpdated?.Invoke(_multiplier);
             OnKillstreakTimeUpdated?.Invoke(0, BaseMultiplierDuration);
-
+        }
+        
+        private void RunStarted()
+        {
+            _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier;
+            _lastRecordedHeight = playerTransform.position.y + 1;
         }
         
         public int GetScore()
         {
             return _score;
         }
-
         public float GetMultiplier()
         {
             return _multiplier;
+        }
+
+        public void OnDeathScoreUpdatedEvent()
+        {
+            OnDeathScoreUpdated?.Invoke(GameManager.Instance.PlayerData.highScore, GetScore());
         }
     }
 }

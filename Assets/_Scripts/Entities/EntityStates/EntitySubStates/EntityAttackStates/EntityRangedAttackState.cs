@@ -22,7 +22,7 @@ namespace _Scripts.Entities.EntityStates.EntitySubStates.EntityAttackStates
             
             if (_player is null)
             {
-                Debug.Log("Player is null");
+                //Debug.Log("Player is null");
                 return;
             }
             

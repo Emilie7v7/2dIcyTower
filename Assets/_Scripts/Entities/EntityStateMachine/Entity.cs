@@ -50,7 +50,6 @@ namespace _Scripts.Entities.EntityStateMachine
         {
             if (other.gameObject.CompareTag("Player"))
             {
-                ScoreManager.Instance.RegisterKill();
                 Stats.Health.CurrentValue = 0;
             }
         }

@@ -72,7 +72,33 @@ namespace _Scripts.PlayerComponent
             Core.LogicUpdate();
             StateMachine.CurrentState.LogicUpdate();
             
-            float targetAngle = Vector2.SignedAngle(Vector2.right, InputHandler.ThrowDirectionInput);
+            IndicatorRotation();
+        }
+
+        private void FixedUpdate()
+        {
+            StateMachine.CurrentState.PhysicsUpdate();
+        }
+
+        private bool _hasBeenHit = false; // Prevent multiple triggers
+
+        private void OnTriggerEnter2D(Collider2D other)
+        {
+            if (_hasBeenHit) return; // Prevents re-triggering
+
+            if (other.CompareTag("Lava"))
+            {
+                Debug.Log("Hit by lava");
+                Stats.Health.CurrentValue = 0;
+                _hasBeenHit = true; // Mark as hit
+            }
+        }
+
+        #endregion
+
+        private void IndicatorRotation()
+        {
+            var targetAngle = Vector2.SignedAngle(Vector2.right, InputHandler.ThrowDirectionInput);
 
             // Smoothly interpolate rotation using Quaternion.Lerp
             Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle - 45f);
@@ -82,22 +108,6 @@ namespace _Scripts.PlayerComponent
                 Time.deltaTime * playerData.rotationSpeed
             );
         }
-
-        private void FixedUpdate()
-        {
-            StateMachine.CurrentState.PhysicsUpdate();
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (other.CompareTag("Lava"))
-            {
-                Stats.Health.CurrentValue = 0;
-            }
-        }
-
-        #endregion
-
         private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
 
         private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();

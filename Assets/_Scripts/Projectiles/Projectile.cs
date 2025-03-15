@@ -66,9 +66,9 @@ namespace _Scripts.Projectiles
                             ? PlayerExplosionPool.Instance?.GetObject(hitPosition)
                             : EnemyExplosionPool.Instance?.GetObject(hitPosition);
 
-                        if (explosion is not null)
+                        if (explosion != null)
                         {
-                            explosion.ActivateExplosion(hitPosition, _isPlayerProjectile); // ✅ Trigger explosion properly
+                            explosion.ActivateExplosion(hitPosition, _isPlayerProjectile); //Trigger explosion properly
                         }
 
                         ReturnToPool(); // Ensure projectile is returned properly

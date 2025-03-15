@@ -1,3 +1,4 @@
+using System;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
@@ -9,6 +10,7 @@ namespace _Scripts.Managers.Menu_Logic
 {
     public class MenuManager : MonoBehaviour
     {
+
         public void StartGame()
         {
             Time.timeScale = 1;
@@ -23,6 +25,36 @@ namespace _Scripts.Managers.Menu_Logic
             SceneManager.LoadScene("MenuScene");
         }
 
+        public void UponDeathBackToMenu()
+        {
+            Time.timeScale = 1;
+            ResetPooledObjects();
+            SceneManager.LoadScene("MenuScene");
+        }
+        
+        public void RestartGame()
+        {
+            Time.timeScale = 1;
+            ResetPooledObjects();
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        }
+        
+        public void QuitGame()
+        {
+            Application.Quit();
+        }
+
+        public void PauseGame()
+        {
+            Time.timeScale = 0;
+        }
+
+        public void ResumeGame()
+        {
+            Time.timeScale = 1;
+        }
+        
+        #region Return Of Unused Objects To Pool
         private static void ResetPooledObjects()
         {
             if (EnemyPool.Instance != null)
@@ -82,26 +114,7 @@ namespace _Scripts.Managers.Menu_Logic
                 }
             }
         }
-        public void RestartGame()
-        {
-            Time.timeScale = 1;
-            ResetPooledObjects();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-        }
-        
-        public void QuitGame()
-        {
-            Application.Quit();
-        }
 
-        public void PauseGame()
-        {
-            Time.timeScale = 0;
-        }
-
-        public void ResumeGame()
-        {
-            Time.timeScale = 1;
-        }
+        #endregion
     }
 }

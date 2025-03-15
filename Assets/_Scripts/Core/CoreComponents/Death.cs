@@ -1,8 +1,10 @@
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Drop_Items_Logic;
 using _Scripts.Managers.GameOver_Logic;
+using _Scripts.Managers.Score_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 namespace _Scripts.CoreSystem
 {

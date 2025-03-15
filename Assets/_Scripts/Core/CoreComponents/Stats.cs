@@ -1,9 +1,11 @@
 using System.Collections;
 using _Scripts.CoreSystem.StatSystem;
 using _Scripts.Managers.Game_Manager_Logic;
+using _Scripts.Managers.Save_System_Logic;
 using _Scripts.Managers.Score_Logic;
 using _Scripts.Managers.UI_Logic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 namespace _Scripts.CoreSystem
 {
@@ -46,7 +48,7 @@ namespace _Scripts.CoreSystem
         }
 
 
-        private void HandleEnemyDeath()
+        private static void HandleEnemyDeath()
         {   
             ScoreManager.Instance.RegisterKill();
         }
@@ -71,7 +73,12 @@ namespace _Scripts.CoreSystem
         
         private static void SaveDataUponDeath()
         {
-            GameManager.Instance.SaveGameData();
+            if (ScoreManager.Instance.GetScore() > GameManager.Instance.PlayerData.highScore)
+            {
+                GameManager.Instance.UpdateHighScore(ScoreManager.Instance.GetScore()); //Update in memory
+            }
+            ScoreManager.Instance.OnDeathScoreUpdatedEvent();
+            GameManager.Instance.SaveGameData(); //Save everything (single save operation)
         }
         private void UpdateHealthUI()
         {

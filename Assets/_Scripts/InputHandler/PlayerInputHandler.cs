@@ -54,7 +54,6 @@ namespace _Scripts.InputHandler
             {
                 if (ctx.performed)
                 {
-                    Debug.Log("Throw Input Performed");
                     ThrowInput = true;
                     _throwLocked = true; // Lock throwing until reset
 

@@ -61,6 +61,10 @@ namespace _Scripts.Managers.Game_Manager_Logic
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
         }
 
+        public void UpdateHighScore(int score)
+        {
+            PlayerData.highScore = score;
+        }
         public bool TrySpendCoins(int cost)
         {
             if (PlayerData.playerCoins >= cost)
@@ -72,6 +76,8 @@ namespace _Scripts.Managers.Game_Manager_Logic
             }
             return false;
         }
+
+        #region Upgrades
 
         public void UpgradeMaxHealth(int amount)
         {
@@ -156,6 +162,8 @@ namespace _Scripts.Managers.Game_Manager_Logic
                 Debug.Log("Killstreak Multiplier already at the limit");
             }
         }
+
+        #endregion
         
         #region Game Data
         

@@ -13,6 +13,7 @@ namespace _Scripts.JSON
         public int killstreakMultiplier;
         public int rocketBoostDuration;
         public int immortalityDuration;
+        public int highScore;
         public Dictionary<string, int> UpgradeLevels;
 
         public PlayerData()
@@ -24,6 +25,7 @@ namespace _Scripts.JSON
             rocketBoostDuration = 5;
             immortalityDuration = 10;
             killstreakMultiplier = 2;
+            highScore = 0;
             UpgradeLevels = new Dictionary<string, int>
             {
                 { "Health", 0 },
