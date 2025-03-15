@@ -12,7 +12,7 @@ namespace _Scripts.Projectiles
     {
         [SerializeField] private ExplosionDataSo explosionDataSo;
         [SerializeField] private bool isPlayerExplosion = false;
-        [SerializeField] private ParticleSystem explosionParticles; // Reference to the Particle System
+        [SerializeField] private ParticleSystem explosionParticles;
         [field: SerializeField] public Transform DetectionPosition { get; private set; }
         private Collider2D[] _colliders;
 
@@ -72,7 +72,23 @@ namespace _Scripts.Projectiles
 
                     if (hit && hit.gameObject.CompareTag("Player"))
                     {
+                        var rb = hit.GetComponent<Rigidbody2D>();
                         var stats = hit.GetComponentInChildren<Stats>();
+                        
+                        if (rb is not null)
+                        {
+                            Debug.Log("Player Hit");
+                            var explosionDirection = (hit.transform.position - DetectionPosition.position).normalized;
+                            var distance = Vector2.Distance(hit.transform.position, DetectionPosition.position);
+
+                            // Scale force magnitude based on distance relative to effectiveRadius
+                            var forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x,
+                                distance / effectiveRadius) * 1.8f;
+
+                            rb.velocity = Vector2.zero;
+                            rb.AddForce(explosionDirection * (forceMagnitude * 1.5f), ForceMode2D.Impulse);
+                            rb.gravityScale = 0.5f;
+                        }
                         if (stats is not null && !stats.IsImmortal)
                         {
                             stats.Health.DecreaseAmount(explosionDataSo.explosionDamage);
