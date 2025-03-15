@@ -47,8 +47,8 @@ namespace _Scripts.Managers.UI_Logic
         
         private void UpdateScoreUIUponDeath(int currentHighScore, int uponDeathScore)
         {
-            highScoreText.text = $"HC: {currentHighScore}"; // Update UI
-            uponDeathScoreText.text = $"CS: {uponDeathScore}";
+            highScoreText.text = $"{currentHighScore}"; // Update UI
+            uponDeathScoreText.text = $"{uponDeathScore}";
         }
     }
 }
