@@ -63,6 +63,21 @@ namespace _Scripts.InputHandler
             }
         }
 
+        // public void SetThrow(InputAction.CallbackContext ctx)
+        // {
+        //     if (CanThrow)
+        //     {
+        //         if (ctx.started)
+        //         {
+        //             ThrowInput = true;
+        //         }
+        //         if (ctx.canceled)
+        //         {
+        //             ThrowInput = false;
+        //         }
+        //     }
+        // }
+        
         private IEnumerator ResetThrowInput()
         {
             yield return new WaitForEndOfFrame(); // Waits one frame

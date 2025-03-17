@@ -31,7 +31,7 @@ namespace _Scripts.CoreSystem.StatSystem
         private int _currentValue;
         
         public void Initialize() => CurrentValue = MaxValue;
-        
+        public void Reset() => CurrentValue = MaxValue;
         public void IncreaseAmount(int amount) => CurrentValue += amount;
         public void DecreaseAmount(int amount) => CurrentValue -= amount;
     }

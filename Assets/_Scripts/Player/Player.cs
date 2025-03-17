@@ -34,7 +34,6 @@ namespace _Scripts.PlayerComponent
         public Movement Movement { get; private set; }
         public PlayerInputHandler InputHandler { get; private set; }
         public Animator MyAnimator { get; private set; }
-        public AnimationEventHandler AnimationEventHandler { get; private set; }
         public Transform ThrowDirectionIndicator { get; private set; }
         
         public SpawnManager SpawnManager { get; private set; }
@@ -65,7 +64,6 @@ namespace _Scripts.PlayerComponent
             
             MyAnimator = GetComponent<Animator>();
             InputHandler = GetComponent<PlayerInputHandler>();
-            AnimationEventHandler = GetComponent<AnimationEventHandler>();
             
             ThrowDirectionIndicator = transform.Find("ThrowDirectionIndicator");
             
@@ -118,8 +116,6 @@ namespace _Scripts.PlayerComponent
 
         private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
         
-        // Method to start the smooth fall transition
-
         private void OnDrawGizmos()
         {
             if (Core == null) return;

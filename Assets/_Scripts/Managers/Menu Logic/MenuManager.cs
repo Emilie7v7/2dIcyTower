@@ -19,7 +19,7 @@ namespace _Scripts.Managers.Menu_Logic
 
         public void BackToMenu()
         {
-            GameManager.Instance.SaveGameData();
+            GameManager.Instance.SavePlayerGameData();
             Time.timeScale = 1;
             ResetPooledObjects();
             SceneManager.LoadScene("MenuScene");

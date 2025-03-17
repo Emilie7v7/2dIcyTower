@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace _Scripts.Managers.UI_Scaler_Logic
+namespace _Scripts.Managers.UI_Logic
 {
     public class ScaleToScreenManager : MonoBehaviour
     {

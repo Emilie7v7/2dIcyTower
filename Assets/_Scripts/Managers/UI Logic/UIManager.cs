@@ -19,7 +19,7 @@ namespace _Scripts.Managers.UI_Logic
 
             if (gameManager != null)
             {
-                gameManager.ResetGameData();
+                gameManager.ResetPlayerGameData();
             }
             else
             {

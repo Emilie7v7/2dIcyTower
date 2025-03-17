@@ -42,7 +42,9 @@ namespace _Scripts.CoreSystem
                 if (enemy is not null)
                 {
                     DropManager.Instance.SpawnDroppedItem(transform.position);
+                    _stats.Health.Reset();
                     EnemyPool.Instance.ReturnObject(enemy); //Return the whole enemy entity
+                    
                 }
                 else
                 {

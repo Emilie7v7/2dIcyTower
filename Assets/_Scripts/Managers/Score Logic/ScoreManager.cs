@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.Managers.Save_System_Logic;
 using UnityEngine;
@@ -21,6 +22,8 @@ namespace _Scripts.Managers.Score_Logic
         private float _multiplierTimeLeft;
         private float _initialPosition;
         private const float BaseMultiplierDuration = 6.5f;
+        
+        private bool isTimerFrozen = false;
         
         [SerializeField] private Transform playerTransform;
         private float _lastRecordedHeight;
@@ -45,7 +48,7 @@ namespace _Scripts.Managers.Score_Logic
 
         private void Update()
         {
-            if (_multiplier > 1f)
+            if (!isTimerFrozen && _multiplier > 1f)
             {
                 _multiplierTimeLeft -= Time.deltaTime;
                 OnKillstreakTimeUpdated?.Invoke(_multiplierTimeLeft, BaseMultiplierDuration);
@@ -75,6 +78,21 @@ namespace _Scripts.Managers.Score_Logic
             }
         }
 
+        public void FreezeTimer(float freezeDuration)
+        {
+            if (!isTimerFrozen)
+            {
+                StartCoroutine(FreezeTimerCoroutine(freezeDuration));
+            }
+        }
+
+        private IEnumerator FreezeTimerCoroutine(float freezeDuration)
+        {
+            isTimerFrozen = true;
+            yield return new WaitForSeconds(freezeDuration);
+            isTimerFrozen = false;
+        }
+        
         public void RegisterKill()
         {
             if (_multiplier < _maxMultiplierLevel)

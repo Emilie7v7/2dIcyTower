@@ -78,7 +78,7 @@ namespace _Scripts.CoreSystem
                 GameManager.Instance.UpdateHighScore(ScoreManager.Instance.GetScore()); //Update in memory
             }
             ScoreManager.Instance.OnDeathScoreUpdatedEvent();
-            GameManager.Instance.SaveGameData(); //Save everything (single save operation)
+            GameManager.Instance.SavePlayerGameData(); //Save everything (single save operation)
         }
         private void UpdateHealthUI()
         {

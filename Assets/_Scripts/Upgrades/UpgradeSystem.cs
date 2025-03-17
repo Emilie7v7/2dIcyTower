@@ -55,7 +55,7 @@ namespace _Scripts.Upgrades
             {
                 GameManager.Instance.PlayerData.UpgradeLevels[upgradeType]++;
                 ApplyUpgradeEffect(); //Apply the effect dynamically
-                GameManager.Instance.SaveGameData();
+                GameManager.Instance.SavePlayerGameData();
 
                 Debug.Log($"{upgradeType} Upgraded! New Level: {GameManager.Instance.PlayerData.UpgradeLevels[upgradeType]}");
 

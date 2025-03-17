@@ -11,7 +11,9 @@ namespace _Scripts.Managers.Game_Manager_Logic
     public class GameManager : MonoBehaviour
     {
         public static GameManager Instance { get; private set; }
+        
         public Transform Player { get; private set; }
+        
         public PlayerData PlayerData { get; private set; }
 
         public event Action<int> OnCoinsUpdated;
@@ -22,7 +24,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             {
                 Instance = this;
                 DontDestroyOnLoad(gameObject);
-                LoadGameData();
+                LoadPlayerGameData();
             }
             else
             {
@@ -33,8 +35,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
         private void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded; //Listen for scene changes
-            Application.targetFrameRate = 60; // Adjust to 120 if needed
-            QualitySettings.vSyncCount = 0; // Disable VSync to avoid FPS limitations
+            SettingsManager.ApplySettings();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -63,7 +64,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
 
         public void UpdateHighScore(int score)
         {
-            PlayerData.highScore = score;
+            PlayerData.highScore = score; 
         }
         public bool TrySpendCoins(int cost)
         {
@@ -71,7 +72,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             {
                 PlayerData.playerCoins -= cost;
                 OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
-                SaveGameData();
+                SavePlayerGameData();
                 return true;
             }
             return false;
@@ -84,7 +85,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (PlayerData.maxHealth < 10)
             {
                 PlayerData.maxHealth += amount;
-                SaveGameData();
+                SavePlayerGameData();
                 Debug.Log($"Max Health Upgraded: {PlayerData.maxHealth}/10");
             }
             else
@@ -98,7 +99,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (PlayerData.explosionRadiusBonus < 10)
             {
                 PlayerData.explosionRadiusBonus += amount;
-                SaveGameData();
+                SavePlayerGameData();
                 Debug.Log($"Max Explosion Radius Upgraded: {PlayerData.explosionRadiusBonus}/10");
             }
             else
@@ -112,7 +113,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (PlayerData.magnetDuration < 10)
             {
                 PlayerData.magnetDuration += amount;
-                SaveGameData();
+                SavePlayerGameData();
                 Debug.Log($"Magnet Duration Upgraded: {PlayerData.magnetDuration}/10");
             }
             else
@@ -126,7 +127,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (PlayerData.rocketBoostDuration < 10)
             {
                 PlayerData.rocketBoostDuration += amount;
-                SaveGameData();
+                SavePlayerGameData();
                 Debug.Log($"Rocket Boost Duration Upgraded: {PlayerData.rocketBoostDuration}/10");
             }
             else
@@ -140,7 +141,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (PlayerData.immortalityDuration < 20)
             {
                 PlayerData.immortalityDuration += amount;
-                SaveGameData();
+                SavePlayerGameData();
                 Debug.Log($"Immortality Duration Upgraded: {PlayerData.immortalityDuration}/10");
             }
             else
@@ -154,7 +155,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (PlayerData.killstreakMultiplier < 10)
             {
                 PlayerData.killstreakMultiplier += amount;
-                SaveGameData();
+                SavePlayerGameData();
                 Debug.Log($"Killstreak Multiplier Upgraded: {PlayerData.killstreakMultiplier}/10");
             }
             else
@@ -165,23 +166,23 @@ namespace _Scripts.Managers.Game_Manager_Logic
 
         #endregion
         
-        #region Game Data
+        #region Player Game Data
         
-        public void SaveGameData()
+        public void SavePlayerGameData()
         {
-            SaveSystem.SaveData(PlayerData);
+            SaveSystem.SavePlayerData(PlayerData);
         }
 
-        private void LoadGameData()
+        private void LoadPlayerGameData()
         {
-            if (File.Exists(SaveSystem.SavePath))
+            if (File.Exists(SaveSystem.PlayerDataSavePath))
             {
-                PlayerData = SaveSystem.LoadData();
+                PlayerData = SaveSystem.LoadPlayerData();
             }
             else
             {
                 PlayerData = new PlayerData();
-                SaveGameData();
+                SavePlayerGameData();
             }
 
             // Ensure the upgrade dictionary exists
@@ -197,25 +198,34 @@ namespace _Scripts.Managers.Game_Manager_Logic
             foreach (var upgrade in defaultUpgrades)
             {
                 PlayerData.UpgradeLevels.TryAdd(upgrade, 0);
-                // Set to default level
             }
 
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
         }
         
-        public void ResetGameData()
+        public void ResetPlayerGameData()
         {
-            SaveSystem.DeleteData(); // Step 1: Delete the save file
+            SaveSystem.DeletePlayerData(); // Step 1: Delete the save file
             PlayerData = new PlayerData(); // Step 2: Create brand-new PlayerData
             
             Debug.Log($"New PlayerData created: Coins = {PlayerData.playerCoins}, Max Health = {PlayerData.maxHealth}, Upgrade Level = {PlayerData.UpgradeLevels.ContainsKey("Health")}");
 
-            SaveGameData(); // Step 3: Save fresh new data
-            LoadGameData(); // Step 4: Ensure we are using the fresh save
+            SavePlayerGameData(); // Step 3: Save fresh new data
+            LoadPlayerGameData(); // Step 4: Ensure we are using the fresh save
 
             OnCoinsUpdated?.Invoke(PlayerData.playerCoins); // Step 5: Update UI
             
         }
         #endregion
+
+        #region Options Data
+
+        public void SaveOptions()
+        {
+            SettingsManager.SaveOptionsData();
+        }
+
+        #endregion
+        
     }
 }

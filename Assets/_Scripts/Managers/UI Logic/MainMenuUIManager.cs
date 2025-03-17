@@ -1,10 +1,8 @@
-using System;
 using _Scripts.Managers.Save_System_Logic;
-using _Scripts.Managers.Score_Logic;
 using TMPro;
 using UnityEngine;
 
-namespace _Scripts.Managers.Main_Menu_UI_Logic
+namespace _Scripts.Managers.UI_Logic
 {
     public class MainMenuUIManager : MonoBehaviour
     {
@@ -12,7 +10,7 @@ namespace _Scripts.Managers.Main_Menu_UI_Logic
 
         private void Start()
         {
-            var highScore = SaveSystem.LoadData().highScore;
+            var highScore = SaveSystem.LoadPlayerData().highScore;
             highScoreText.text = $"Record: {highScore}!";
         }
     }
