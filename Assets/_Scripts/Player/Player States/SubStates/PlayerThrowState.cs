@@ -10,21 +10,25 @@ namespace _Scripts.Player.Player_States.SubStates
     {
         // Correcting for the -45 degree offset
         private static readonly Quaternion CorrectionRotation = Quaternion.Euler(0, 0, 45f);    // Reversing the -45f applied in Update()
+        private bool _hasThrownThisAnimation = false; // Prevents multiple calls per animation
 
         public PlayerThrowState(PlayerComponent.Player player, PlayerStateMachine stateMachine, PlayerDataSo playerDataSo, string animBoolName) : base(player, stateMachine, playerDataSo, animBoolName)
         {
         }
-
-        public override void Enter()
+        
+        public override void Exit()
         {
-            base.Enter();
-
+            base.Exit();
+            _hasThrownThisAnimation = false; // Reset on state exit
         }
-
-        public override void AnimationTrigger()
+        
+        public override void ThrowAnimationTrigger()
         {
+            if (_hasThrownThisAnimation) return; // Prevent multiple calls
+            _hasThrownThisAnimation = true;
+
             base.AnimationTrigger();
-            
+
 
             var projectilePrefab = PlayerProjectilePool.Instance.GetObject(Player.transform.position);
             if (projectilePrefab is null)
@@ -32,16 +36,17 @@ namespace _Scripts.Player.Player_States.SubStates
                 Debug.LogError("Projectile is NULL! Pool might be empty.");
                 return;
             }
-            
+
             projectilePrefab.SetProjectileOwner(true);
             projectilePrefab.transform.position = Player.transform.position;
-            
-            Vector2 launchDirection = CorrectionRotation * Player.ThrowDirectionIndicator.transform.right; 
 
+            Vector2 launchDirection = CorrectionRotation * Player.ThrowDirectionIndicator.transform.right;
             projectilePrefab.Movement.LaunchProjectile(launchDirection, projectilePrefab.ProjectileData.projectileSpeed);
-            
+
             ApplyBackBlastEffect(launchDirection);
         }
+
+        
         private void ApplyBackBlastEffect(Vector2 launchDirection)
         {
             if (Player == null) return;

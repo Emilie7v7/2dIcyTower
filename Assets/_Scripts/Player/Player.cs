@@ -41,7 +41,12 @@ namespace _Scripts.PlayerComponent
     
         #endregion
         
+        #region Other Variables
+        
+        private bool _hasBeenHit = false; // Prevent multiple triggers
         public bool WasThrowingInAir { get; set; }
+        
+        #endregion
         
         #region Unity Callback Functions
 
@@ -76,6 +81,8 @@ namespace _Scripts.PlayerComponent
             StateMachine.CurrentState.LogicUpdate();
             
             IndicatorRotation();
+            JoyStickIndicatorRotation();
+            
         }
 
         private void FixedUpdate()
@@ -83,7 +90,6 @@ namespace _Scripts.PlayerComponent
             StateMachine.CurrentState.PhysicsUpdate();
         }
 
-        private bool _hasBeenHit = false; // Prevent multiple triggers
 
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -105,23 +111,39 @@ namespace _Scripts.PlayerComponent
             var targetAngle = Vector2.SignedAngle(Vector2.right, InputHandler.ThrowDirectionInput);
 
             // Smoothly interpolate rotation using Quaternion.Lerp
-            Quaternion targetRotation = Quaternion.Euler(0, 0, targetAngle - 45f);
+            var targetRotation = Quaternion.Euler(0, 0, targetAngle - 45f);
+            
             ThrowDirectionIndicator.rotation = Quaternion.Lerp(
                 ThrowDirectionIndicator.rotation,
                 targetRotation,
                 Time.deltaTime * playerData.rotationSpeed
             );
         }
-        private void AnimationTrigger() => StateMachine.CurrentState.AnimationTrigger();
+
+        private void JoyStickIndicatorRotation()
+        {
+            if (InputHandler.AimJoystickInput.magnitude > 0.1f)
+            {
+                var targetAngle = Vector2.SignedAngle(Vector2.right, InputHandler.AimJoystickInput);
+                var targetRotation = Quaternion.Euler(0, 0, targetAngle - 45f);
+
+                ThrowDirectionIndicator.rotation = Quaternion.Lerp(
+                    ThrowDirectionIndicator.rotation,
+                    targetRotation,
+                    Time.deltaTime * playerData.rotationSpeed
+                );
+            }
+        }
+        private void ThrowAnimationTrigger() => StateMachine.CurrentState.ThrowAnimationTrigger();
 
         private void AnimationFinishTrigger() => StateMachine.CurrentState.AnimationFinishTrigger();
         
-        private void OnDrawGizmos()
-        {
-            if (Core == null) return;
-            
-            Gizmos.color = Color.red;
-            Gizmos.DrawSphere(CollisionSenses.GroundCheck.position, CollisionSenses.GroundCheckRadius) ;
-        }
+        // private void OnDrawGizmos()
+        // {
+        //     if (Core == null) return;
+        //     
+        //     Gizmos.color = Color.red;
+        //     Gizmos.DrawSphere(CollisionSenses.GroundCheck.position, CollisionSenses.GroundCheckRadius) ;
+        // }
     }
 }

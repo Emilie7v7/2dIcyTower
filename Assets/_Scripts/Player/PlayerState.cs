@@ -57,6 +57,8 @@ namespace _Scripts.PlayerState
         //Is a function that gets called from a PhysicsUpdate and from an Enter function
         public virtual void DoChecks() { }
 
+        public virtual void ThrowAnimationTrigger() { }
+
         public virtual void AnimationTrigger() { }
 
         public virtual void AnimationFinishTrigger() => IsAnimationFinished = true;

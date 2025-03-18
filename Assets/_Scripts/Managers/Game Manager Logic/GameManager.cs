@@ -35,7 +35,6 @@ namespace _Scripts.Managers.Game_Manager_Logic
         private void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded; //Listen for scene changes
-            SettingsManager.ApplySettings();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
