@@ -42,7 +42,15 @@ namespace _Scripts.InputHandler
         {
             if (aimingJoystick && _controlMode == ControlMode.DualJoysticks)
             {
-                AimJoystickInput = aimingJoystick.JoystickDirection;
+                // Get the joystick direction
+                var joystickDirection = aimingJoystick.JoystickDirection;
+
+                // If joystick is moving, update throw direction
+                if (joystickDirection != Vector2.zero)
+                {
+                    AimJoystickInput = joystickDirection;
+                    ThrowDirectionInput = joystickDirection; // Keep last valid input
+                }
             }
         }
 
