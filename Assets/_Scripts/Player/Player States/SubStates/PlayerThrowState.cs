@@ -15,7 +15,14 @@ namespace _Scripts.Player.Player_States.SubStates
         public PlayerThrowState(PlayerComponent.Player player, PlayerStateMachine stateMachine, PlayerDataSo playerDataSo, string animBoolName) : base(player, stateMachine, playerDataSo, animBoolName)
         {
         }
-        
+
+        public override void Enter()
+        {
+            base.Enter();
+            
+            Player.Audio.PlayJumpSound();
+        }
+
         public override void Exit()
         {
             base.Exit();

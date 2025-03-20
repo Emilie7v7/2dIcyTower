@@ -2,7 +2,7 @@ using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ScriptableObjects.EntityData;
 using EntityMoveState = _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates.EntityMoveState;
 
-namespace _Scripts.Entities.EntitySpecific
+namespace _Scripts.Entities.EntitySpecific.Skeleton
 {
     public class E1MoveState : EntityMoveState
     {
@@ -17,7 +17,14 @@ namespace _Scripts.Entities.EntitySpecific
         {
             base.Enter();
             
-            //Debug.Log("We have entered the MoveState");
+            _enemy.SkeletonAudio.PlayWalkingSound();
+        }
+
+        public override void Exit()
+        {
+            base.Exit();
+            
+            _enemy.SkeletonAudio.StopWalkingSound();
         }
 
         public override void LogicUpdate()

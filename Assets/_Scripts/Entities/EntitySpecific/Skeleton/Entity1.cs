@@ -1,6 +1,7 @@
+using _Scripts.Audio;
 using _Scripts.Entities.EntityStateMachine;
 
-namespace _Scripts.Entities.EntitySpecific
+namespace _Scripts.Entities.EntitySpecific.Skeleton
 {
     public class Entity1 : Entity
     {
@@ -8,6 +9,8 @@ namespace _Scripts.Entities.EntitySpecific
         public E1MoveState MoveState { get; private set; }
         public E1PlayerDetectedState PlayerDetectedState { get; private set; }
         public E1LongRangeAttackState LongRangeAttackState { get; private set; }
+        
+        public SkeletonAudio SkeletonAudio { get; private set; }
         
         public override void Awake()
         {
@@ -22,6 +25,8 @@ namespace _Scripts.Entities.EntitySpecific
         public override void Start()
         {
             base.Start();
+
+            SkeletonAudio = GetComponent<SkeletonAudio>();
             
             StateMachine.Initialize(IdleState);
         }

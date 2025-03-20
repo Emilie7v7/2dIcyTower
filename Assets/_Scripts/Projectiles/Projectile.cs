@@ -1,5 +1,4 @@
 using _Scripts.CoreSystem;
-using _Scripts.ObjectPool;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.ProjectileData;
 using UnityEngine;

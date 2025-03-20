@@ -1,4 +1,5 @@
 using System;
+using _Scripts.Audio;
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
 using _Scripts.Managers.Spawn_Logic;
@@ -35,6 +36,7 @@ namespace _Scripts.PlayerComponent
         public PlayerInputHandler InputHandler { get; private set; }
         public Animator MyAnimator { get; private set; }
         public Transform ThrowDirectionIndicator { get; private set; }
+        public PlayerAudio Audio { get; private set; }
         
         public SpawnManager SpawnManager { get; private set; }
 
@@ -69,6 +71,7 @@ namespace _Scripts.PlayerComponent
             
             MyAnimator = GetComponent<Animator>();
             InputHandler = GetComponent<PlayerInputHandler>();
+            Audio = GetComponent<PlayerAudio>();
             
             ThrowDirectionIndicator = transform.Find("ThrowDirectionIndicator");
             
@@ -89,8 +92,7 @@ namespace _Scripts.PlayerComponent
         {
             StateMachine.CurrentState.PhysicsUpdate();
         }
-
-
+        
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (_hasBeenHit) return; // Prevents re-triggering
@@ -102,7 +104,6 @@ namespace _Scripts.PlayerComponent
                 _hasBeenHit = true; // Mark as hit
             }
         }
-        
 
         #endregion
 

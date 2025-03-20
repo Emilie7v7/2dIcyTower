@@ -1,3 +1,4 @@
+using _Scripts.Audio;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
@@ -48,7 +49,8 @@ namespace _Scripts.Pickups
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.CompareTag("Player")) return;
-
+            other.GetComponent<PlayerAudio>()?.PlayCoinPickupSound();
+            
             GameManager.Instance.AddCoins(settings.coinValue);
             CoinPool.Instance?.ReturnObject(this);
         }

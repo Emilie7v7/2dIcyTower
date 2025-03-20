@@ -1,6 +1,7 @@
 using System.IO;
 using _Scripts.Generics;
 using _Scripts.JSON;
+using _Scripts.Managers.Audio_Logic;
 using _Scripts.Managers.Save_System_Logic;
 using TMPro;
 using Unity.VisualScripting;
@@ -13,9 +14,13 @@ namespace _Scripts.Managers.Game_Manager_Logic
     {
         public static OptionsData OptionsData { get; private set; }
 
+        #region Fps
+
         private static GameObject _incompatibilityPanel;
         private static TextMeshProUGUI _incompatibilityText; 
         private static TMP_Dropdown _tmpDropdownForFps;
+
+        #endregion
         
         static SettingsManager()
         {
@@ -34,7 +39,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (File.Exists(SaveSystem.OptionsDataSavePath))
             {
                 OptionsData = SaveSystem.LoadOptionsData() ?? new OptionsData();
-                Debug.Log("Options Loaded Successfully!");
+                //Debug.Log("Options Loaded Successfully!");
             }
             else
             {
@@ -59,12 +64,12 @@ namespace _Scripts.Managers.Game_Manager_Logic
         {
             QualitySettings.vSyncCount = OptionsData.vSync ? 1 : 0;
             Application.targetFrameRate = OptionsData.fpsCount; // Apply FPS cap **after** VSync
-    
-            Debug.Log($"Settings Applied: FPS = {OptionsData.fpsCount}, VSync = {(OptionsData.vSync ? "Enabled" : "Disabled")}");
-
+            
             //Force a Quality Settings Refresh to ensure Unity updates VSync
             QualitySettings.SetQualityLevel(QualitySettings.GetQualityLevel(), true);
         }
+
+        #region Controls Settings
 
         public static int GetControlMode()
         {
@@ -76,8 +81,11 @@ namespace _Scripts.Managers.Game_Manager_Logic
             OptionsData.controlMode = mode;
             SaveOptionsData();
         }
+
+        #endregion
         
-        // UI Methods to update settings dynamically
+        #region Fps Settings
+
         public static void SetFPS(int fps)
         {
             var maxFps = GetMaxRefreshRateForMobile();
@@ -100,19 +108,11 @@ namespace _Scripts.Managers.Game_Manager_Logic
             FPSCounter.SetVisibility(show);
         }
         
-        public static void SetVSync(bool enabled)
-        {
-            OptionsData.vSync = enabled;
-            SaveOptionsData();
-            ApplySettings();
-        }
-
         private static int GetMaxRefreshRateForMobile()
         {
             return Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value);
         }
-
-
+        
         public static void InitializeIncompatibilityPanel(GameObject panel, TextMeshProUGUI text, TMP_Dropdown dropdown)
         {
             _incompatibilityPanel = panel;
@@ -129,5 +129,60 @@ namespace _Scripts.Managers.Game_Manager_Logic
                 _tmpDropdownForFps.RefreshShownValue();
             }
         }
+        
+        #endregion
+        
+        #region Vsync Settings
+        
+        public static void SetVSync(bool enabled)
+        {
+            OptionsData.vSync = enabled;
+            SaveOptionsData();
+            ApplySettings();
+        }
+        
+        #endregion
+
+        #region Music Settings
+        
+        public static float GetMusicVolume()
+        {
+            return OptionsData.musicVolume;
+        }
+
+        public static void SetMusicVolume(float volume)
+        {
+            OptionsData.musicVolume = volume;
+            SaveOptionsData();
+            
+            AudioManager.Instance.SetVolume(volume, AudioManager.AudioTypes.Music);
+        }
+        
+        public static float GetSfxVolume()
+        {
+            return OptionsData.sfxVolume;
+        }
+
+        public static void SetSfxVolume(float volume)
+        {
+            OptionsData.sfxVolume = volume;
+            SaveOptionsData();
+            
+            AudioManager.Instance.SetVolume(volume, AudioManager.AudioTypes.SFX);
+        }
+        
+        public static float GetUiVolume()
+        {
+            return OptionsData.uiVolume;
+        }
+        public static void SetUiVolume(float volume)
+        {
+            OptionsData.uiVolume = volume;
+            SaveOptionsData();
+            
+            AudioManager.Instance.SetVolume(volume, AudioManager.AudioTypes.UI);
+        }
+        
+        #endregion
     }
 }

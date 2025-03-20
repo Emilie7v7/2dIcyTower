@@ -1,7 +1,7 @@
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.ScriptableObjects.EntityData;
 
-namespace _Scripts.Entities.EntitySpecific
+namespace _Scripts.Entities.EntitySpecific.Skeleton
 {
     public class E1PlayerDetectedState : EntityPlayerDetectedState
     {

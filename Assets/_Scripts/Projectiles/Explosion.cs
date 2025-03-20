@@ -1,4 +1,6 @@
+using System;
 using System.Collections;
+using _Scripts.Audio;
 using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
 using _Scripts.Managers.Game_Manager_Logic;
@@ -14,18 +16,17 @@ namespace _Scripts.Projectiles
         [SerializeField] private bool isPlayerExplosion = false;
         [SerializeField] private ParticleSystem explosionParticles;
         
-        [SerializeField] private AudioSource audioSource;
-        [SerializeField] private AudioClip hitClip;
-        
         [field: SerializeField] public Transform DetectionPosition { get; private set; }
         private Collider2D[] _colliders;
 
         private bool _hasExploded;
         private Core _core;
+        private ExplosionAudio _audio;
         
         private void Awake()
         {
             _core = GetComponentInChildren<Core>();
+            _audio = GetComponent<ExplosionAudio>();
 
             _colliders = new Collider2D[explosionDataSo.maxHitsRayForExplosion];
             _hasExploded = false;
@@ -35,20 +36,31 @@ namespace _Scripts.Projectiles
         {
             isPlayerExplosion = isPlayer;
             transform.position = position;
-
-            //Debug.Log("Explosion Activated at: " + position);
-
+            
             Explode(); //Manually trigger explosion effect every time it's retrieved
         }
         private void Explode()
         {
             if(_hasExploded) return;
             _hasExploded = true;
+            
             // Play the explosion particle effect manually
             if (explosionParticles is not null)
             {
-                explosionParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear); //Ensure old particles are cleared
-                explosionParticles.Play(); //Start explosion effect again
+                explosionParticles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+                explosionParticles.Play();
+            }
+            
+            if (_audio)
+            {
+                if (isPlayerExplosion)
+                {
+                    _audio.PlayPlayerExplosion();
+                }
+                else
+                {
+                    _audio.PlaySkeletonExplosion();
+                }
             }
             
             // Calculate effective explosion radius
@@ -78,12 +90,6 @@ namespace _Scripts.Projectiles
                     {
                         var rb = hit.GetComponent<Rigidbody2D>();
                         var stats = hit.GetComponentInChildren<Stats>();
-                        
-                        // Play hit sound
-                        if (audioSource != null && hitClip != null)
-                        {
-                            audioSource.PlayOneShot(hitClip);
-                        }
                         
                         if (rb is not null)
                         {
@@ -151,7 +157,6 @@ namespace _Scripts.Projectiles
             }
 
             #endregion
-            
 
             // Start coroutine to return to pool after particle system finishes
             StartCoroutine(WaitForParticlesToEnd());

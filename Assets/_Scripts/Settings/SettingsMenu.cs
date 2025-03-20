@@ -10,30 +10,66 @@ namespace _Scripts.Settings
     {
         [Header("Fps Settings")]
         [SerializeField] private TMP_Dropdown fpsDropdown;
+        [SerializeField] private Slider fpsSlider;
         [SerializeField] private GameObject incompatibilityPanel;
         [SerializeField] private TextMeshProUGUI incompatibilityText;
         [SerializeField] private Toggle  showFpsToggle;
         
         [Header("Other Settings")]
         [SerializeField] private Toggle vsyncToggle;
+        
         [Header("Control Settings")]
         [SerializeField] private TMP_Dropdown controlDropdown;
+        [SerializeField] private Slider controlSlider;
+        
+        [Header("Music Settings")]
+        [SerializeField] private Slider musicVolumeSlider;
+        [SerializeField] private Slider sfxVolumeSlider;
+        [SerializeField] private Slider uiSoundVolumeSlider;
 
         private void Start()
         {
-            fpsDropdown.value = GetFPSDropdownIndex(SettingsManager.OptionsData.fpsCount);
+            #region Fps
+
+            fpsDropdown.value = GetFPSSliderIndex(SettingsManager.OptionsData.fpsCount);
+            fpsSlider.value = GetFPSSliderIndex(SettingsManager.OptionsData.fpsCount);
             showFpsToggle.isOn = SettingsManager.OptionsData.showFps;
             
-            vsyncToggle.isOn = SettingsManager.OptionsData.vSync;
-            
             fpsDropdown.onValueChanged.AddListener(SetFPS);
+            fpsSlider.onValueChanged.AddListener(value => SetFPS((int)value));
             showFpsToggle.onValueChanged.AddListener(SetShowFps);
+
+            #endregion
+            
+            #region Vsync
+            vsyncToggle.isOn = SettingsManager.OptionsData.vSync;
             
             vsyncToggle.onValueChanged.AddListener(SetVSync);
             
-            controlDropdown.onValueChanged.AddListener(SetControlMode);
+            #endregion
+
+            #region Controls
+
+            controlSlider.value = SettingsManager.GetControlMode();
             
+            controlDropdown.onValueChanged.AddListener(SetControlMode);
+            controlSlider.onValueChanged.AddListener(value => SetControlMode((int)value));
+
             LoadControlMode();
+            
+            #endregion
+
+            #region Music
+
+            musicVolumeSlider.value = SettingsManager.GetMusicVolume();
+            sfxVolumeSlider.value = SettingsManager.GetSfxVolume();
+            uiSoundVolumeSlider.value = SettingsManager.GetUiVolume();
+            
+            musicVolumeSlider.onValueChanged.AddListener(SetMusicVolume);
+            sfxVolumeSlider.onValueChanged.AddListener(SetSfxVolume);
+            uiSoundVolumeSlider.onValueChanged.AddListener(SetUiVolume);
+            
+            #endregion
             SettingsManager.InitializeIncompatibilityPanel(incompatibilityPanel, incompatibilityText, fpsDropdown);
             incompatibilityPanel.SetActive(false);
         }   
@@ -42,7 +78,7 @@ namespace _Scripts.Settings
         
         private static void SetFPS(int index)
         {
-            var fps = GetFPSValueFromDropdown(index);
+            var fps = GetFPSValueFromSlider(index);
             SettingsManager.SetFPS(fps);
         }
         private static void SetShowFps(bool show)
@@ -50,7 +86,7 @@ namespace _Scripts.Settings
             SettingsManager.SetShowFPS(show);
         }
         
-        private static int GetFPSDropdownIndex(int fps)
+        private static int GetFPSSliderIndex(int fps)
         {
             var maxFps = GetMaxRefreshRateForMobile();
             
@@ -62,7 +98,7 @@ namespace _Scripts.Settings
                 default: return 0;
             }
         }
-        private static int GetFPSValueFromDropdown(int index)
+        private static int GetFPSValueFromSlider(int index)
         {
             switch (index)
             {
@@ -88,6 +124,8 @@ namespace _Scripts.Settings
         }
         #endregion
 
+        #region Controls Settings
+
         private static void SetControlMode(int mode)
         {
             SettingsManager.SetControlMode(mode);
@@ -97,5 +135,27 @@ namespace _Scripts.Settings
         {
             controlDropdown.value = SettingsManager.GetControlMode();
         }
+        
+
+        #endregion
+        
+        #region Music Settings
+
+        private static void SetMusicVolume(float volume)
+        {
+            SettingsManager.SetMusicVolume(volume);
+        }
+
+        private static void SetSfxVolume(float volume)
+        {
+            SettingsManager.SetSfxVolume(volume);
+        }
+
+        private static void SetUiVolume(float volume)
+        {
+            SettingsManager.SetUiVolume(volume);
+        }
+        
+        #endregion
     }
 }

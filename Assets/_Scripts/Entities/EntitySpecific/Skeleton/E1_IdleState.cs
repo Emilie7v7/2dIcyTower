@@ -2,7 +2,7 @@ using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Entities.EntityStates.EntitySubStates.EntityMovementStates;
 using _Scripts.ScriptableObjects.EntityData;
 
-namespace _Scripts.Entities.EntitySpecific
+namespace _Scripts.Entities.EntitySpecific.Skeleton
 {
     public class E1IdleState : EntityIdleState
     {
