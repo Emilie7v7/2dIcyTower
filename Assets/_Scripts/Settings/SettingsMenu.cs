@@ -70,7 +70,7 @@ namespace _Scripts.Settings
             uiSoundVolumeSlider.onValueChanged.AddListener(SetUiVolume);
             
             #endregion
-            SettingsManager.InitializeIncompatibilityPanel(incompatibilityPanel, incompatibilityText, fpsDropdown);
+            SettingsManager.InitializeIncompatibilityPanel(incompatibilityPanel, incompatibilityText, fpsDropdown, fpsSlider);
             incompatibilityPanel.SetActive(false);
         }   
         

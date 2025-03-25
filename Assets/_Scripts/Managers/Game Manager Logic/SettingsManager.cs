@@ -4,21 +4,20 @@ using _Scripts.JSON;
 using _Scripts.Managers.Audio_Logic;
 using _Scripts.Managers.Save_System_Logic;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Rendering;
+using UnityEngine.UI;
 
 namespace _Scripts.Managers.Game_Manager_Logic
 {
     public static class SettingsManager
     {
         public static OptionsData OptionsData { get; private set; }
-
         #region Fps
 
         private static GameObject _incompatibilityPanel;
         private static TextMeshProUGUI _incompatibilityText; 
         private static TMP_Dropdown _tmpDropdownForFps;
+        private static Slider _fpsSlider;
 
         #endregion
         
@@ -60,13 +59,10 @@ namespace _Scripts.Managers.Game_Manager_Logic
         }
         #endregion
 
-        public static void ApplySettings()
+        private static void ApplySettings()
         {
-            QualitySettings.vSyncCount = OptionsData.vSync ? 1 : 0;
-            Application.targetFrameRate = OptionsData.fpsCount; // Apply FPS cap **after** VSync
-            
-            //Force a Quality Settings Refresh to ensure Unity updates VSync
-            QualitySettings.SetQualityLevel(QualitySettings.GetQualityLevel(), true);
+            QualitySettings.vSyncCount = 0;
+            Application.targetFrameRate = OptionsData.fpsCount;
         }
 
         #region Controls Settings
@@ -98,7 +94,8 @@ namespace _Scripts.Managers.Game_Manager_Logic
             
             OptionsData.fpsCount = fps;
             SaveOptionsData();
-            ApplySettings();
+    
+            Application.targetFrameRate = fps;
         }
 
         public static void SetShowFPS(bool show)
@@ -113,11 +110,12 @@ namespace _Scripts.Managers.Game_Manager_Logic
             return Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value);
         }
         
-        public static void InitializeIncompatibilityPanel(GameObject panel, TextMeshProUGUI text, TMP_Dropdown dropdown)
+        public static void InitializeIncompatibilityPanel(GameObject panel, TextMeshProUGUI text, TMP_Dropdown dropdown, Slider slider)
         {
             _incompatibilityPanel = panel;
             _incompatibilityText = text;
             _tmpDropdownForFps = dropdown;
+            _fpsSlider = slider;
         }
         private static void ShowIncompatibilityErrorFpsMessage(int fps, int maxFps)
         {
@@ -126,6 +124,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
                 _incompatibilityPanel.SetActive(true);
                 _incompatibilityText.text = $"{fps} FPS is not supported on your device! Resetting to {maxFps} FPS.";
                 _tmpDropdownForFps.value = 0;
+                _fpsSlider.value = 0;
                 _tmpDropdownForFps.RefreshShownValue();
             }
         }

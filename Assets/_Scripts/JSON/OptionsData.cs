@@ -18,7 +18,7 @@ namespace _Scripts.JSON
         {
             fpsCount = 60;
             showFps = false;
-            vSync = true;
+            vSync = false;
             controlMode = 0; // default tap to throw
             musicVolume = 1f;
             sfxVolume = 1f;
