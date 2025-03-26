@@ -31,10 +31,10 @@ namespace _Scripts.Projectiles
                 {
                     if (rb)
                     {
-                        var explosionDirection = (other.transform.position - transform.position).normalized;
+                        var punchDirection = (other.transform.position - transform.position).normalized;
                         
                         rb.velocity = Vector2.zero;
-                        rb.AddForce(explosionDirection * (punchStrengthX * 1.5f), ForceMode2D.Impulse);
+                        rb.AddForce(punchDirection * (punchStrengthX * 1.5f), ForceMode2D.Impulse);
                         rb.gravityScale = 0.5f;
                     }
 
