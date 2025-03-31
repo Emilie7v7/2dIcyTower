@@ -96,6 +96,7 @@ namespace _Scripts.Pickups
                 _playerRb.position = new Vector2(Mathf.Lerp(startPosition.x, targetPosition.x, t), _playerRb.position.y);
                 _playerRb.velocity = new Vector2(_playerRb.velocity.x, RocketSpeed);
                 centerTime += Time.deltaTime;
+                Physics.IgnoreLayerCollision(3, 14, true);
                 yield return null;
             }
             var finalVelocity = _playerRb.velocity.y;
@@ -112,6 +113,7 @@ namespace _Scripts.Pickups
                 // Apply horizontal movement while still boosting upwards
                 _playerRb.position = new Vector2(horizontalPosition, _playerRb.position.y + RocketSpeed * Time.deltaTime);
                 elapsedTime += Time.deltaTime;
+                Physics.IgnoreLayerCollision(3, 14, true);
                 yield return null;
             }
 
@@ -119,6 +121,7 @@ namespace _Scripts.Pickups
             _playerInput.CanThrow = true;
             _playerRb.velocity = new Vector2(_playerRb.velocity.x, finalVelocity);
             _isRocketActive = false;
+            Physics.IgnoreLayerCollision(3, 14, false);
             PowerUpPool.Instance.ReturnObject(this);
         }
         private void OnEnable()
