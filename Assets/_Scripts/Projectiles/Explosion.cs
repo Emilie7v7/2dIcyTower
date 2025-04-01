@@ -5,8 +5,10 @@ using _Scripts.Combat.Damage;
 using _Scripts.CoreSystem;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
+using _Scripts.Objects;
 using _Scripts.ScriptableObjects.ExplosionData;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Projectiles
 {
@@ -68,7 +70,6 @@ namespace _Scripts.Projectiles
             if (isPlayerExplosion && GameManager.Instance?.PlayerData != null)
             {
                 effectiveRadius += GameManager.Instance.PlayerData.explosionRadiusBonus;
-                //Debug.Log("Player Explosion Radius is: " + effectiveRadius);
             }
 
             #region Damage Collision
@@ -115,6 +116,12 @@ namespace _Scripts.Projectiles
                     {
                         var damageable = hit.GetComponentInChildren<IDamageable>();
                         damageable?.Damage(new DamageData(explosionDataSo.explosionDamage, _core.Root));
+                    }
+
+                    if (hit && hit.gameObject.CompareTag("Chest"))
+                    {
+                        var chest = hit.GetComponent<Chest>();
+                        chest.OpenChest();
                     }
                 }
             }
@@ -186,6 +193,7 @@ namespace _Scripts.Projectiles
                 EnemyExplosionPool.Instance.ReturnObject(this);
             }
         }
+
         private void OnDrawGizmos()
         {
             // Draw the effective explosion radius for debugging

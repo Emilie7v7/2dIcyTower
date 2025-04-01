@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using _Scripts.Audio;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
@@ -11,20 +13,38 @@ namespace _Scripts.Pickups
         [SerializeField] private ObjectSpawnSettingsSo settings;
         [SerializeField] private float getPulledDistance = 5f;
         [SerializeField] private float maxPullSpeed = 30f;
+        [SerializeField] private bool isPhysicalCoin;
+        
+        private Collider2D _collider2D;
+        private Rigidbody2D _rigidbody2D;
         private bool _isBeingPulled;
         private Transform _player;
+
+
+        private void Start()
+        {
+            _collider2D = GetComponent<Collider2D>();
+            _rigidbody2D = GetComponent<Rigidbody2D>();
+        }
 
         private void Update()
         {
             if (_player is null) return; // Avoid null reference errors
 
             var distance = Vector3.Distance(_player.position, transform.position);
-            
-            if (distance < getPulledDistance)
-                _isBeingPulled = true;
 
-            if (_isBeingPulled)
-                MoveTowardsPlayer(distance);
+            if (isPhysicalCoin)
+            {
+                StartCoroutine(BounceCoinsCoroutine());
+            }
+            if (!isPhysicalCoin)
+            {
+                if (distance < getPulledDistance)
+                    _isBeingPulled = true;
+
+                if (_isBeingPulled)
+                    MoveTowardsPlayer(distance);
+            }
         }
 
         private void MoveTowardsPlayer(float distance)
@@ -41,6 +61,16 @@ namespace _Scripts.Pickups
             transform.position += smoothPullSpeed * Time.deltaTime * direction;
         }
 
+        private IEnumerator BounceCoinsCoroutine()
+        {
+            yield return new WaitForSeconds(2f);
+            _rigidbody2D.gravityScale = 1f;
+            _collider2D.isTrigger = true;
+            _rigidbody2D.isKinematic = true;
+            var distance = Vector3.Distance(_player.position, transform.position);
+            MoveTowardsPlayer(distance);
+        }
+        
         public void StartPulling()
         {
             _isBeingPulled = true;

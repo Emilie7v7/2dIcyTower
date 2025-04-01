@@ -8,6 +8,7 @@ namespace _Scripts.Editor
     public class ObjectSpawnSettingsSoEditor : UnityEditor.Editor
     {
         private SerializedProperty _coinsPrefab;
+        private SerializedProperty _chestCoinPrefab;
         private SerializedProperty _minCoinsPerChunk;
         private SerializedProperty _maxCoinsPerChunk;
         private SerializedProperty _coinValue;
@@ -34,6 +35,7 @@ namespace _Scripts.Editor
         private void OnEnable()
         {
             _coinsPrefab = serializedObject.FindProperty("coinsPrefab");
+            _chestCoinPrefab = serializedObject.FindProperty("chestCoinPrefab");
             _minCoinsPerChunk = serializedObject.FindProperty("minCoinsPerChunk");
             _maxCoinsPerChunk = serializedObject.FindProperty("maxCoinsPerChunk");
             _coinValue = serializedObject.FindProperty("coinValue");
@@ -111,6 +113,11 @@ namespace _Scripts.Editor
 
                 GUILayout.Space(5);
 
+                EditorGUILayout.PropertyField(_chestCoinPrefab, new GUIContent("Chest Coins Prefab"));
+                
+                GUILayout.Space(5);
+                
+                // WONT BE USED IN THE FUTURE 
                 // --- Min Coins Per Chunk ---
                 EditorGUILayout.BeginHorizontal();
 

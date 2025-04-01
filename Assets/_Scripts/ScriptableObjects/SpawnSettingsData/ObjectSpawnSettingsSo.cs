@@ -6,6 +6,7 @@ namespace _Scripts.ScriptableObjects.SpawnSettingsData
     public class ObjectSpawnSettingsSo : ScriptableObject
     {
         [HideInInspector] public GameObject coinsPrefab;
+        [HideInInspector] public GameObject chestCoinPrefab;
 
         [HideInInspector] public int minCoinsPerChunk;
         [HideInInspector] public int maxCoinsPerChunk;
