@@ -10,8 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1853045930691960638}
   - component: {fileID: 5866854612811401725}
-  - component: {fileID: 2289694814042291407}
   - component: {fileID: 5419829328477570033}
+  - component: {fileID: 5231505906343333920}
   m_Layer: 0
   m_Name: LanternLight3
   m_TagString: Untagged
@@ -86,27 +86,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &2289694814042291407
-Animator:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4802924451202332723}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 2fe05d585fc3f7544803bdc0796fa829, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &5419829328477570033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -123,11 +102,11 @@ MonoBehaviour:
   m_LightType: 3
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.764
-  m_Color: {r: 1, g: 0.8352941, b: 0.30980393, a: 1}
+  m_Color: {r: 0.7176471, g: 0.598499, b: 0.28627452, a: 1}
   m_Intensity: 6.5
   m_LightVolumeIntensity: 0.03
   m_LightVolumeIntensityEnabled: 0
-  m_ApplyToSortingLayers: 0000000025e8ff1e5fa853510fd312fb8328cfa765b13ec4b11c011909bf9990d7a9fa746be56639396d085ba3483a2c
+  m_ApplyToSortingLayers: 0000000025e8ff1e5fa853510fd312fb8328cfa765b13ec4b11c011909bf9990d7a9fa746be56639396d085b396d085b
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -157,3 +136,27 @@ MonoBehaviour:
   - {x: 0.40701866, y: -0.63381135, z: 0}
   - {x: 0.438519, y: 0.16888508, z: 0}
   - {x: -0.16963673, y: -0.03321752, z: 0}
+--- !u!114 &5231505906343333920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4802924451202332723}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6707444f43151304296b7d341bb4ac6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mode: 2
+  baseIntensity: 5
+  flickerRange: 1
+  flickerSpeed: 0.3
+  baseRadius: 8
+  radiusRange: 8
+  flickerRadius: 1
+  flickerIntervalMin: 0.05
+  flickerIntervalMax: 0.1
+  lanternIntensityMin: 6
+  lanternIntensityMax: 6.5
+  randomBurst: 0
