@@ -18,7 +18,7 @@ namespace _Scripts.Entities.EntityStateMachine
         public Animator MyAnimator { get; private set; }
         public AnimationToStateMachine AnimationToStateMachine { get; private set; }
 
-        private CollisionSenses CollisionSenses { get; set; }
+        public CollisionSenses CollisionSenses { get; set; }
         public Stats Stats { get; set; }
 
         public virtual void Awake()

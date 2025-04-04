@@ -51,6 +51,11 @@ namespace _Scripts.Projectiles
             {
                 Destroy(gameObject);
             }
+
+            if (other.CompareTag("SolidPlatform"))
+            {
+                Destroy(gameObject);
+            }
         }
     }
 }

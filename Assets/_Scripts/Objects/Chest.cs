@@ -10,6 +10,7 @@ namespace _Scripts.Objects
 
         [Header("General Settings")]
         [SerializeField] private ChestType chestType = ChestType.ChooseType;
+        [SerializeField] private GameObject openedChest;
 
         [Header("Burst Settings")]
         [SerializeField] private float burstStrengthX = 3f;
@@ -30,13 +31,14 @@ namespace _Scripts.Objects
         private void Start()
         {
             _animator = GetComponent<Animator>();
+            openedChest.SetActive(false);
         }
 
         public void OpenChest()
         {
             Debug.Log("Chest got hit");
             _animator.SetBool(Exploded, true);
-
+            openedChest.SetActive(true);
             switch (chestType)
             {
                 case ChestType.Golden:
