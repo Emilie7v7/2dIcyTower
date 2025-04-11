@@ -8,11 +8,13 @@ namespace _Scripts.JSON
     {
         public int playerCoins;
         public int maxHealth;
-        public int explosionRadiusBonus;
+        //public int explosionRadiusBonus;
         public int magnetDuration;
         public int killstreakMultiplier;
         public int rocketBoostDuration;
         public int immortalityDuration;
+        public int multiplierUpgrade;
+        public int coinValueUpgrade;
         public int highScore;
         public Dictionary<string, int> UpgradeLevels;
 
@@ -20,11 +22,13 @@ namespace _Scripts.JSON
         {
             playerCoins = 0;
             maxHealth = 3;
-            explosionRadiusBonus = 1;
+            //explosionRadiusBonus = 1;
             magnetDuration = 5;
             rocketBoostDuration = 5;
             immortalityDuration = 10;
             killstreakMultiplier = 2;
+            multiplierUpgrade = 1;
+            coinValueUpgrade = 0;
             highScore = 0;
             UpgradeLevels = new Dictionary<string, int>
             {

@@ -85,5 +85,11 @@ namespace _Scripts.Objects
                 }
             }
         }
+
+        public void ResetChest()
+        {
+            _animator.SetBool(Exploded, false);
+            openedChest.SetActive(false);
+        }
     }
 }

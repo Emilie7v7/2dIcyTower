@@ -1,3 +1,4 @@
+using System;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.Managers.Score_Logic;
 using TMPro;
@@ -30,6 +31,11 @@ namespace _Scripts.Managers.UI_Logic
             ScoreManager.Instance.OnDeathScoreUpdated -= UpdateScoreUIUponDeath;
         }
 
+        private void Start()
+        {
+            multiplierText.text = GameManager.Instance.PlayerData.multiplierUpgrade + "x";
+        }
+
         private void UpdateScore(int score)
         {
             scoreText.text = score.ToString();
@@ -37,7 +43,7 @@ namespace _Scripts.Managers.UI_Logic
 
         private void UpdateMultiplier(float multiplier)
         {
-            multiplierText.text = multiplier.ToString();
+            multiplierText.text = multiplier + "x";
         }
 
         private void UpdateKillStreakTimer(float timeLeft, float timeMax)

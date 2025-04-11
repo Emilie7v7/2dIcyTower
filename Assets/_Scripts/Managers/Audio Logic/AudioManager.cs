@@ -85,17 +85,17 @@ namespace _Scripts.Managers.Audio_Logic
             {
                 if (source.CompareTag("Music")) 
                 {
-                    Debug.Log($"✅ Registering {source.gameObject.name} as Music");
+                    Debug.Log($"Registering {source.gameObject.name} as Music");
                     RegisterAudioSource(source, AudioTypes.Music);
                 }
                 else if (source.CompareTag("SFX"))
                 {
-                    Debug.Log($"✅ Registering {source.gameObject.name} as SFX");
+                    Debug.Log($"Registering {source.gameObject.name} as SFX");
                     RegisterAudioSource(source, AudioTypes.SFX);
                 }
                 else if (source.CompareTag("UI"))
                 {
-                    Debug.Log($"✅ Registering {source.gameObject.name} as UI");
+                    Debug.Log($"Registering {source.gameObject.name} as UI");
                     RegisterAudioSource(source, AudioTypes.UI);
                 }
                 else

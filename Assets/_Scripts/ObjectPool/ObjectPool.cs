@@ -37,6 +37,30 @@ namespace _Scripts.ObjectPool
             }
             return null;
         }
+        
+        public T GetObject(Vector3 position, Quaternion rotation)
+        {
+            while (Pool.Count > 0)
+            {
+                var obj = Pool.Dequeue();
+
+                switch (obj)
+                {
+                    //Check if the object was destroyed
+                    case null:
+                        continue; //Skip destroyed objects
+                    //If it's a projectile, update its spawn position
+                    case Projectile projectile:
+                        projectile.SetSpawnPosition(position);
+                        break;
+                }
+
+                obj.transform.position = position;
+                obj.gameObject.SetActive(true);
+                return obj;
+            }
+            return null;
+        }
 
         public void ReturnObject(T obj)
         {

@@ -65,7 +65,9 @@ namespace _Scripts.Upgrades
 
         private int CalculateUpgradeCost()
         {
-            return baseUpgradeCost * (GameManager.Instance.PlayerData.UpgradeLevels[upgradeType] + 1);
+            GameManager.Instance.PlayerData.UpgradeLevels.TryAdd(upgradeType, 0);
+            var level = GameManager.Instance.PlayerData.UpgradeLevels[upgradeType];
+            return baseUpgradeCost * (int)Mathf.Pow(2, level);
         }
 
         private void UpdateUpgradeUI(int currentCurrency)
@@ -99,9 +101,9 @@ namespace _Scripts.Upgrades
                     GameManager.Instance.UpgradeMaxHealth(increaseAmount); // Increases max health
                     break;
                 
-                case "ExplosionRadius":
-                    GameManager.Instance.UpgradeMaxExplosionRadius(increaseAmount); // Explosion radius upgrade
-                    break;
+                // case "ExplosionRadius":
+                //     GameManager.Instance.UpgradeMaxExplosionRadius(increaseAmount); // Explosion radius upgrade
+                //     break;
             
                 case "Magnet":
                     GameManager.Instance.UpgradeMagnetDuration(increaseAmount); // Magnet duration upgrade
@@ -117,6 +119,14 @@ namespace _Scripts.Upgrades
                 
                 case "Immortality":
                     GameManager.Instance.UpgradeImmortalityDuration(increaseAmount); // Immortality duration upgrade
+                    break;
+                
+                case "Coin":
+                    GameManager.Instance.UpgradeCoinValue(increaseAmount); // Coin value upgrade
+                    break;
+                
+                case "Multiplier":
+                    GameManager.Instance.UpgradeMultiplier(increaseAmount); // Permanent Multiplier upgrade
                     break;
             
                 default:

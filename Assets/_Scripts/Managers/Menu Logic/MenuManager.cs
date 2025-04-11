@@ -2,7 +2,9 @@ using System;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
+using _Scripts.Objects;
 using _Scripts.Pickups;
+using _Scripts.Projectiles;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -71,6 +73,31 @@ namespace _Scripts.Managers.Menu_Logic
             {
                 ReturnActivePowerUps();
             }
+
+            if (ChestCoinPool.Instance != null)
+            {
+                ReturnActiveChestCoins();
+            }
+
+            if (PlayerProjectilePool.Instance && EnemyProjectilePool.Instance != null)
+            {
+                ReturnActiveProjectiles();
+            }
+
+            if (PlayerExplosionPool.Instance && EnemyExplosionPool.Instance != null)
+            {
+                ReturnActiveExplosion();
+            }
+
+            if (GoldenChestPool.Instance && WoodenChestPool.Instance != null)
+            {
+                ReturnActiveChests();
+            }
+
+            if (ArrowPool.Instance != null)
+            {
+                ReturnActiveArrows();
+            }
         }
 
         // Return all active enemies to the pool
@@ -115,6 +142,111 @@ namespace _Scripts.Managers.Menu_Logic
             }
         }
 
+        // Return all active chest coins to the pool
+        private static void ReturnActiveChestCoins()
+        {
+            var activeChestCoins = GameObject.FindGameObjectsWithTag("ChestCoin");
+            foreach (var chestCoin in activeChestCoins)
+            {
+                var chestCoinsComponent = chestCoin.GetComponent<CoinPickup>();
+                if (chestCoinsComponent != null)
+                {
+                    ChestCoinPool.Instance.ReturnObject(chestCoinsComponent);
+                }
+            }
+        }
+        
+        // Return all active chests to the pool
+        private static void ReturnActiveChests()
+        {
+            var activeGoldenChests = GameObject.FindGameObjectsWithTag("GoldChest");
+            var activeWoodenChests = GameObject.FindGameObjectsWithTag("WoodChest");
+            
+            foreach (var goldenChests in activeGoldenChests)
+            {
+                var goldChestComponent = goldenChests.GetComponent<Chest>();
+                if (goldChestComponent != null)
+                {
+                    goldChestComponent.ResetChest();
+                    GoldenChestPool.Instance.ReturnObject(goldChestComponent);
+                }
+            }
+
+            foreach (var woodenChests in activeWoodenChests)
+            {
+                var woodChestComponent = woodenChests.GetComponent<Chest>();
+                if (woodChestComponent != null)
+                {
+                    woodChestComponent.ResetChest();
+                    WoodenChestPool.Instance.ReturnObject(woodChestComponent);
+                }
+            }
+        }
+        
+        // Return all active projectiles to the pool
+        private static void ReturnActiveProjectiles()
+        {
+            var activePlayerProjectiles = GameObject.FindGameObjectsWithTag("PlayerProjectile");
+            var activeSkeletonProjectiles = GameObject.FindGameObjectsWithTag("SkeletonProjectile");
+
+            foreach (var playerProjectile in activePlayerProjectiles)
+            {
+                var playerProjectileComponent = playerProjectile.GetComponent<Projectile>();
+                if (playerProjectileComponent != null)
+                {
+                    PlayerProjectilePool.Instance.ReturnObject(playerProjectileComponent);
+                }
+            }
+
+            foreach (var skeletonProjectile in activeSkeletonProjectiles)
+            {
+                var skeletonProjectileComponent = skeletonProjectile.GetComponent<Projectile>();
+                if (skeletonProjectileComponent != null)
+                {
+                    EnemyProjectilePool.Instance.ReturnObject(skeletonProjectileComponent);
+                }
+            }
+        }
+        
+        // Return all active explosion to the pool
+        private static void ReturnActiveExplosion()
+        {
+            var activePlayerExplosion = GameObject.FindGameObjectsWithTag("PlayerExplosion");
+            var activeSkeletonExplosion = GameObject.FindGameObjectsWithTag("SkeletonExplosion");
+            
+            foreach (var playerExplosion in activePlayerExplosion)
+            {
+                var playerExplosionComponent = playerExplosion.GetComponent<Explosion>();
+                if (playerExplosionComponent != null)
+                {
+                    PlayerExplosionPool.Instance.ReturnObject(playerExplosionComponent);
+                }
+            }
+
+            foreach (var skeletonExplosion in activeSkeletonExplosion)
+            {
+                var skeletonExplosionComponent = skeletonExplosion.GetComponent<Explosion>();
+                if (skeletonExplosionComponent != null)
+                {
+                    EnemyExplosionPool.Instance.ReturnObject(skeletonExplosionComponent);
+                }
+            }
+        }
+        
+        // Return all active arrows to the pool
+        private static void ReturnActiveArrows()
+        {
+            var activeArrows = GameObject.FindGameObjectsWithTag("Dart");
+            
+            foreach (var arrows in activeArrows)
+            {
+                var arrowComponent = arrows.GetComponent<Arrow>();
+                if (arrowComponent != null)
+                {
+                    ArrowPool.Instance.ReturnObject(arrowComponent);
+                }
+            }
+        }
         #endregion
     }
 }

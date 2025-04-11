@@ -7,6 +7,7 @@ namespace _Scripts.Parallax
     {
         private float _startPos, _length;
         [SerializeField] private GameObject cam;
+        [Range(0f,1f)]
         [SerializeField] private float parallaxFactor;
 
         private void Start()

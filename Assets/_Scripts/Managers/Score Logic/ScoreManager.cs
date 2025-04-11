@@ -17,8 +17,9 @@ namespace _Scripts.Managers.Score_Logic
         
         private int _score;
         private int _maxMultiplierLevel;
-        
-        private float _multiplier = 1.0f;
+
+        private float _multiplier = 0f;
+        private float _startMultiplier;
         private float _multiplierTimeLeft;
         private float _initialPosition;
         private const float BaseMultiplierDuration = 6.5f;
@@ -42,13 +43,18 @@ namespace _Scripts.Managers.Score_Logic
         
         private void Start()
         {
+            if (GameManager.Instance.PlayerData != null)
+            {
+                _multiplier += GameManager.Instance.PlayerData.multiplierUpgrade;
+            }
+            _startMultiplier = _multiplier;
             RunStarted();
             InvokeRepeating(nameof(UpdateScore), 0.1f, 0.1f);
         }
 
         private void Update()
         {
-            if (!isTimerFrozen && _multiplier > 1f)
+            if (!isTimerFrozen && _multiplier > _startMultiplier)
             {
                 _multiplierTimeLeft -= Time.deltaTime;
                 OnKillstreakTimeUpdated?.Invoke(_multiplierTimeLeft, BaseMultiplierDuration);
@@ -108,14 +114,14 @@ namespace _Scripts.Managers.Score_Logic
 
         private void ResetMultiplier()
         {
-            _multiplier = 1.0f;
+            _multiplier = _startMultiplier;
             OnMultiplierUpdated?.Invoke(_multiplier);
             OnKillstreakTimeUpdated?.Invoke(0, BaseMultiplierDuration);
         }
         
         private void RunStarted()
         {
-            _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier;
+            _maxMultiplierLevel = GameManager.Instance.PlayerData.killstreakMultiplier + GameManager.Instance.PlayerData.multiplierUpgrade;
             _lastRecordedHeight = playerTransform.position.y + 1;
         }
         

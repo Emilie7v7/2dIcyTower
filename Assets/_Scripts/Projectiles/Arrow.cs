@@ -1,24 +1,14 @@
 using System;
 using _Scripts.CoreSystem;
+using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
 
 namespace _Scripts.Projectiles
 {
     public class Arrow : MonoBehaviour
     {
-        [SerializeField] private float speed;
-
         [SerializeField] private float punchStrengthX;
         private Rigidbody2D _rb;
-
-        private void Start()
-        {
-            _rb = GetComponent<Rigidbody2D>();
-            _rb.gravityScale = 0f;
-            
-            _rb.velocity = transform.right * speed;
-
-        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -44,18 +34,31 @@ namespace _Scripts.Projectiles
                     }
                 }
                 
-                Destroy(gameObject);
+                ArrowPool.Instance?.ReturnObject(this);
             }
 
             if (other.CompareTag("Wall"))
             {
-                Destroy(gameObject);
+                ArrowPool.Instance?.ReturnObject(this);
             }
 
             if (other.CompareTag("SolidPlatform"))
             {
-                Destroy(gameObject);
+                ArrowPool.Instance?.ReturnObject(this);
             }
+        }
+        
+        public void Launch(Vector2 direction, float speed)
+        {
+            if (_rb == null)
+                _rb = GetComponent<Rigidbody2D>();
+
+            _rb.gravityScale = 0f;
+            _rb.velocity = direction.normalized * speed;
+
+            var sr = GetComponent<SpriteRenderer>();
+            if (sr != null)
+                sr.flipX = direction.x < 0;
         }
     }
 }

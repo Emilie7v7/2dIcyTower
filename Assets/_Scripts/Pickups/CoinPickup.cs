@@ -80,8 +80,13 @@ namespace _Scripts.Pickups
         {
             if (!other.CompareTag("Player")) return;
             other.GetComponent<PlayerAudio>()?.PlayCoinPickupSound();
-            
-            GameManager.Instance.AddCoins(settings.coinValue);
+
+            var coinValue = settings.coinValue;
+            if (GameManager.Instance.PlayerData != null)
+            {
+                coinValue += GameManager.Instance.PlayerData.coinValueUpgrade;
+            }
+            GameManager.Instance.AddCoins(coinValue);
             CoinPool.Instance?.ReturnObject(this);
         }
 

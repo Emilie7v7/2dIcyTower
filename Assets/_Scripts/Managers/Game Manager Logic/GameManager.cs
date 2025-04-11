@@ -93,19 +93,19 @@ namespace _Scripts.Managers.Game_Manager_Logic
             }
         }
 
-        public void UpgradeMaxExplosionRadius(int amount)
-        {
-            if (PlayerData.explosionRadiusBonus < 10)
-            {
-                PlayerData.explosionRadiusBonus += amount;
-                SavePlayerGameData();
-                Debug.Log($"Max Explosion Radius Upgraded: {PlayerData.explosionRadiusBonus}/10");
-            }
-            else
-            {
-                Debug.Log("Max Radius already at the limit");
-            }
-        }
+        // public void UpgradeMaxExplosionRadius(int amount)
+        // {
+        //     if (PlayerData.explosionRadiusBonus < 10)
+        //     {
+        //         PlayerData.explosionRadiusBonus += amount;
+        //         SavePlayerGameData();
+        //         Debug.Log($"Max Explosion Radius Upgraded: {PlayerData.explosionRadiusBonus}/10");
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Max Radius already at the limit");
+        //     }
+        // }
 
         public void UpgradeMagnetDuration(int amount)
         {
@@ -163,6 +163,34 @@ namespace _Scripts.Managers.Game_Manager_Logic
             }
         }
 
+        public void UpgradeMultiplier(int amount)
+        {
+            if (PlayerData.multiplierUpgrade < 10)
+            {
+                PlayerData.multiplierUpgrade += amount;
+                SavePlayerGameData();
+                Debug.Log($" Multiplier Upgraded: {PlayerData.multiplierUpgrade}/10");
+            }
+            else
+            {
+                Debug.Log("Multiplier already at the limit");
+            }
+        }
+
+        public void UpgradeCoinValue(int amount)
+        {
+            if (PlayerData.coinValueUpgrade < 4)
+            {
+                PlayerData.coinValueUpgrade += amount;
+                SavePlayerGameData();
+                Debug.Log($"Coin Value Upgraded: {PlayerData.coinValueUpgrade}/10");
+            }
+            else
+            {
+                Debug.Log("Coin Value already at the limit");
+            }
+        }
+        
         #endregion
         
         #region Player Game Data
