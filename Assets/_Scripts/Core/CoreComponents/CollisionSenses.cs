@@ -116,7 +116,7 @@ namespace _Scripts.CoreSystem
         public bool IsPlayerInLineOfSight()
         {
             Vector2 origin = PlayerDetectedCheck.position;
-            var layerMask = WhatIsPlayer; // Ignore ground collisions
+            var layerMask = WhatIsPlayer;
             var angleStep = AngleInDegreesForDetectingPlayer;
 
             for (float angle = 0; angle < 360; angle += angleStep)

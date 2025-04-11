@@ -7,6 +7,8 @@ namespace _Scripts.ScriptableObjects.ProjectileData
     {
         [Header("Projectile Properties")]
         public GameObject explosionPrefab;
+        
+        [Header("Long Range Projectile Properties")]
         public float projectileSpeed;
         public float projectileRadius;
         public Vector2 projectileArc;
