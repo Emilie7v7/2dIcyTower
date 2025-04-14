@@ -1,4 +1,5 @@
 using System;
+using _Scripts.JSON;
 using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -19,8 +20,8 @@ namespace _Scripts.Settings
         [SerializeField] private Toggle vsyncToggle;
         
         [Header("Control Settings")]
-        [SerializeField] private TMP_Dropdown controlDropdown;
-        [SerializeField] private Slider controlSlider;
+        [SerializeField] private Toggle touchScreenToggle;
+        [SerializeField] private Toggle joystickToggle;
         
         [Header("Music Settings")]
         [SerializeField] private Slider musicVolumeSlider;
@@ -50,10 +51,9 @@ namespace _Scripts.Settings
 
             #region Controls
 
-            controlSlider.value = SettingsManager.GetControlMode();
-            
-            controlDropdown.onValueChanged.AddListener(SetControlMode);
-            controlSlider.onValueChanged.AddListener(value => SetControlMode((int)value));
+            var controlMode = SettingsManager.GetControlMode();
+            touchScreenToggle.isOn = controlMode == OptionsData.ControlModes.Touchscreen;
+            joystickToggle.isOn = controlMode == OptionsData.ControlModes.Joystick;
 
             LoadControlMode();
             
@@ -72,6 +72,7 @@ namespace _Scripts.Settings
             #endregion
             SettingsManager.InitializeIncompatibilityPanel(incompatibilityPanel, incompatibilityText, fpsDropdown, fpsSlider);
             incompatibilityPanel.SetActive(false);
+            
         }   
         
         #region FPS Settings
@@ -126,14 +127,25 @@ namespace _Scripts.Settings
 
         #region Controls Settings
 
-        private static void SetControlMode(int mode)
-        {
-            SettingsManager.SetControlMode(mode);
-        }
-
         private void LoadControlMode()
         {
-            controlDropdown.value = SettingsManager.GetControlMode();
+            touchScreenToggle.onValueChanged.AddListener(isOn =>
+            {
+                if (isOn)
+                {
+                    joystickToggle.isOn = false;
+                    SettingsManager.SetControlMode(OptionsData.ControlModes.Touchscreen);
+                }
+            });
+
+            joystickToggle.onValueChanged.AddListener(isOn =>
+            {
+                if (isOn)
+                {
+                    touchScreenToggle.isOn = false;
+                    SettingsManager.SetControlMode(OptionsData.ControlModes.Joystick);
+                }
+            });
         }
         
 

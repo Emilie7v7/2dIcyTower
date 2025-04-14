@@ -67,12 +67,12 @@ namespace _Scripts.Managers.Game_Manager_Logic
 
         #region Controls Settings
 
-        public static int GetControlMode()
+        public static OptionsData.ControlModes GetControlMode()
         {
             return OptionsData.controlMode;
         }
 
-        public static void SetControlMode(int mode)
+        public static void SetControlMode(OptionsData.ControlModes mode)
         {
             OptionsData.controlMode = mode;
             SaveOptionsData();

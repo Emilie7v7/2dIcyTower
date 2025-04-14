@@ -53,6 +53,8 @@ namespace _Scripts.Hazards
                 }
             }
         }
+        
+        
 
         private void OnTriggerExit2D(Collider2D other)
         {

@@ -10,15 +10,21 @@ namespace _Scripts.Pickups
 {
     public class RocketPickup : PowerUp
     {
+
+        [SerializeField] private LayerMask layerMask;
+
         private float _rocketDuration;
-        private const float RocketSpeed = 75f;
+        private const float RocketSpeed = 20f;
         private bool _isRocketActive = false;
-        
+
         private Rigidbody2D _playerRb;
         private PlayerInputHandler _playerInput;
         private Stats _playerStats;
-        
-        private void Start()
+
+        private const int PlayerLayer = 3;
+        private int[] _hazardLayers = {14, 21, 22, 23, 24};
+
+    private void Start()
         {
             _rocketDuration = GameManager.Instance.PlayerData.rocketBoostDuration;
         }
@@ -55,7 +61,7 @@ namespace _Scripts.Pickups
                 if (_playerRb is not null)
                 {
                     Activate();
-                    _playerStats.ActivateImmortality(_rocketDuration);
+                    _playerStats.ActivateImmortality(_rocketDuration + 1f);
                 }
             }
         }
@@ -80,50 +86,64 @@ namespace _Scripts.Pickups
         private IEnumerator RocketEffect()
         {
             var elapsedTime = 0f;
-            const float frequency = 2f; // Controls oscillation speed
-            const float moveToCenterDuration = 1f; // Duration to move to the center
-            const float levelMiddleX = (-14f + 14f) / 2;
+            const float moveCenterSpeed = 10f; // X smoothing speed
+            const float centerX = 0f;
 
-            // Smoothly move the player to the middle of the level
-            var centerTime = 0f;
-            var startPosition = _playerRb.position;
-            var targetPosition = new Vector2(levelMiddleX, startPosition.y);
-
-            while (centerTime < moveToCenterDuration)
+            foreach (var layers in _hazardLayers)
             {
-                // Smoothly move towards center
-                var t = centerTime / moveToCenterDuration;
-                _playerRb.position = new Vector2(Mathf.Lerp(startPosition.x, targetPosition.x, t), _playerRb.position.y);
-                _playerRb.velocity = new Vector2(_playerRb.velocity.x, RocketSpeed);
-                centerTime += Time.deltaTime;
-                Physics.IgnoreLayerCollision(3, 14, true);
-                yield return null;
+                Physics2D.IgnoreLayerCollision(PlayerLayer, layers, true);
             }
-            var finalVelocity = _playerRb.velocity.y;
-
-            // Start oscillating but based on level boundaries
             while (elapsedTime < _rocketDuration)
             {
                 _playerInput.CanThrow = false;
+                
+                // Smooth horizontal drift to center
+                var directionX = Mathf.Sign(centerX - _playerRb.position.x);
+                var deltaX = Mathf.Abs(centerX - _playerRb.position.x);
 
-                // Map Sin to the entire level width
-                var normalizedSin = Mathf.Sin(elapsedTime * frequency);
-                var horizontalPosition = Mathf.Lerp(-10, 10, (normalizedSin + 1) / 2);
+                var xSpeed = (deltaX > 0.05f) ? moveCenterSpeed * directionX : 0f;
 
-                // Apply horizontal movement while still boosting upwards
-                _playerRb.position = new Vector2(horizontalPosition, _playerRb.position.y + RocketSpeed * Time.deltaTime);
+                // Apply velocity directly
+                _playerRb.velocity = new Vector2(xSpeed, RocketSpeed);
+
+
                 elapsedTime += Time.deltaTime;
-                Physics.IgnoreLayerCollision(3, 14, true);
                 yield return null;
             }
 
-            // Reset movement after effect
-            _playerInput.CanThrow = true;
-            _playerRb.velocity = new Vector2(_playerRb.velocity.x, finalVelocity);
+            // Don't override Y — preserve current momentum
             _isRocketActive = false;
-            Physics.IgnoreLayerCollision(3, 14, false);
+
+            yield return StartCoroutine(WaitUntilNotInsidePlatform());
+            foreach (var layers in _hazardLayers)
+            {
+                Physics2D.IgnoreLayerCollision(PlayerLayer, layers, false);
+            }
+            _playerInput.CanThrow = true;
             PowerUpPool.Instance.ReturnObject(this);
         }
+        
+        private IEnumerator WaitUntilNotInsidePlatform()
+        {
+            const float checkInterval = 0.05f;
+            const float maxWaitTime = 2f;
+            var waitedTime = 0f;
+
+            
+            var boxSize = new Vector2(0.9f, 1.8f);
+            
+            while (waitedTime < maxWaitTime)
+            {
+                // Check if still overlapping any platform
+                var hit = Physics2D.OverlapBox(_playerRb.position, boxSize, 0f, layerMask);
+
+                if (hit == null) break; // No longer inside a platform
+
+                waitedTime += checkInterval;
+                yield return new WaitForSeconds(checkInterval);
+            }
+        }
+        
         private void OnEnable()
         {
             if (Player is null)
