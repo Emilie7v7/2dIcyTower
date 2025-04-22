@@ -378,4 +378,3 @@ namespace _Scripts.Editor
         }
     }
 }
-
