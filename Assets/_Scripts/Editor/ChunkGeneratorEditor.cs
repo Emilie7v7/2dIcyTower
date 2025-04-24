@@ -7,12 +7,14 @@ using Random = UnityEngine.Random;
 
 namespace _Scripts.Editor
 {
+    internal enum ChunkGenerationType {Default, Easy, Medium, Hard}
     public class ChunkGeneratorEditor : EditorWindow
     {
 
         #region Variables
 
         // Chunk generation settings
+        private ChunkGenerationType selectedType = ChunkGenerationType.Default; // Controls the type of chunk to be generated
         private int _chunkWidth = 40; // Width of the chunk in grid cells
         private int _chunkHeight = 99; // Height of the chunk in grid cells
         private bool _generateWalls = true; // Toggle for walls
@@ -24,7 +26,12 @@ namespace _Scripts.Editor
         private GameObject _chunkPrefab; // Prefab to be created or modified
         
         // Chunk accessible fields
+        private Tilemap _backgroundTilemap;
         private Tilemap _wallsTilemap;
+        private Tilemap _platformsTilemap;
+        private Tilemap _solidPlatformsTilemap;
+        private Tilemap _wallDecorTilemap;
+        
         
         // Trap settings
         private bool _dartTrapsGaps;
@@ -53,6 +60,9 @@ namespace _Scripts.Editor
         private void OnGUI()
         {
             GUILayout.Label("Chunk Generation Settings", EditorStyles.boldLabel);
+
+            // Create an enum popup in the inspector
+            selectedType = (ChunkGenerationType)EditorGUILayout.EnumPopup("Chunk Type", selectedType);
 
             // Basic settings
             _chunkWidth = EditorGUILayout.IntField("Chunk Width", _chunkWidth);
@@ -121,9 +131,77 @@ namespace _Scripts.Editor
                     ClearCurrentChunk();
                 }
 
-                if (GUILayout.Button("Rebuild With Current Settings"))
+                if (GUILayout.Button("Rebuild Whole Chunk"))
                 {
                     RebuildCurrentChunk();
+                }
+
+                if (GUILayout.Button("Rebuild Background"))
+                {
+                    // Generate Background
+                    if (_backgroundTilemap)
+                    {
+                        GenerateBackground(_backgroundTilemap);
+                    }
+                }
+
+                if (GUILayout.Button("Rebuild Walls"))
+                {
+                    // Generate Walls
+                    if (_wallsTilemap)
+                    {
+                        GenerateWalls(_wallsTilemap);
+                    }
+                }
+
+                if (GUILayout.Button("Rebuild Basic Platforms"))
+                {
+                    // Generate Basic Platforms
+                    if (_platformsTilemap)
+                    {
+                        if (_generatePlatforms)
+                        {
+                            GenerateBasicPlatforms(_platformsTilemap);
+                        }
+                        else
+                        {
+                            _platformsTilemap.ClearAllTiles();
+                        }
+                    }
+                }
+
+                if (GUILayout.Button("Rebuild Solid Platforms"))
+                {
+                    // Generate Solid Platforms
+                    if (_solidPlatformsTilemap)
+                    {
+                        if (_generateSolidPlatforms)
+                        {
+                            GenerateSolidPlatforms(_solidPlatformsTilemap);
+                        }
+                        else
+                        {
+                            _solidPlatformsTilemap.ClearAllTiles();
+                        }
+
+                    }
+                }
+                
+                if (GUILayout.Button("Rebuild Dart Traps"))
+                {
+                    if (_dartTrapsGaps)
+                    {
+                        // Generate base structure
+                        if (_generateWalls)
+                        {
+                            if (_wallsTilemap)
+                            {
+                                GenerateWalls(_wallsTilemap);
+                                GenerateDartTrapGaps(_wallsTilemap);
+                                GenerateWallDecorations(_wallDecorTilemap);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -142,7 +220,16 @@ namespace _Scripts.Editor
 
             // Create a new instance
             _currentChunkInstance = Instantiate(_chunkPrefab, new Vector3(-20, -5, 0), Quaternion.identity);
-            _currentChunkInstance.name = "GeneratedChunk";
+            var chunkName = selectedType switch
+            {
+                ChunkGenerationType.Default => "GeneratedChunk",
+                ChunkGenerationType.Easy => "EasyChunk",
+                ChunkGenerationType.Medium => "MediumChunk",
+                ChunkGenerationType.Hard => "HardChunk",
+                _ => "GeneratedChunk"
+            };
+            
+            _currentChunkInstance.name = chunkName;
 
             // Generate the chunk with current settings
             RebuildCurrentChunk();
@@ -160,10 +247,10 @@ namespace _Scripts.Editor
             }
 
             // Generate Background
-            var backgroundTilemap = gridTransform.Find("Tilemap_Background")?.GetComponent<Tilemap>();
-            if (backgroundTilemap)
+            _backgroundTilemap = gridTransform.Find("Tilemap_Background")?.GetComponent<Tilemap>();
+            if (_backgroundTilemap)
             {
-                GenerateBackground(backgroundTilemap);
+                GenerateBackground(_backgroundTilemap);
             }
             
             // Generate base structure
@@ -185,28 +272,28 @@ namespace _Scripts.Editor
             // Generate other elements in order
             if (_generateWallDecorations)
             {
-                var wallDecorTilemap = gridTransform.Find("Tilemap_WallDeco")?.GetComponent<Tilemap>();
-                if (wallDecorTilemap)
+                _wallDecorTilemap = gridTransform.Find("Tilemap_WallDeco")?.GetComponent<Tilemap>();
+                if (_wallDecorTilemap)
                 {
-                    GenerateWallDecorations(wallDecorTilemap);
+                    GenerateWallDecorations(_wallDecorTilemap);
                 }
             }
 
             if (_generatePlatforms)
             {
-                var platformsTilemap = gridTransform.Find("Tilemap_Collision_Platforms")?.GetComponent<Tilemap>();
-                if (platformsTilemap)
+                _platformsTilemap = gridTransform.Find("Tilemap_Collision_Platforms")?.GetComponent<Tilemap>();
+                if (_platformsTilemap)
                 {
-                    GenerateBasicPlatforms(platformsTilemap);
+                    GenerateBasicPlatforms(_platformsTilemap);
                 }
             }
             
             if (_generateSolidPlatforms)
             {
-                var solidPlatformsTilemap = gridTransform.Find("Tilemap_Collision_SolidPlatforms")?.GetComponent<Tilemap>();
-                if (solidPlatformsTilemap)
+                _solidPlatformsTilemap = gridTransform.Find("Tilemap_Collision_SolidPlatforms")?.GetComponent<Tilemap>();
+                if (_solidPlatformsTilemap)
                 {
-                    GenerateSolidPlatforms(solidPlatformsTilemap);
+                    GenerateSolidPlatforms(_solidPlatformsTilemap);
                 }
             }
             
@@ -779,9 +866,10 @@ namespace _Scripts.Editor
         }
 
         #endregion
-        
 
-        private void GenerateDartTrapGaps(Tilemap wallsTilemap)
+        #region DartTrap Generation
+
+         private void GenerateDartTrapGaps(Tilemap wallsTilemap)
         {
             // Create lists to track positions for each wall
             var leftWallGapPositions = new List<int>();
@@ -898,5 +986,8 @@ namespace _Scripts.Editor
                 }
             }
         }
+
+        #endregion
+       
     }
 }
