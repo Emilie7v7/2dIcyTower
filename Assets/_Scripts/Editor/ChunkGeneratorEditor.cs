@@ -420,6 +420,34 @@ namespace _Scripts.Editor
             {
                 tilemap.ClearAllTiles();
             }
+            var spawnPoint = _currentChunkInstance.transform.Find("SpawnPoints");
+            
+            if (spawnPoint)
+            {
+                var leftDart = spawnPoint.Find("LeftWallDartTrap");
+                var rightDart = spawnPoint.Find("RightWallDartTrap");
+                        
+                // Destroy all children of left dart trap parent
+                if (leftDart)
+                {
+                    var children = new List<GameObject>();
+                    foreach (Transform child in leftDart)
+                    {
+                        children.Add(child.gameObject);
+                    }
+                    children.ForEach(child => DestroyImmediate(child));
+                }
+                // Destroy all children of right dart trap parent
+                if (rightDart)
+                {
+                    var children = new List<GameObject>();
+                    foreach (Transform child in rightDart)
+                    {
+                        children.Add(child.gameObject);
+                    }
+                    children.ForEach(child => DestroyImmediate(child));
+                }
+            }
         }
         
         #endregion
@@ -535,8 +563,8 @@ namespace _Scripts.Editor
             // Platform generation parameters
             const float minYDistance = 7f;
             const float maxYDistance = 8f;
-            const int platformMinLength = 8;
-            const int platformMaxLength = 12;
+            const int platformMinLength = 9;
+            const int platformMaxLength = 14;
             const int maxAttempts = 100; // Prevent infinite loops
             
             var currentY = 10; // Starting Y position
