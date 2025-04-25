@@ -278,23 +278,26 @@ namespace _Scripts.Editor
                         {
                             var leftDart = spawnPoint.Find("LeftWallDartTrap");
                             var rightDart = spawnPoint.Find("RightWallDartTrap");
-                                
+                        
                             // Destroy all children of left dart trap parent
                             if (leftDart)
                             {
+                                var children = new List<GameObject>();
                                 foreach (Transform child in leftDart)
                                 {
-                                    DestroyImmediate(child.gameObject);
-                                        
+                                    children.Add(child.gameObject);
                                 }
+                                children.ForEach(child => DestroyImmediate(child));
                             }
                             // Destroy all children of right dart trap parent
                             if (rightDart)
                             {
+                                var children = new List<GameObject>();
                                 foreach (Transform child in rightDart)
                                 {
-                                    DestroyImmediate(child.gameObject);
+                                    children.Add(child.gameObject);
                                 }
+                                children.ForEach(child => DestroyImmediate(child));
                             }
                         }
                     }
@@ -891,8 +894,37 @@ namespace _Scripts.Editor
 
         #region DartTrap Generation
 
-         private void GenerateDartTrapGaps(Tilemap wallsTilemap)
+        private void GenerateDartTrapGaps(Tilemap wallsTilemap)
         {
+            var spawnPoint = _currentChunkInstance.transform.Find("SpawnPoints");
+            if (spawnPoint)
+            {
+                var leftDart = spawnPoint.Find("LeftWallDartTrap");
+                var rightDart = spawnPoint.Find("RightWallDartTrap");
+                        
+                // Destroy all children of left dart trap parent
+                if (leftDart)
+                {
+                    var children = new List<GameObject>();
+                    foreach (Transform child in leftDart)
+                    {
+                        children.Add(child.gameObject);
+                    }
+                    children.ForEach(child => DestroyImmediate(child));
+                }
+                // Destroy all children of right dart trap parent
+                if (rightDart)
+                {
+                    var children = new List<GameObject>();
+                    foreach (Transform child in rightDart)
+                    {
+                        children.Add(child.gameObject);
+                    }
+                    children.ForEach(child => DestroyImmediate(child));
+                }
+            }
+
+            
             // Create lists to track positions for each wall
             var leftWallGapPositions = new List<int>();
             var rightWallGapPositions = new List<int>();
@@ -920,18 +952,17 @@ namespace _Scripts.Editor
             
             if (_dartTrapsGaps)
             {
-                var spawnPoint = _currentChunkInstance.transform.Find("SpawnPoints");
                 var leftDartTrap = spawnPoint.Find("LeftWallDartTrap");
                 var rightDartTrap = spawnPoint.Find("RightWallDartTrap");
                 
                 if (_dartsOnTheLeftWall)
                 {
-                    InstantiateDartTraps(leftWallGapPositions, true, leftDartTrap);;
+                    InstantiateDartTraps(leftWallGapPositions, true, leftDartTrap);
                 }
                     
                 if (_dartsOnTheRightWall)
                 {
-                    InstantiateDartTraps(rightWallGapPositions, false, rightDartTrap);;
+                    InstantiateDartTraps(rightWallGapPositions, false, rightDartTrap);
                 }
             }
             
