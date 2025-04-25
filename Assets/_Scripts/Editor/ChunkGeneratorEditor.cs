@@ -420,6 +420,34 @@ namespace _Scripts.Editor
             {
                 tilemap.ClearAllTiles();
             }
+            var spawnPoint = _currentChunkInstance.transform.Find("SpawnPoints");
+            
+            if (spawnPoint)
+            {
+                var leftDart = spawnPoint.Find("LeftWallDartTrap");
+                var rightDart = spawnPoint.Find("RightWallDartTrap");
+                        
+                // Destroy all children of left dart trap parent
+                if (leftDart)
+                {
+                    var children = new List<GameObject>();
+                    foreach (Transform child in leftDart)
+                    {
+                        children.Add(child.gameObject);
+                    }
+                    children.ForEach(child => DestroyImmediate(child));
+                }
+                // Destroy all children of right dart trap parent
+                if (rightDart)
+                {
+                    var children = new List<GameObject>();
+                    foreach (Transform child in rightDart)
+                    {
+                        children.Add(child.gameObject);
+                    }
+                    children.ForEach(child => DestroyImmediate(child));
+                }
+            }
         }
         
         #endregion
