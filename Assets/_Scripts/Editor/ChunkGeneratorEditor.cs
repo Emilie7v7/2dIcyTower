@@ -563,8 +563,8 @@ namespace _Scripts.Editor
             // Platform generation parameters
             const float minYDistance = 7f;
             const float maxYDistance = 8f;
-            const int platformMinLength = 8;
-            const int platformMaxLength = 12;
+            const int platformMinLength = 9;
+            const int platformMaxLength = 14;
             const int maxAttempts = 100; // Prevent infinite loops
             
             var currentY = 10; // Starting Y position
