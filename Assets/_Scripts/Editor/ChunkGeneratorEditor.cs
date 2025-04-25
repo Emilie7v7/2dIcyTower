@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -8,6 +9,7 @@ using Random = UnityEngine.Random;
 namespace _Scripts.Editor
 {
     internal enum ChunkGenerationType {Default, Easy, Medium, Hard}
+    internal enum SolidPlatformType {None, Cube, UpsideDownT, ShapeT}
     public class ChunkGeneratorEditor : EditorWindow
     {
 
@@ -42,7 +44,11 @@ namespace _Scripts.Editor
         private int _amountOfGapsOnRightWall = 1;
         private GameObject _dartTrapPrefabLeftWall; // Prefab to be used for traps
         private GameObject _dartTrapPrefabRightWall; // Prefab to be used for traps
-
+        
+        // Solid Platform settings
+        private SolidPlatformType _solidPlatformType = SolidPlatformType.None; // Type of solid platform to be generated
+        private Vector2Int newPlatformPosition = Vector2Int.zero;
+        
         // Generation steps
         private GameObject _currentChunkInstance;
         private Dictionary<string, bool> _generationSteps = new Dictionary<string, bool>();
@@ -59,9 +65,11 @@ namespace _Scripts.Editor
         
         private void OnGUI()
         {
+            #region Core Chunk Generation Settings
+            
             GUILayout.Label("Chunk Generation Settings", EditorStyles.boldLabel);
 
-            // Create an enum popup in the inspector
+            // Create an enum popup in the inspector to select the chunk type
             selectedType = (ChunkGenerationType)EditorGUILayout.EnumPopup("Chunk Type", selectedType);
 
             // Basic settings
@@ -76,8 +84,13 @@ namespace _Scripts.Editor
             _generateWallDecorations = EditorGUILayout.Toggle("Generate Wall Decorations", _generateWallDecorations);
             _generatePlatforms = EditorGUILayout.Toggle("Generate Platforms", _generatePlatforms);
             _generateSolidPlatforms = EditorGUILayout.Toggle("Generate Solid Platforms", _generateSolidPlatforms);
-
+            
+            #endregion
+            
             GUILayout.Space(10);
+            
+            #region Trap Settings
+            
             GUILayout.Label("Trap Settings", EditorStyles.boldLabel);
             
             // Trap settings
@@ -103,7 +116,70 @@ namespace _Scripts.Editor
                 }
             }
             
+            #endregion
+            
             GUILayout.Space(10);
+            
+            #region Solid Platforms Settings
+            
+            GUILayout.Label("Solid Platforms Settings", EditorStyles.boldLabel);
+            _solidPlatformType = (SolidPlatformType)EditorGUILayout.EnumPopup("Solid Platform Type", _solidPlatformType);
+            
+            // Position controls
+            newPlatformPosition = EditorGUILayout.Vector2IntField("Position:", newPlatformPosition);
+    
+            if (GUILayout.Button("Add at Position"))
+            {
+                if (_solidPlatformsTilemap && _solidPlatformType != SolidPlatformType.None)
+                {
+                    var solidPlatformRuleTile = Resources.Load<RuleTile>("Tiles/SolidPlatformsRuleTile");
+                    if (!solidPlatformRuleTile)
+                    {
+                        Debug.LogError("SolidPlatformRuleTile not found. Ensure it is placed in the 'Resources/Tiles' folder.");
+                        return;
+                    }
+                    // Check if the position is valid
+                    if (IsSufficientSpaceForPlatform(newPlatformPosition.x, newPlatformPosition.y, _solidPlatformsTilemap))
+                    {
+                        switch (_solidPlatformType)
+                        {
+                            case SolidPlatformType.Cube:
+                                GenerateCube(_solidPlatformsTilemap, solidPlatformRuleTile, newPlatformPosition.x, newPlatformPosition.y);
+                                break;
+                            case SolidPlatformType.UpsideDownT:
+                                GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, newPlatformPosition.x, newPlatformPosition.y, true);
+                                break;
+                            case SolidPlatformType.ShapeT:
+                                GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, newPlatformPosition.x, newPlatformPosition.y, false);
+                                break;
+                            case SolidPlatformType.None:
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Not enough space at specified position");
+                    }
+                }
+            }
+
+            if (GUILayout.Button("Add at Random Position"))
+            {
+                if (_solidPlatformsTilemap && _solidPlatformType != SolidPlatformType.None)
+                {
+                    AddSinglePlatform();
+                }
+            }
+
+            
+            #endregion
+            
+            GUILayout.Space(10);
+            
+            #region Chunk Customization Buttons Settings
+            
             _chunkPrefab = (GameObject)EditorGUILayout.ObjectField("Chunk Prefab", _chunkPrefab, typeof(GameObject), false);
 
             // Generation buttons
@@ -166,6 +242,7 @@ namespace _Scripts.Editor
                         else
                         {
                             _platformsTilemap.ClearAllTiles();
+                            GenerateFullWidthPlatform(_platformsTilemap);
                         }
                     }
                 }
@@ -189,21 +266,46 @@ namespace _Scripts.Editor
                 
                 if (GUILayout.Button("Rebuild Dart Traps"))
                 {
-                    if (_dartTrapsGaps)
+                    // Generate base structure
+                    if (!_dartTrapsGaps) return;
+                    if (!_generateWalls) return;
+                    if (!_wallsTilemap) return;
+                    // First, remove existing dart traps
+                    if (_currentChunkInstance)
                     {
-                        // Generate base structure
-                        if (_generateWalls)
+                        var spawnPoint = _currentChunkInstance.transform.Find("SpawnPoints");
+                        if (spawnPoint)
                         {
-                            if (_wallsTilemap)
+                            var leftDart = spawnPoint.Find("LeftWallDartTrap");
+                            var rightDart = spawnPoint.Find("RightWallDartTrap");
+                                
+                            // Destroy all children of left dart trap parent
+                            if (leftDart)
                             {
-                                GenerateWalls(_wallsTilemap);
-                                GenerateDartTrapGaps(_wallsTilemap);
-                                GenerateWallDecorations(_wallDecorTilemap);
+                                foreach (Transform child in leftDart)
+                                {
+                                    DestroyImmediate(child.gameObject);
+                                        
+                                }
+                            }
+                            // Destroy all children of right dart trap parent
+                            if (rightDart)
+                            {
+                                foreach (Transform child in rightDart)
+                                {
+                                    DestroyImmediate(child.gameObject);
+                                }
                             }
                         }
                     }
+                    // Now proceed with generating new dart traps
+                    GenerateWalls(_wallsTilemap);
+                    GenerateDartTrapGaps(_wallsTilemap);
+                    GenerateWallDecorations(_wallDecorTilemap);
                 }
             }
+            
+            #endregion
         }
 
         #endregion
@@ -288,6 +390,9 @@ namespace _Scripts.Editor
                 }
             }
             
+            if(!_platformsTilemap) _platformsTilemap = gridTransform.Find("Tilemap_Collision_Platforms")?.GetComponent<Tilemap>();
+            GenerateFullWidthPlatform(_platformsTilemap);
+            
             if (_generateSolidPlatforms)
             {
                 _solidPlatformsTilemap = gridTransform.Find("Tilemap_Collision_SolidPlatforms")?.GetComponent<Tilemap>();
@@ -317,7 +422,6 @@ namespace _Scripts.Editor
         #endregion
         
         // TODO - Add a function to generate a chunk from a given seed
-        // Implement a function to spawn dart traps at the gaps of the walls
         #region Walls Generation
 
         private void GenerateWalls(Tilemap wallsTilemap)
@@ -382,7 +486,7 @@ namespace _Scripts.Editor
                 {
                     if (_wallsTilemap.HasTile(new Vector3Int(x, y, 0)))
                     {
-                        // Place right wall decoration right before the first wall tile
+                        // Place the right wall decoration right before the first wall tile
                         wallDecorTilemap.SetTile(new Vector3Int(x - 1, y, 0), rightWallDecorTile);
                         rightWallFound = true;
                         break;
@@ -402,9 +506,21 @@ namespace _Scripts.Editor
         
         #region Basic Platforms Generation
 
+        private void GenerateFullWidthPlatform(Tilemap platformsTilemap)
+        {
+            var platformRuleTile = Resources.Load<RuleTile>("Tiles/PlatformRuleTile");
+            
+            // Generate the initial full-width platform at the start
+            for (var x = 4; x < _chunkWidth - 3; x++)
+            {
+                platformsTilemap.SetTile(new Vector3Int(x, 4, 0), platformRuleTile);
+            }
+        }
         private void GenerateBasicPlatforms(Tilemap platformsTilemap)
         {
             platformsTilemap.ClearAllTiles();
+
+            GenerateFullWidthPlatform(_platformsTilemap);
 
             var platformRuleTile = Resources.Load<RuleTile>("Tiles/PlatformRuleTile");
             if (!platformRuleTile)
@@ -412,203 +528,90 @@ namespace _Scripts.Editor
                 Debug.LogError("PlatformRuleTile not found. Ensure it is placed in the 'Resources/Tiles' folder.");
                 return;
             }
-
-            // Generate the initial full-width platform at the start
-            for (var x = 4; x < _chunkWidth - 3; x++)
-            {
-                platformsTilemap.SetTile(new Vector3Int(x, 4, 0), platformRuleTile);
-            }
-
+            
             // Platform generation parameters
-            const float minYDistance = 5f;
+            const float minYDistance = 7f;
             const float maxYDistance = 8f;
-            //const float maxHorizontalGap = 7f; // Maximum allowed gap between platforms
+            const int platformMinLength = 8;
+            const int platformMaxLength = 12;
+            const int maxAttempts = 100; // Prevent infinite loops
             
-            var currentY = 4;
-            var lastX = Random.Range(4, _chunkWidth - 3);
-            var goingRight = Random.value < 0.5f;
-            var currentPattern = 0; // Track current pattern type
-
-            while (currentY < _chunkHeight - 8)
+            var currentY = 10; // Starting Y position
+            
+            while (currentY < _chunkHeight - 4) // Leave space at the top
             {
-                currentY += Mathf.RoundToInt(Random.Range(minYDistance, maxYDistance));
+                var attempts = 0;
+                var platformPlaced = false;
                 
-                // Randomly change pattern type
-                if (Random.value < 0.3f) // 30% chance to change pattern
+                while (!platformPlaced && attempts < maxAttempts)
                 {
-                    currentPattern = Random.Range(0, 3); // 0: staircase, 1: zigzag, 2: parallel
-                }
+                    // Randomize platform length
+                    var platformLength = Random.Range(platformMinLength, platformMaxLength);
+                    
+                    // Try to find a valid X position
+                    var startX = Random.Range(4, _chunkWidth - platformLength - 2);
+                    
+                    // Check if we can place a platform here
+                    if (IsSufficientSpaceForBasicPlatform(startX, currentY, platformsTilemap, platformLength))
+                    {
+                        // Place the platform
+                        for (var x = 0; x < platformLength; x++)
+                        {
+                            platformsTilemap.SetTile(new Vector3Int(startX + x, currentY, 0), platformRuleTile);
+                        }
 
-                var isChangingDirection = false;
-
-                // Direction change check
-                if (goingRight && lastX > _chunkWidth - 15)
-                {
-                    isChangingDirection = true;
-                    goingRight = false;
+                        platformPlaced = true;
+                    }
+                    
+                    attempts++;
                 }
-                else if (!goingRight && lastX < 15)
+                
+                if (!platformPlaced)
                 {
-                    isChangingDirection = true;
-                    goingRight = true;
+                    Debug.LogWarning($"Could not place platform at Y: {currentY} after {maxAttempts} attempts");
                 }
-
-                // Generate platform based on current pattern
-                switch (currentPattern)
-                {
-                    case 0:
-                        GenerateStaircasePattern(platformsTilemap, platformRuleTile, ref lastX, currentY, ref goingRight, isChangingDirection);
-                        break;
-                    case 1:
-                        GenerateZigzagPattern(platformsTilemap, platformRuleTile, ref lastX, currentY, ref goingRight, isChangingDirection);
-                        break;
-                    case 2:
-                        GenerateParallelPattern(platformsTilemap, platformRuleTile, ref lastX, currentY, ref goingRight, isChangingDirection);
-                        break;
-                }
+                
+                // Calculate next Y position
+                var yIncrease = Random.Range(minYDistance, maxYDistance);
+                currentY += Mathf.RoundToInt(yIncrease);
             }
         }
 
-        private void GenerateStaircasePattern(Tilemap tilemap, RuleTile tile, ref int lastX, int y, ref bool goingRight, bool isDirectionChange)
+
+        private bool IsSufficientSpaceForBasicPlatform(int startX, int startY, Tilemap basicPlatformTilemap, int platformLength)
         {
-            var platformLength = Random.Range(6, 9);
-            const int horizontalStep = 4;
-
-            int startX = CalculateStartX(lastX, platformLength, horizontalStep, goingRight, isDirectionChange);
-            startX = ClampStartPosition(startX, platformLength, ref goingRight);
-
-            // Safety check for gaps
-            if (!IsGapSafe(lastX, startX, y))
+            // Check the area around the platform (including some padding)
+            const int verticalPadding = 2; // Space to check above and below
+    
+            // Check the entire area where the platform might be placed
+            for (var x = -1; x <= platformLength; x++) // Check one tile before and after
             {
-                // Adjust position to ensure safe gap
-                startX = CalculateSafePosition(lastX, platformLength, goingRight);
-            }
-
-            // Place platform
-            if (CanPlacePlatform(startX, y, platformLength))
-            {
-                PlacePlatform(tilemap, tile, startX, y, platformLength);
-                lastX = goingRight ? startX : startX + platformLength;
-            }
-        }
-
-        private bool IsGapSafe(int prevX, int newX, int y)
-        {
-            const float maxSafeGap = 7f; // Maximum safe jumping distance
-            return Mathf.Abs(prevX - newX) <= maxSafeGap;
-        }
-
-        private int CalculateSafePosition(int lastX, int platformLength, bool goingRight)
-        {
-            const float safeGap = 5f; // Ideal safe jumping distance
-            return goingRight ? 
-                lastX + Mathf.RoundToInt(safeGap) : 
-                lastX - platformLength - Mathf.RoundToInt(safeGap);
-        }
-
-        private void GenerateZigzagPattern(Tilemap tilemap, RuleTile tile, ref int lastX, int y, ref bool goingRight, bool isDirectionChange)
-        {
-            var platformLength = Random.Range(4, 7);
-            var horizontalOffset = Random.Range(3, 6);
-
-            int startX = CalculateStartX(lastX, platformLength, horizontalOffset, goingRight, isDirectionChange);
-            startX = ClampStartPosition(startX, platformLength, ref goingRight);
-
-            // Safety check and platform placement
-            if (IsGapSafe(lastX, startX, y) && CanPlacePlatform(startX, y, platformLength))
-            {
-                PlacePlatform(tilemap, tile, startX, y, platformLength);
-                lastX = goingRight ? startX : startX + platformLength;
-                goingRight = !goingRight; // Zigzag pattern changes direction after each platform
-            }
-        }
-
-        private void GenerateParallelPattern(Tilemap tilemap, RuleTile tile, ref int lastX, int y, ref bool goingRight, bool isDirectionChange)
-        {
-            var platformLength = Random.Range(5, 8);
+                for (var y = -verticalPadding; y <= verticalPadding; y++)
+                {
+                    var positionCheck = new Vector3Int(startX + x, startY + y, 0);
             
-            // Create two parallel platforms
-            for (int i = 0; i < 2; i++)
-            {
-                int startX = lastX + (goingRight ? 4 : -4);
-                startX = ClampStartPosition(startX, platformLength, ref goingRight);
-
-                if (IsGapSafe(lastX, startX, y) && CanPlacePlatform(startX, y + (i * 2), platformLength))
-                {
-                    PlacePlatform(tilemap, tile, startX, y + (i * 2), platformLength);
-                    lastX = startX;
+                    // Check if the position is within chunk bounds
+                    if (startX + x < 0 || startX + x >= _chunkWidth || 
+                        startY + y < 0 || startY + y >= _chunkHeight)
+                    {
+                        return false;
+                    }
+    
+                    // Check if a position already has any tiles
+                    if (_wallsTilemap && _wallsTilemap.HasTile(positionCheck))
+                        return false;
+        
+                    if (_solidPlatformsTilemap && _solidPlatformsTilemap.HasTile(positionCheck))
+                        return false;
+        
+                    if (basicPlatformTilemap && basicPlatformTilemap.HasTile(positionCheck))
+                        return false;
                 }
-            }
-        }
-
-        private bool CanPlacePlatform(int startX, int y, int length)
-        {
-            for (var x = startX; x < startX + length; x++)
-            {
-                if (!IsPositionValid(x, y))
-                    return false;
             }
             return true;
         }
 
-        private void PlacePlatform(Tilemap tilemap, RuleTile tile, int startX, int y, int length)
-        {
-            for (var x = startX; x < startX + length; x++)
-            {
-                tilemap.SetTile(new Vector3Int(x, y, 0), tile);
-            }
-        }
-
-        private int CalculateStartX(int lastX, int platformLength, int horizontalStep, bool goingRight, bool isDirectionChange)
-        {
-            if (goingRight)
-            {
-                if (isDirectionChange)
-                {
-                    // When changing from left to right, start closer to the last platform
-                    return lastX - (horizontalStep / 2);
-                }
-                else
-                {
-                    return lastX + horizontalStep;
-                }
-            }
-            else
-            {
-                if (isDirectionChange)
-                {
-                    // When changing from right to left, start closer to the last platform
-                    return lastX - platformLength - (horizontalStep / 2);
-                }
-                else
-                {
-                    return lastX - horizontalStep - platformLength;
-                }
-            }
-        }
-
-        private int ClampStartPosition(int startX, int platformLength, ref bool goingRight)
-        {
-            // Ensure we're within bounds and adjust direction if necessary
-            if (startX < 4)
-            {
-                startX = 4;
-                goingRight = true;  // Force direction change if too far left
-            }
-            else if (startX > _chunkWidth - platformLength - 4)
-            {
-                startX = _chunkWidth - platformLength - 4;
-                goingRight = false;  // Force direction change if too far right
-            }
-            return startX;
-        }
-
-        private bool IsPositionValid(int x, int y)
-        {
-            // Check if a position collides with walls
-            return !_wallsTilemap.HasTile(new Vector3Int(x, y, 0));
-        }
-
+        
         #endregion
 
         #region Solid Platforms Generation
@@ -624,78 +627,239 @@ namespace _Scripts.Editor
                 return;
             }
 
-            // Total number of solid platforms to generate
-            var totalSolidPlatforms = Mathf.RoundToInt(_chunkWidth * _chunkHeight);
+            // Try to find a valid position for the platform
+            const int maxAttempts = 50; // Prevent infinite loops
+            var attempts = 0;
 
-            for (var i = 0; i < totalSolidPlatforms; i++)
+            while (attempts < maxAttempts)
             {
-                // Choose a random starting position
-                var startX = Random.Range(2, _chunkWidth - 6); // Leave space for the shape to fit
-                var startY = Random.Range(2, _chunkHeight - 6);
+                // Generate random position within chunk bounds
+                var startX = Random.Range(4, _chunkWidth - 3);
+                var startY = Random.Range(7, _chunkHeight - 10);
 
-                // Randomly choose a shape
-                var shapeType = Random.Range(0, 3); // 0 = cube, 1 = stairs, 2 = reversed T
-                switch (shapeType)
+                // Check if we can place the platform here
+                if (IsSufficientSpaceForPlatform(startX, startY, solidPlatformsTilemap))
                 {
-                    case 0:
-                        GenerateCube(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
-                        break;
-                    case 1:
-                        GenerateStairs(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
-                        break;
-                    case 2:
-                        GenerateReversedT(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
-                        break;
+                    switch (_solidPlatformType)
+                    {
+                        case SolidPlatformType.Cube:
+                            GenerateCube(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
+                            return; // Cube platform generated successfully
+                        
+                        case SolidPlatformType.UpsideDownT:
+                            GenerateShapeT(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, true);
+                            return;
+                        case SolidPlatformType.ShapeT:
+                            GenerateShapeT(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, false);
+                            return;
+                        case SolidPlatformType.None:
+                            return; // No platform generated
+                        default:
+                            Debug.LogError("Invalid solid platform type selected.");
+                            return;
+                    }
                 }
+
+                attempts++;
             }
-
-            Debug.Log($"Solid Platforms Generated: {totalSolidPlatforms} platforms placed.");
+            
+            Debug.LogWarning("Could not find suitable position for solid platform after " + maxAttempts + " attempts");
         }
-
-        // Cube shape generator
+        
+        // Solid platform types
+        
+        // Generate Cube Shapes Solid Platform
         private static void GenerateCube(Tilemap tilemap, RuleTile tile, int startX, int startY)
         {
-            var size = Random.Range(2, 5); // Random cube size
-            for (var x = 0; x < size; x++)
+            var sizeX = Random.Range(10, 15); // Random cube size
+            var sizeY = Random.Range(7, 9); // Random cube size
+            
+            for (var x = 0; x < sizeX; x++)
             {
-                for (var y = 0; y < size; y++)
+                for (var y = 0; y < sizeY; y++)
                 {
                     tilemap.SetTile(new Vector3Int(startX + x, startY + y, 0), tile);
                 }
             }
         }
 
-        // Stairs shape generator
-        private static void GenerateStairs(Tilemap tilemap, RuleTile tile, int startX, int startY)
+        private static void GenerateShapeT(Tilemap tilemap, RuleTile tile, int startX, int startY, bool isUpsideDown)
         {
-            var height = Random.Range(3, 6); // Random height of stairs
-            for (var i = 0; i < height; i++)
+            // Generate top bar width first
+            var topBarWidth = Random.Range(12, 16); // Random top bar width
+            var topBarHeight = Random.Range(2, 3);  // Random top bar height
+
+            // Determine stem width based on the top bar width parity
+            const int minStemWidth = 3;
+            const int maxStemWidth = 5;
+    
+            // Ensure stem width has the same parity as top bar width
+            var stemWidth = Random.Range(minStemWidth, maxStemWidth);
+            if (topBarWidth % 2 != stemWidth % 2)
             {
-                for (var j = 0; j <= i; j++) // Create the "step effect"
+                // If parities don't match, adjust stem width by 1
+                stemWidth += 1;
+                // Make sure we don't exceed our max range
+                if (stemWidth > maxStemWidth)
+                    stemWidth -= 2;
+            }
+    
+            var stemHeight = Random.Range(7, 8); // Random stem height
+
+            
+            // Calculate center alignment
+            var stemStartX = startX + (topBarWidth - stemWidth) / 2;
+            
+            // Generate the top horizontal bar
+            for (var x = 0; x < topBarWidth; x++)
+            {
+                for (var y = 0; y < topBarHeight; y++)
                 {
-                    tilemap.SetTile(new Vector3Int(startX + j, startY + i, 0), tile);
+                    tilemap.SetTile(new Vector3Int(startX + x, startY + y, 0), tile);
+                }
+            }
+            
+            // Generate the vertical stem
+            for (var x = 0; x < stemWidth; x++)
+            {
+                for (var y = 0; y < stemHeight; y++)
+                {
+                    var yPos = isUpsideDown ? startY + y : startY - stemHeight + y;
+                    tilemap.SetTile(new Vector3Int(stemStartX + x, yPos, 0), tile);
                 }
             }
         }
+        
+        // End of Section for Solid Platforms types
 
-        // Reversed T shape generator
-        private static void GenerateReversedT(Tilemap tilemap, RuleTile tile, int centerX, int centerY)
+        private void AddSinglePlatform()
         {
-            // Center column (vertical part of the T)
-            var height = Random.Range(3, 6); // Random height
-            for (var y = 0; y < height; y++)
+            var solidPlatformRuleTile = Resources.Load<RuleTile>("Tiles/SolidPlatformsRuleTile");
+            if (!solidPlatformRuleTile)
             {
-                tilemap.SetTile(new Vector3Int(centerX, centerY + y, 0), tile);
+                Debug.LogError("SolidPlatformRuleTile not found. Ensure it is placed in the 'Resources/Tiles' folder.");
+                return;
             }
 
-            // Horizontal part (top of the T)
-            var armLength = Random.Range(2, 5); // Arm length
-            for (var x = -armLength; x <= armLength; x++)
+            // Calculate safe boundaries based on a platform type
+            int minX, maxX, minY, maxY;
+            switch (_solidPlatformType)
             {
-                tilemap.SetTile(new Vector3Int(centerX + x, centerY + height - 1, 0), tile);
+                case SolidPlatformType.Cube:
+                    minX = 4;
+                    maxX = _chunkWidth - 12; // 8 for cube width + 4 padding
+                    minY = 4;
+                    maxY = _chunkHeight - 12;
+                    break;
+                
+                case SolidPlatformType.ShapeT:
+                case SolidPlatformType.UpsideDownT:
+                    minX = 4;
+                    maxX = _chunkWidth - 20; // 16 for max width + 4 padding
+                    minY = 12; // Ensure enough space for the full T shape
+                    maxY = _chunkHeight - 12;
+                    break;
+                    
+                default:
+                    Debug.LogError("Invalid platform type");
+                    return;
             }
+
+            const int maxAttempts = 50;
+            var attempts = 0;
+
+            while (attempts < maxAttempts)
+            {
+                var startX = Random.Range(minX, maxX);
+                var startY = Random.Range(minY, maxY);
+
+                if (IsSufficientSpaceForPlatform(startX, startY, _solidPlatformsTilemap))
+                {
+                    switch (_solidPlatformType)
+                    {
+                        case SolidPlatformType.Cube:
+                            GenerateCube(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
+                            return;
+                        
+                        case SolidPlatformType.UpsideDownT:
+                            GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, true);
+                            return;
+                        
+                        case SolidPlatformType.ShapeT:
+                            GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, false);
+                            return;
+                    }
+                }
+                
+                attempts++;
+            }
+            
+            Debug.LogWarning("Could not find suitable space for new platform after " + maxAttempts + " attempts");
         }
 
+        private bool IsSufficientSpaceForPlatform(int startX, int startY, Tilemap solidPlatformsTilemap)
+        {
+            // Define dimensions based on a platform type
+            int width, height;
+            switch (_solidPlatformType)
+            {
+                case SolidPlatformType.Cube:
+                    width = 15;  // Your cube width
+                    height = 9; // Your cube height
+                    break;
+                    
+                case SolidPlatformType.ShapeT:
+                case SolidPlatformType.UpsideDownT:
+                    width = 16;  // Maximum top bar width
+                    height = 10; // Maximum total height (top bar and stem)
+                    break;
+                    
+                default:
+                    return false;
+            }
+
+            // Add some padding to prevent merging
+            const int padding = 1;
+            
+            // Adjust check area based on a shape type
+            var checkStartY = startY;
+            var checkHeight = height;
+            
+            // For regular T shape, we need to check below the start position
+            if (_solidPlatformType == SolidPlatformType.ShapeT)
+            {
+                checkStartY = startY - height + 2; // +2 for the top bar height
+                checkHeight = height + 1; // Add 1 for better separation
+            }
+
+            // Check the entire area where the platform might be placed, including padding
+            for (var x = -padding; x < width + padding; x++)
+            {
+                for (var y = -padding; y < checkHeight + padding; y++)
+                {
+                    var positionCheck = new Vector3Int(startX + x, checkStartY + y, 0);
+                    
+                    // Check if the position is within valid bounds
+                    if (positionCheck.x < 0 || positionCheck.x >= _chunkWidth ||
+                        positionCheck.y < 0 || positionCheck.y >= _chunkHeight)
+                    {
+                        return false;
+                    }
+
+                    // Check if a position already has any tiles
+                    if (_wallsTilemap && _wallsTilemap.HasTile(positionCheck))
+                        return false;
+                    
+                    if (_platformsTilemap && _platformsTilemap.HasTile(positionCheck))
+                        return false;
+                    
+                    if (solidPlatformsTilemap && solidPlatformsTilemap.HasTile(positionCheck))
+                        return false;
+                }
+            }
+            return true;
+        }
+        
         #endregion
         
         #region Background Generation
@@ -720,149 +884,7 @@ namespace _Scripts.Editor
                 }
             }
 
-            // Introduce random deletions
-            //RandomlyDeleteBackgroundTiles(backgroundTilemap);
-
             Debug.Log("Background Generated with random removals.");
-        }
-
-        private void RandomlyDeleteBackgroundTiles(Tilemap backgroundTilemap)
-        {
-            // Deletion parameters
-            var totalDeletions = Mathf.RoundToInt(_chunkWidth * _chunkHeight * 0.2f); // Change 0.2f to specify density of deletion
-            var snakeDeletionChance = 4; // Chance that deletion continues as a snake (out of 10)
-
-            for (var i = 0; i < totalDeletions; i++)
-            {
-                // Choose a random starting point for deletion
-                var x = Random.Range(1, _chunkWidth - 1);
-                var y = Random.Range(1, _chunkHeight - 1);
-
-                Vector3Int start = new Vector3Int(x, y, 0);
-
-                // Random chance: use snake deletion
-                if (Random.Range(0, 10) < snakeDeletionChance)
-                {
-                    PerformSnakeDeletion(backgroundTilemap, start, Random.Range(4, 10)); // Random snake length
-                }
-                else
-                {
-                    PerformClusterDeletion(backgroundTilemap, start, Random.Range(1, 4)); // Random cluster size
-                }
-            }
-        }
-
-        // Create an irregular snake-like deletion
-        private void PerformSnakeDeletion(Tilemap tilemap, Vector3Int start, int length)
-        {
-            var current = start;
-
-            for (var i = 0; i < length; i++)
-            {
-                tilemap.SetTile(current, null); // Remove tile at the current position
-
-                // Randomize the next direction
-                var direction = Random.Range(0, 4); // 0 = up, 1 = right, 2 = down, 3 = left
-                switch (direction)
-                {
-                    case 0: current += Vector3Int.up; break;
-                    case 1: current += Vector3Int.right; break;
-                    case 2: current += Vector3Int.down; break;
-                    case 3: current += Vector3Int.left; break;
-                }
-
-                // Avoid going out of bounds
-                if (current.x < 1 || current.x >= _chunkWidth - 1 || current.y < 1 || current.y >= _chunkHeight - 1)
-                {
-                    break;
-                }
-            }
-        }
-
-        // Create a circular cluster deletion
-        private void PerformClusterDeletion(Tilemap tilemap, Vector3Int center, int radius)
-        {
-            for (var x = center.x - radius; x <= center.x + radius; x++)
-            {
-                for (var y = center.y - radius; y <= center.y + radius; y++)
-                {
-                    var pos = new Vector3Int(x, y, 0);
-
-                    // Check for bounds
-                    if (x > 0 && x < _chunkWidth && y > 0 && y < _chunkHeight)
-                    {
-                        // Random chance of deleting within cluster
-                        if (Vector3Int.Distance(center, pos) <= radius && Random.Range(0, 2) == 0)
-                        {
-                            tilemap.SetTile(pos, null);
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-        #region Gizmos
-
-        // Define debug visualization color options
-        private Color platformGizmoColor = Color.green;
-        private Color wallGizmoColor = Color.red;
-        private Color solidPlatformGizmoColor = Color.blue;
-
-        // Call this inside the GenerateChunk function (optional) to save positions for visualization
-        private List<Vector3Int> platformTiles = new List<Vector3Int>();
-        private List<Vector3Int> wallTiles = new List<Vector3Int>();
-        private List<Vector3Int> solidPlatformTiles = new List<Vector3Int>();
-
-        private void GenerateGizmoVisualization(Tilemap platformsTilemap, Tilemap wallsTilemap, Tilemap solidPlatformsTilemap)
-        {
-            // Clear previous visualizations
-            platformTiles.Clear();
-            wallTiles.Clear();
-            solidPlatformTiles.Clear();
-
-            // Store tile positions for platforms
-            foreach (var pos in platformsTilemap.cellBounds.allPositionsWithin)
-            {
-                if (platformsTilemap.HasTile(pos)) platformTiles.Add(pos);
-            }
-
-            // Store tile positions for walls
-            foreach (var pos in wallsTilemap.cellBounds.allPositionsWithin)
-            {
-                if (wallsTilemap.HasTile(pos)) wallTiles.Add(pos);
-            }
-
-            // Store tile positions for solid platforms
-            foreach (var pos in solidPlatformsTilemap.cellBounds.allPositionsWithin)
-            {
-                if (solidPlatformsTilemap.HasTile(pos)) solidPlatformTiles.Add(pos);
-            }
-        }
-
-        private void OnDrawGizmos()
-        {
-            // Visualize Platform Tiles
-            Gizmos.color = platformGizmoColor;
-            foreach (var pos in platformTiles)
-            {
-                Gizmos.DrawCube(new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0), Vector3.one * 0.9f); // Draw cubes for tiles
-            }
-
-            // Visualize Wall Tiles
-            Gizmos.color = wallGizmoColor;
-            foreach (var pos in wallTiles)
-            {
-                Gizmos.DrawCube(new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0), Vector3.one * 0.9f);
-            }
-
-            // Visualize Solid Platform Tiles
-            Gizmos.color = solidPlatformGizmoColor;
-            foreach (var pos in solidPlatformTiles)
-            {
-                Gizmos.DrawCube(new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0), Vector3.one * 0.9f);
-            }
         }
 
         #endregion
