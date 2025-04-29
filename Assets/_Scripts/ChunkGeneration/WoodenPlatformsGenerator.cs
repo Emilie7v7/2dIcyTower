@@ -27,22 +27,19 @@ namespace _Scripts.ChunkGeneration
         {
             GenerateBasicPlatforms(_platformsTilemap);
         }
-        
+
+        public void GetTilemapsByType(Tilemap wallsTilemap, Tilemap solidPlatformsTilemap)
+        {
+            _wallsTilemap = wallsTilemap;
+            _solidPlatformsTilemap = solidPlatformsTilemap;
+        }
         public void GenerateFullWidthPlatform(Tilemap platformsTilemap)
         {
             // Generate the initial full-width platform at the start
-            for (var x = 4; x < _chunkWidth - 3; x++)
+            for (var x = 4; x < _chunkWidth - 4; x++)
             {
                 platformsTilemap.SetTile(new Vector3Int(x, 4, 0), platformRuleTile);
             }
-        }
-        public void GetWallsTilemap(Tilemap wallsTilemap)
-        {
-            _wallsTilemap = wallsTilemap;
-        }
-        public void GetSolidPlatformsTilemap(Tilemap solidPlatformsTilemap)
-        {
-            _solidPlatformsTilemap = solidPlatformsTilemap;
         }
         
         #region Basic Platforms Generation

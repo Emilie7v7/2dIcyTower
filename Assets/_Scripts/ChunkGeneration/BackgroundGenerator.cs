@@ -102,14 +102,14 @@ namespace _Scripts.ChunkGeneration
             var possiblePositions = new List<Vector2Int>();
             
             // Check every Nth position to reduce density
-            int step = 2; // Increase this value to reduce density
+            const int step = 2; // Increase this value to reduce density
             for (var y = 2; y < _chunkHeight - 2; y += step)
             {
                 for (var x = 2; x < _chunkWidth - 2; x += step)
                 {
-                    if (backgroundTilemap.GetTile(new Vector3Int(x, y, 0)) != null)
+                    if (backgroundTilemap.GetTile(new Vector3Int(x, y, 0)))
                     {
-                        // Only add position if random check passes
+                        // Only add position if a random check passes
                         if (Random.value < decorationChance)
                         {
                             possiblePositions.Add(new Vector2Int(x, y));
@@ -119,14 +119,12 @@ namespace _Scripts.ChunkGeneration
             }
 
             // Shuffle the positions
-            int n = possiblePositions.Count;
+            var n = possiblePositions.Count;
             while (n > 1)
             {
                 n--;
-                int k = Random.Range(0, n + 1);
-                var temp = possiblePositions[k];
-                possiblePositions[k] = possiblePositions[n];
-                possiblePositions[n] = temp;
+                var k = Random.Range(0, n + 1);
+                (possiblePositions[k], possiblePositions[n]) = (possiblePositions[n], possiblePositions[k]);
             }
 
             // Try to place decorations at the selected positions
@@ -142,7 +140,7 @@ namespace _Scripts.ChunkGeneration
 
         private bool CanPlaceDecoration(int centerX, int centerY)
         {
-            // First check if there's already a decoration here
+            // First, check if there's already a decoration here
             if (decorationsTilemap1.GetTile(new Vector3Int(centerX, centerY, 0)))
                 return false;
 
@@ -156,7 +154,7 @@ namespace _Scripts.ChunkGeneration
                         return false;
 
                     // If any background tile is missing in the 3x3 area, return false
-                    if (backgroundTilemap.GetTile(new Vector3Int(x, y, 0)) == null)
+                    if (!backgroundTilemap.GetTile(new Vector3Int(x, y, 0)))
                         return false;
                 }
             }

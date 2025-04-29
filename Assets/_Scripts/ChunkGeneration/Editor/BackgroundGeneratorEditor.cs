@@ -92,6 +92,7 @@ namespace _Scripts.ChunkGeneration.Editor
             EditorGUILayout.Space(10);
 
             EditorGUILayout.PropertyField(_decorationChance);
+            
             // Debug Tools (Foldout)
             _showDebugTools = EditorGUILayout.Foldout(_showDebugTools, "Debug Tools", true);
             if (_showDebugTools)

@@ -50,7 +50,6 @@ namespace _Scripts.ChunkGeneration
             
             if (spawnPoint)
             {
-                
                 var leftDart = left.transform.Find("LeftWallDartTrap");
                 var rightDart = right.transform.Find("RightWallDartTrap");
                         

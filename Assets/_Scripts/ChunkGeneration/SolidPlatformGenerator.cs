@@ -30,17 +30,12 @@ namespace _Scripts.ChunkGeneration
             GenerateSolidPlatforms(_solidPlatformsTilemap);
         }
 
-        public void GetWallsTilemap(Tilemap wallsTilemap)
+        public void GetTilemapsByType(Tilemap wallsTilemap, Tilemap platformsTilemap)
         {
             _wallsTilemap = wallsTilemap;
-        }
-
-        public void GetPlatformTilemap(Tilemap platformsTilemap)
-        {
             _platformsTilemap = platformsTilemap;
         }
         
-        #region Solid Platforms Generation
         
         private void GenerateSolidPlatforms(Tilemap solidPlatformsTilemap)
         {
@@ -238,7 +233,8 @@ namespace _Scripts.ChunkGeneration
                     width = 16;  // Maximum top bar width
                     height = 10; // Maximum total height (top bar and stem)
                     break;
-                    
+
+                case SolidPlatformType.None:
                 default:
                     return false;
             }
@@ -284,7 +280,5 @@ namespace _Scripts.ChunkGeneration
             }
             return true;
         }
-        
-        #endregion
     }
 }

@@ -144,14 +144,22 @@ namespace _Scripts.Editor
                             break;
                         case WoodenPlatformsGenerator woodenPlatformsGenerator:
                             woodenPlatformsGenerator.Setup(_chunkWidth, _chunkHeight, platformsTilemap);
-                            woodenPlatformsGenerator.GetWallsTilemap(wallsTilemap);
-                            woodenPlatformsGenerator.GetSolidPlatformsTilemap(solidPlatformsTilemap);
+                            woodenPlatformsGenerator.GetTilemapsByType(wallsTilemap, solidPlatformsTilemap);
                             woodenPlatformsGenerator.GenerateFullWidthPlatform(platformsTilemap);
                             break;
                         case SolidPlatformGenerator solidPlatformGenerator:
                             solidPlatformGenerator.Setup(_chunkWidth, _chunkHeight, solidPlatformsTilemap);
-                            solidPlatformGenerator.GetWallsTilemap(wallsTilemap);
-                            solidPlatformGenerator.GetPlatformTilemap(platformsTilemap);
+                            solidPlatformGenerator.GetTilemapsByType(wallsTilemap, platformsTilemap);
+                            break;
+                        case CoinGenerator coinGenerator:
+                            coinGenerator.Setup(_chunkWidth, _chunkHeight, null);
+                            coinGenerator.GetChunkInstance(_currentChunkInstance);
+                            coinGenerator.GetTilemapsByType(wallsTilemap, solidPlatformsTilemap, platformsTilemap);
+                            break;
+                        case EnemyGenerator enemyGenerator:
+                            enemyGenerator.Setup(_chunkWidth, _chunkHeight, null);
+                            enemyGenerator.GetChunkInstance(_currentChunkInstance);
+                            enemyGenerator.GetTilemapsByType(wallsTilemap, solidPlatformsTilemap, platformsTilemap);
                             break;
                     }
                     
@@ -175,6 +183,9 @@ namespace _Scripts.Editor
             {
                 tilemap.ClearAllTiles();
             }
+            // Clear all game objects in the chunk
+            DestroyAllSpawnedGameObjects(_currentChunkInstance);
+            
         }
 
         // Utility to find a specific Tilemap by name in the chunk prefab hierarchy
@@ -188,6 +199,33 @@ namespace _Scripts.Editor
             }
 
             return gridTransform.Find(tilemapName)?.GetComponent<Tilemap>();
+        }
+
+        private static void DestroyAllSpawnedGameObjects(GameObject parent)
+        {
+            var spawnPointTransform = parent.transform.Find("SpawnPoints");
+            if (!spawnPointTransform)
+            {
+                Debug.LogError("No SpawnPoints transform found in chunk prefab!");
+            }
+            
+            var coinSpawnPoint = spawnPointTransform.Find("Coins");
+            var enemySpawnPoint = spawnPointTransform.Find("Enemies");
+            var dartTrapLeftSpawnPoint = spawnPointTransform.Find("LeftWallDartTrap");
+            var dartTrapRightSpawnPoint = spawnPointTransform.Find("RightWallDartTrap");
+
+            var listOfTransforms = new List<Transform>
+            {
+                coinSpawnPoint,
+                enemySpawnPoint,
+                dartTrapLeftSpawnPoint,
+                dartTrapRightSpawnPoint
+            };
+
+            foreach (var child in listOfTransforms)
+            {
+                DestroyImmediate(child.gameObject);
+            }
         }
 
         #endregion
