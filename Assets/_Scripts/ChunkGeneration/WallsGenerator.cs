@@ -10,6 +10,7 @@ namespace _Scripts.ChunkGeneration
         [SerializeField] private RuleTile wallRuleTile;
         [SerializeField] private TileBase wallDecorTileLeft;
         [SerializeField] private TileBase wallDecorTileRight;
+        
         public int wallThickness = 4;
 
         private int _chunkWidth;
@@ -27,6 +28,7 @@ namespace _Scripts.ChunkGeneration
         {
             GenerateWalls(wallsTilemap);
         }
+        
         
         // TODO - Add a function to generate a chunk from a given seed
         private void GenerateWalls(Tilemap walls)
@@ -52,5 +54,7 @@ namespace _Scripts.ChunkGeneration
 
             Debug.Log("Walls generated successfully.");
         }
+        
+        
     }
 }

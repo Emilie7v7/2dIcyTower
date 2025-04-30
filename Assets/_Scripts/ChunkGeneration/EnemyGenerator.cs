@@ -131,7 +131,7 @@ namespace _Scripts.ChunkGeneration
                                   _platformsTilemap.HasTile(belowPosition);
             if (!hasSupportBelow) return false;
             
-            // Check minimum distance from other coins
+            // Check minimum distance from other enemies
             var newPos = new Vector2(x, y);
             foreach (var existingPos in _placedEnemiesPositions)
             {
