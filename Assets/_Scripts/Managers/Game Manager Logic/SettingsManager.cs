@@ -12,13 +12,12 @@ namespace _Scripts.Managers.Game_Manager_Logic
     public static class SettingsManager
     {
         public static OptionsData OptionsData { get; private set; }
-        #region Fps
 
+        #region Fps
         private static GameObject _incompatibilityPanel;
         private static TextMeshProUGUI _incompatibilityText; 
         private static TMP_Dropdown _tmpDropdownForFps;
         private static Slider _fpsSlider;
-
         #endregion
         
         static SettingsManager()
@@ -27,7 +26,6 @@ namespace _Scripts.Managers.Game_Manager_Logic
         }
 
         #region Options Game Data
-
         public static void SaveOptionsData()
         {
             SaveSystem.SaveOptionsData(OptionsData);
@@ -38,13 +36,12 @@ namespace _Scripts.Managers.Game_Manager_Logic
             if (File.Exists(SaveSystem.OptionsDataSavePath))
             {
                 OptionsData = SaveSystem.LoadOptionsData() ?? new OptionsData();
-                //Debug.Log("Options Loaded Successfully!");
             }
             else
             {
                 Debug.Log("No Options File Found, Creating Default...");
                 OptionsData = new OptionsData();
-                SaveOptionsData(); // Ensure it's created
+                SaveOptionsData();
             }
             ApplySettings();
         }
@@ -53,36 +50,53 @@ namespace _Scripts.Managers.Game_Manager_Logic
         {
             SaveSystem.DeleteOptionsData();
             OptionsData = new OptionsData();
-            
             SaveOptionsData();
             LoadOptionsData();
+        }
+
+        public static void ApplyAndSaveSettings(OptionsData newSettings)
+        {
+            OptionsData = newSettings;
+            SaveOptionsData();
+            ApplyAllSettings();
         }
         #endregion
 
         private static void ApplySettings()
         {
-            QualitySettings.vSyncCount = 0;
+            QualitySettings.vSyncCount = OptionsData.vSync ? 1 : 0;
             Application.targetFrameRate = OptionsData.fpsCount;
         }
 
-        #region Controls Settings
+        private static void ApplyAllSettings()
+        {
+            // Apply FPS settings
+            ApplySettings();
+            
+            // Apply FPS Counter visibility
+            FPSCounter.SetVisibility(OptionsData.showFps);
+            
+            // Apply Audio Settings
+            AudioManager.Instance.SetVolume(OptionsData.musicVolume, AudioManager.AudioTypes.Music);
+            AudioManager.Instance.SetVolume(OptionsData.sfxVolume, AudioManager.AudioTypes.SFX);
+            AudioManager.Instance.SetVolume(OptionsData.uiVolume, AudioManager.AudioTypes.UI);
+        }
 
+        #region Controls Settings
         public static OptionsData.ControlModes GetControlMode()
         {
             return OptionsData.controlMode;
         }
 
-        public static void SetControlMode(OptionsData.ControlModes mode)
+        public static void ApplyControlMode(OptionsData.ControlModes mode)
         {
             OptionsData.controlMode = mode;
             SaveOptionsData();
         }
-
         #endregion
         
         #region Fps Settings
-
-        public static void SetFPS(int fps)
+        public static void ApplyFPS(int fps)
         {
             var maxFps = GetMaxRefreshRateForMobile();
 
@@ -94,11 +108,10 @@ namespace _Scripts.Managers.Game_Manager_Logic
             
             OptionsData.fpsCount = fps;
             SaveOptionsData();
-    
             Application.targetFrameRate = fps;
         }
 
-        public static void SetShowFPS(bool show)
+        public static void ApplyShowFPS(bool show)
         {
             OptionsData.showFps = show;
             SaveOptionsData();
@@ -117,6 +130,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
             _tmpDropdownForFps = dropdown;
             _fpsSlider = slider;
         }
+
         private static void ShowIncompatibilityErrorFpsMessage(int fps, int maxFps)
         {
             if (_incompatibilityPanel != null && _incompatibilityText != null) 
@@ -128,32 +142,27 @@ namespace _Scripts.Managers.Game_Manager_Logic
                 _tmpDropdownForFps.RefreshShownValue();
             }
         }
-        
         #endregion
         
         #region Vsync Settings
-        
-        public static void SetVSync(bool enabled)
+        public static void ApplyVSync(bool enabled)
         {
             OptionsData.vSync = enabled;
             SaveOptionsData();
             ApplySettings();
         }
-        
         #endregion
 
         #region Music Settings
-        
         public static float GetMusicVolume()
         {
             return OptionsData.musicVolume;
         }
 
-        public static void SetMusicVolume(float volume)
+        public static void ApplyMusicVolume(float volume)
         {
             OptionsData.musicVolume = volume;
             SaveOptionsData();
-            
             AudioManager.Instance.SetVolume(volume, AudioManager.AudioTypes.Music);
         }
         
@@ -162,11 +171,10 @@ namespace _Scripts.Managers.Game_Manager_Logic
             return OptionsData.sfxVolume;
         }
 
-        public static void SetSfxVolume(float volume)
+        public static void ApplySfxVolume(float volume)
         {
             OptionsData.sfxVolume = volume;
             SaveOptionsData();
-            
             AudioManager.Instance.SetVolume(volume, AudioManager.AudioTypes.SFX);
         }
         
@@ -174,14 +182,14 @@ namespace _Scripts.Managers.Game_Manager_Logic
         {
             return OptionsData.uiVolume;
         }
-        public static void SetUiVolume(float volume)
+
+        public static void ApplyUiVolume(float volume)
         {
             OptionsData.uiVolume = volume;
             SaveOptionsData();
-            
             AudioManager.Instance.SetVolume(volume, AudioManager.AudioTypes.UI);
         }
-        
         #endregion
     }
 }
+
