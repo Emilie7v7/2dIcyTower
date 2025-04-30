@@ -3,13 +3,16 @@ using UnityEngine.Tilemaps;
 
 namespace _Scripts.ChunkGeneration
 {
-    public enum SolidPlatformType {None, Cube, UpsideDownT, ShapeT}
+    public enum SolidPlatformType {None, Cube, SmallCube, UpsideDownT, ShapeT}
 
     [CreateAssetMenu(menuName = "Chunk Generation/Solid Platform Generator")]
     public class SolidPlatformGenerator : ScriptableObject, IChunkGenerator
     {
         [SerializeField] private RuleTile solidPlatformRuleTile;
         [SerializeField] private SolidPlatformType solidPlatformType = SolidPlatformType.None;
+        [SerializeField] private int amountOfPlatforms = 1;
+        [SerializeField] private float platformSpacing = 1f;
+        [SerializeField] private bool placeIndividualType;
             
         private int _chunkWidth;
         private int _chunkHeight;
@@ -27,7 +30,7 @@ namespace _Scripts.ChunkGeneration
 
         public void Generate()
         {
-            GenerateSolidPlatforms(_solidPlatformsTilemap);
+            GenerateSolidPlatforms();
         }
 
         public void GetTilemapsByType(Tilemap wallsTilemap, Tilemap platformsTilemap)
@@ -36,55 +39,96 @@ namespace _Scripts.ChunkGeneration
             _platformsTilemap = platformsTilemap;
         }
         
-        
-        private void GenerateSolidPlatforms(Tilemap solidPlatformsTilemap)
+        private void GenerateSolidPlatforms()
         {
-            solidPlatformsTilemap.ClearAllTiles();
-        
+            _solidPlatformsTilemap.ClearAllTiles();
+
             if (!solidPlatformRuleTile)
             {
                 Debug.LogError("SolidPlatformRuleTile not found. Ensure it is assigned in the inspector.");
                 return;
             }
-        
-            // Try to find a valid position for the platform
-            const int maxAttempts = 50; // Prevent infinite loops
-            var attempts = 0;
-        
-            while (attempts < maxAttempts)
+
+            for (int i = 0; i < amountOfPlatforms; i++)
             {
-                // Generate random position within chunk bounds
-                var startX = Random.Range(4, _chunkWidth - 3);
-                var startY = Random.Range(7, _chunkHeight - 10);
-        
-                // Check if we can place the platform here
-                if (IsSufficientSpaceForPlatform(startX, startY, solidPlatformsTilemap))
+                // Randomly select a platform type (excluding None)
+                var randomType = (SolidPlatformType)Random.Range(1, 5); // 1 to 4 corresponds to Cube, Small Cube, UpsideDownT, ShapeT
+                solidPlatformType = randomType;
+
+                const int maxAttempts = 50;
+                var attempts = 0;
+                var platformPlaced = false;
+
+                while (attempts < maxAttempts && !platformPlaced)
                 {
+                    // Calculate safe boundaries based on a platform type
+                    int minX, maxX, minY, maxY;
                     switch (solidPlatformType)
                     {
                         case SolidPlatformType.Cube:
-                            GenerateCube(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
-                            return; // Cube platform generated successfully
+                            minX = 4;
+                            maxX = _chunkWidth - 12;
+                            minY = 4;
+                            maxY = _chunkHeight - 12;
+                            break;
+                        case SolidPlatformType.SmallCube:
+                            minX = 4;
+                            maxX = _chunkWidth - 8;
+                            minY = 4;
+                            maxY = _chunkHeight - 8;
+                            break;
                         
-                        case SolidPlatformType.UpsideDownT:
-                            GenerateShapeT(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, true);
-                            return;
                         case SolidPlatformType.ShapeT:
-                            GenerateShapeT(solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, false);
-                            return;
-                        case SolidPlatformType.None:
-                            return; // No platform generated
+                        case SolidPlatformType.UpsideDownT:
+                            minX = 4;
+                            maxX = _chunkWidth - 20;
+                            minY = 12;
+                            maxY = _chunkHeight - 12;
+                            break;
+                            
                         default:
-                            Debug.LogError("Invalid solid platform type selected.");
-                            return;
+                            continue;
                     }
+
+                    var startX = Random.Range(minX, maxX);
+                    var startY = Random.Range(minY, maxY);
+
+                    if (IsSufficientSpaceForPlatform(startX, startY, _solidPlatformsTilemap))
+                    {
+                        switch (solidPlatformType)
+                        {
+                            case SolidPlatformType.Cube:
+                                GenerateCube(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
+                                platformPlaced = true;
+                                break;
+                            
+                            case SolidPlatformType.SmallCube:
+                                GenerateSmallCube(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
+                                platformPlaced = true;
+                                break;
+                            
+                            case SolidPlatformType.UpsideDownT:
+                                GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, true);
+                                platformPlaced = true;
+                                break;
+                            
+                            case SolidPlatformType.ShapeT:
+                                GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, false);
+                                platformPlaced = true;
+                                break;
+                        }
+                    }
+                    
+                    attempts++;
                 }
-        
-                attempts++;
+
+                if (!platformPlaced)
+                {
+                    Debug.LogWarning($"Could not place platform {i + 1} after {maxAttempts} attempts");
+                }
             }
-            
-            Debug.LogWarning("Could not find suitable position for solid platform after " + maxAttempts + " attempts");
         }
+
         
         // ##### Section for Solid Platforms types #####
         
@@ -93,6 +137,19 @@ namespace _Scripts.ChunkGeneration
         {
             var sizeX = Random.Range(10, 15); // Random cube size
             var sizeY = Random.Range(7, 9); // Random cube size
+            
+            for (var x = 0; x < sizeX; x++)
+            {
+                for (var y = 0; y < sizeY; y++)
+                {
+                    tilemap.SetTile(new Vector3Int(startX + x, startY + y, 0), tile);
+                }
+            }
+        }
+        private static void GenerateSmallCube(Tilemap tilemap, RuleTile tile, int startX, int startY)
+        {
+            var sizeX = Random.Range(3, 4); // Random cube size
+            var sizeY = Random.Range(3, 4); // Random cube size
             
             for (var x = 0; x < sizeX; x++)
             {
@@ -151,6 +208,8 @@ namespace _Scripts.ChunkGeneration
             }
         }
         
+        // Can add more types in the future
+        
         // End of Section for Solid Platforms types
         
         public void AddSinglePlatform()
@@ -170,6 +229,12 @@ namespace _Scripts.ChunkGeneration
                     maxX = _chunkWidth - 12; // 8 for cube width + 4 paddings
                     minY = 4;
                     maxY = _chunkHeight - 12;
+                    break;
+                case SolidPlatformType.SmallCube:
+                    minX = 4;
+                    maxX = _chunkWidth - 8; // 4 for cube width + 4 paddings
+                    minY = 4;
+                    maxY = _chunkHeight - 8;
                     break;
                 
                 case SolidPlatformType.ShapeT:
@@ -200,7 +265,9 @@ namespace _Scripts.ChunkGeneration
                         case SolidPlatformType.Cube:
                             GenerateCube(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
                             return;
-                        
+                        case SolidPlatformType.SmallCube:
+                            GenerateSmallCube(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY);
+                            return;
                         case SolidPlatformType.UpsideDownT:
                             GenerateShapeT(_solidPlatformsTilemap, solidPlatformRuleTile, startX, startY, true);
                             return;
@@ -224,61 +291,64 @@ namespace _Scripts.ChunkGeneration
             switch (solidPlatformType)
             {
                 case SolidPlatformType.Cube:
-                    width = 15;  // Your cube width
-                    height = 9; // Your cube height
+                    width = 15;
+                    height = 9;
                     break;
-                    
+                case SolidPlatformType.SmallCube:
+                    width = 4;
+                    height = 4;
+                    break;
                 case SolidPlatformType.ShapeT:
                 case SolidPlatformType.UpsideDownT:
-                    width = 16;  // Maximum top bar width
-                    height = 10; // Maximum total height (top bar and stem)
+                    width = 16;
+                    height = 10;
                     break;
 
                 case SolidPlatformType.None:
                 default:
                     return false;
             }
-        
-            // Add some padding to prevent merging
-            const int padding = 1;
-            
+
+            // Use platformSpacing as padding to ensure minimum distance between platforms
+            var padding = Mathf.CeilToInt(platformSpacing);
+    
             // Adjust the check area based on a shape type
             var checkStartY = startY;
             var checkHeight = height;
-            
-            // For regular T shape, we need to check below the start position
+    
             if (solidPlatformType == SolidPlatformType.ShapeT)
             {
-                checkStartY = startY - height + 2; // +2 for the top bar height
-                checkHeight = height + 1; // Add 1 for better separation
+                checkStartY = startY - height + 2;
+                checkHeight = height + 1;
             }
-        
+
             // Check the entire area where the platform might be placed, including padding
             for (var x = -padding; x < width + padding; x++)
             {
                 for (var y = -padding; y < checkHeight + padding; y++)
                 {
                     var positionCheck = new Vector3Int(startX + x, checkStartY + y, 0);
-                    
+            
                     // Check if the position is within valid bounds
                     if (positionCheck.x < 0 || positionCheck.x >= _chunkWidth ||
                         positionCheck.y < 0 || positionCheck.y >= _chunkHeight)
                     {
                         return false;
                     }
-        
+
                     // Check if a position already has any tiles
                     if (_wallsTilemap && _wallsTilemap.HasTile(positionCheck))
                         return false;
-                    
+            
                     if (_platformsTilemap && _platformsTilemap.HasTile(positionCheck))
                         return false;
-                    
+            
                     if (solidPlatformsTilemap && solidPlatformsTilemap.HasTile(positionCheck))
                         return false;
                 }
             }
             return true;
         }
+
     }
 }

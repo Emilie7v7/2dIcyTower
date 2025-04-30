@@ -20,7 +20,7 @@ namespace _Scripts.ChunkGeneration
         private int _chunkWidth;
         private int _chunkHeight;
         private Tilemap backgroundTilemap;
-        private Tilemap decorationsTilemap1;
+        private Tilemap decorationsTilemap;
         
         public void Setup(int chunkWidth, int chunkHeight, Tilemap tilemap)
         {
@@ -31,7 +31,7 @@ namespace _Scripts.ChunkGeneration
 
         public void GetDecorationsTilemap1(Tilemap decorTilemapReference)
         {
-            decorationsTilemap1 = decorTilemapReference;
+            decorationsTilemap = decorTilemapReference;
         }
 
         public void Generate()
@@ -43,8 +43,8 @@ namespace _Scripts.ChunkGeneration
             }
 
             backgroundTilemap.ClearAllTiles();
-            if (decorationsTilemap1)
-                decorationsTilemap1.ClearAllTiles();
+            if (decorationsTilemap)
+                decorationsTilemap.ClearAllTiles();
 
             
             GenerateBackground();
@@ -141,7 +141,7 @@ namespace _Scripts.ChunkGeneration
         private bool CanPlaceDecoration(int centerX, int centerY)
         {
             // First, check if there's already a decoration here
-            if (decorationsTilemap1.GetTile(new Vector3Int(centerX, centerY, 0)))
+            if (decorationsTilemap.GetTile(new Vector3Int(centerX, centerY, 0)))
                 return false;
 
             // Check if we have a complete 3x3 area of background tiles
@@ -170,7 +170,7 @@ namespace _Scripts.ChunkGeneration
                         continue;
 
                     // If we find any decoration within this radius, return false
-                    if (decorationsTilemap1.GetTile(new Vector3Int(x, y, 0)))
+                    if (decorationsTilemap.GetTile(new Vector3Int(x, y, 0)))
                         return false;
                 }
             }
@@ -181,7 +181,7 @@ namespace _Scripts.ChunkGeneration
         private void PlaceDecoration(int centerX, int centerY, TileBase decorTile)
         {
             // Place only a single decoration tile
-            decorationsTilemap1.SetTile(new Vector3Int(centerX, centerY, 0), decorTile);
+            decorationsTilemap.SetTile(new Vector3Int(centerX, centerY, 0), decorTile);
         }
 
 

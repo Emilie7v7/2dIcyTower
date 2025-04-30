@@ -12,6 +12,7 @@ namespace _Scripts.ChunkGeneration.Editor
         private SerializedProperty _wallDecorTileLeft;
         private SerializedProperty _wallDecorTileRight;
 
+
         private void OnEnable()
         {
             _wallThickness = serializedObject.FindProperty("wallThickness");

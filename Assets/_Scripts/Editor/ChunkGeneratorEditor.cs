@@ -117,7 +117,8 @@ namespace _Scripts.Editor
             var wallDecorTilemap = FindTilemap(_currentChunkInstance, "Tilemap_WallDeco");
             var platformsTilemap = FindTilemap(_currentChunkInstance, "Tilemap_Collision_Platforms");
             var solidPlatformsTilemap = FindTilemap(_currentChunkInstance, "Tilemap_Collision_SolidPlatforms");
-            var decorationsTilemap1 = FindTilemap(_currentChunkInstance, "Tilemap_Decorations");
+            var decorationsTilemap = FindTilemap(_currentChunkInstance, "Tilemap_Decorations");
+            var decorationsTilemap1 = FindTilemap(_currentChunkInstance, "Tilemap_Decorations1");
             
 
             // Pass relevant Tilemaps to the generators
@@ -131,16 +132,17 @@ namespace _Scripts.Editor
                             wallsGenerator.Setup(_chunkWidth, _chunkHeight, wallsTilemap);
                             break;
                         case DartTrapGenerator dartTrapGenerator:
-                            dartTrapGenerator.GetChunkInstance(_currentChunkInstance);
                             dartTrapGenerator.Setup(_chunkWidth, _chunkHeight, wallsTilemap);
+                            dartTrapGenerator.GetChunkInstance(_currentChunkInstance);
                             break;
                         case WallDecorationGenerator wallDecorationGenerator:
-                            wallDecorationGenerator.GetWallTilemap(wallsTilemap);
                             wallDecorationGenerator.Setup(_chunkWidth, _chunkHeight, wallDecorTilemap);
+                            wallDecorationGenerator.GetChunkInstance(_currentChunkInstance);
+                            wallDecorationGenerator.GetTilemapsByType(wallsTilemap);
                             break;
                         case BackgroundGenerator backgroundGenerator:
                             backgroundGenerator.Setup(_chunkWidth, _chunkHeight, backgroundTilemap);
-                            backgroundGenerator.GetDecorationsTilemap1(decorationsTilemap1);
+                            backgroundGenerator.GetDecorationsTilemap1(decorationsTilemap);
                             break;
                         case WoodenPlatformsGenerator woodenPlatformsGenerator:
                             woodenPlatformsGenerator.Setup(_chunkWidth, _chunkHeight, platformsTilemap);
@@ -213,13 +215,15 @@ namespace _Scripts.Editor
             var enemySpawnPoint = spawnPointTransform.Find("Enemies");
             var dartTrapLeftSpawnPoint = spawnPointTransform.Find("LeftWallDartTrap");
             var dartTrapRightSpawnPoint = spawnPointTransform.Find("RightWallDartTrap");
+            var animatedDecorationsSpawnpoint = parent.transform.Find("AnimatedDecorations");
 
             var listOfTransforms = new List<Transform>
             {
                 coinSpawnPoint,
                 enemySpawnPoint,
                 dartTrapLeftSpawnPoint,
-                dartTrapRightSpawnPoint
+                dartTrapRightSpawnPoint,
+                animatedDecorationsSpawnpoint
             };
 
             foreach (var child in listOfTransforms)
