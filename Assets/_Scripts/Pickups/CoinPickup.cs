@@ -87,7 +87,7 @@ namespace _Scripts.Pickups
                 coinValue += GameManager.Instance.PlayerData.coinValueUpgrade;
             }
             GameManager.Instance.AddCoins(coinValue);
-            CoinPool.Instance?.ReturnObject(this);
+            //CoinPool.Instance?.ReturnObject(this);
         }
 
         private void OnEnable()

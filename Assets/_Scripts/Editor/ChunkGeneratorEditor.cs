@@ -6,7 +6,7 @@ using UnityEngine.Tilemaps;
 
 namespace _Scripts.Editor
 {
-    internal enum ChunkGenerationType {Default, Easy, Medium, Hard}
+    internal enum ChunkGenerationType {Default, Bonus, Spawn, Easy, Medium, Hard}
 
     public class ChunkGeneratorEditor : EditorWindow
     {
@@ -100,16 +100,19 @@ namespace _Scripts.Editor
             }
 
             // Instantiate a new chunk instance
-            _currentChunkInstance = Instantiate(_chunkPrefab, new Vector3(-20, -5, 0), Quaternion.identity);
+            _currentChunkInstance = Instantiate(_chunkPrefab, new Vector3(0, 0, 0), Quaternion.identity);
             var chunkName = selectedType switch
             {
                 ChunkGenerationType.Default => "GeneratedChunk",
+                ChunkGenerationType.Bonus => "Bonus",
+                ChunkGenerationType.Spawn => "Spawn",
                 ChunkGenerationType.Easy => "Easy",
                 ChunkGenerationType.Medium => "Medium",
                 ChunkGenerationType.Hard => "Hard",
                 _ => "GeneratedChunk"
             };
             _currentChunkInstance.name = chunkName;
+            _currentChunkInstance.tag = chunkName;
             
             // Find the Tilemap objects in the new chunk instance
             var backgroundTilemap = FindTilemap(_currentChunkInstance, "Tilemap_Background");
@@ -215,7 +218,7 @@ namespace _Scripts.Editor
             var enemySpawnPoint = spawnPointTransform.Find("Enemies");
             var dartTrapLeftSpawnPoint = spawnPointTransform.Find("LeftWallDartTrap");
             var dartTrapRightSpawnPoint = spawnPointTransform.Find("RightWallDartTrap");
-            var animatedDecorationsSpawnpoint = parent.transform.Find("AnimatedDecorations");
+            var animatedDecorationsSpawnPoint = parent.transform.Find("AnimatedDecorations");
 
             var listOfTransforms = new List<Transform>
             {
@@ -223,7 +226,7 @@ namespace _Scripts.Editor
                 enemySpawnPoint,
                 dartTrapLeftSpawnPoint,
                 dartTrapRightSpawnPoint,
-                animatedDecorationsSpawnpoint
+                animatedDecorationsSpawnPoint
             };
 
             foreach (var child in listOfTransforms)
