@@ -11,6 +11,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
 {
     public static class SettingsManager
     {
+        private static int _cachedMaxRefreshRate = -1;
         public static OptionsData OptionsData { get; private set; }
 
         #region Fps
@@ -96,20 +97,31 @@ namespace _Scripts.Managers.Game_Manager_Logic
         #endregion
         
         #region Fps Settings
-        public static void ApplyFPS(int fps)
+        public static void ApplyFPS(int requestedFps)
         {
+            QualitySettings.vSyncCount = 0; // First disable VSync
             var maxFps = GetMaxRefreshRateForMobile();
-
-            if (fps > maxFps)
+    
+            int targetFps;
+            if (requestedFps > maxFps)
             {
-                ShowIncompatibilityErrorFpsMessage(fps, maxFps);
-                fps = maxFps;
+                targetFps = maxFps;
+                ShowIncompatibilityErrorFpsMessage(requestedFps, targetFps);
             }
-            
-            OptionsData.fpsCount = fps;
+            else
+            {
+                targetFps = requestedFps;
+            }
+
+            Debug.Log($"Setting FPS to {targetFps} (Requested: {requestedFps}, Device Max: {maxFps})");
+    
+            OptionsData.fpsCount = targetFps;
+            OptionsData.vSync = false;
             SaveOptionsData();
-            Application.targetFrameRate = fps;
+            Application.targetFrameRate = targetFps;
         }
+
+
 
         public static void ApplyShowFPS(bool show)
         {
@@ -120,8 +132,51 @@ namespace _Scripts.Managers.Game_Manager_Logic
         
         private static int GetMaxRefreshRateForMobile()
         {
-            return Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value);
+            if (_cachedMaxRefreshRate == -1)
+            {
+                // Try to get from screen, explicitly cast double to float
+                float refreshRate = (float)Screen.currentResolution.refreshRateRatio.value;
+        
+                // Fallback values if we get an invalid refresh rate
+                if (refreshRate <= 0)
+                {
+#if UNITY_ANDROID
+                    try 
+                    {
+                        using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                        {
+                            using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                            {
+                                using (var windowManager = activity.Call<AndroidJavaObject>("getWindowManager"))
+                                {
+                                    using (var display = windowManager.Call<AndroidJavaObject>("getDefaultDisplay"))
+                                    {
+                                        refreshRate = display.Call<float>("getRefreshRate");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (System.Exception e)
+                    {
+                        Debug.LogWarning($"Failed to get refresh rate from Android API: {e.Message}");
+                        refreshRate = 60f; // Fallback to 60 if Android API call fails
+                    }
+#endif
+                }
+        
+                _cachedMaxRefreshRate = Mathf.RoundToInt(refreshRate);
+        
+                // Fallback to 60 if we still don't have a valid value
+                if (_cachedMaxRefreshRate <= 0)
+                    _cachedMaxRefreshRate = 60;
+            
+                Debug.Log($"Detected max refresh rate: {_cachedMaxRefreshRate}Hz");
+            }
+    
+            return _cachedMaxRefreshRate;
         }
+
         
         public static void InitializeIncompatibilityPanel(GameObject panel, TextMeshProUGUI text, TMP_Dropdown dropdown, Slider slider)
         {
@@ -192,4 +247,3 @@ namespace _Scripts.Managers.Game_Manager_Logic
         #endregion
     }
 }
-

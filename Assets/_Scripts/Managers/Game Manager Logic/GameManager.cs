@@ -49,10 +49,10 @@ namespace _Scripts.Managers.Game_Manager_Logic
             {
                 Player = playerObj.transform;
             }
-            else
-            {
-                Debug.LogWarning("⚠ Player not found in scene!");
-            }
+            // else
+            // {
+            //     Debug.LogWarning("⚠ Player not found in scene!");
+            // }
         }
         
         public void AddCoins(int amount)

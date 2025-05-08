@@ -39,17 +39,43 @@ namespace _Scripts.Settings
 
         private PendingSettings _pendingSettings;
 
+        private void OnEnable()
+        {
+            InitializeSettings();
+        }
+
         private void Start()
+        {
+            InitializeSettings();
+        }
+
+        private void InitializeSettings()
         {
             _pendingSettings = new PendingSettings(SettingsManager.OptionsData);
             SetupUI();
+            
+            // First set control states without notification to prevent flicker
+            PreInitializeControlStates();
+            
+            // Then load all settings
             LoadInitialSettings();
+            
             SettingsManager.InitializeIncompatibilityPanel(incompatibilityPanel, incompatibilityText, fpsDropdown, fpsSlider);
         }
 
-        // Modify the Apply button listener setup in SetupUI
+        private void PreInitializeControlStates()
+        {
+            var controlMode = _pendingSettings.TempOptionsData.controlMode;
+            touchScreenToggle.SetIsOnWithoutNotify(controlMode == OptionsData.ControlModes.Touchscreen);
+            joystickToggle.SetIsOnWithoutNotify(controlMode == OptionsData.ControlModes.Joystick);
+            
+            UpdateToggleInteractableStates();
+        }
+
         private void SetupUI()
         {
+            RemoveAllListeners();
+
             applyButton.onClick.AddListener(ApplySettings);
             closeButton.onClick.AddListener(OnCloseButtonClick);
             confirmButton.onClick.AddListener(OnConfirmExit);
@@ -60,16 +86,17 @@ namespace _Scripts.Settings
             incompatibilityPanel.SetActive(false);
         }
 
-
         private void LoadInitialSettings()
         {
             #region FPS Settings
-            fpsDropdown.value = GetFPSSliderIndex(_pendingSettings.TempOptionsData.fpsCount);
-            fpsSlider.value = GetFPSSliderIndex(_pendingSettings.TempOptionsData.fpsCount);
-            showFpsToggle.isOn = _pendingSettings.TempOptionsData.showFps;
+            int currentFpsIndex = GetFPSSliderIndex(_pendingSettings.TempOptionsData.fpsCount);
+            fpsDropdown.value = currentFpsIndex;
+            fpsSlider.value = currentFpsIndex;
             
             fpsDropdown.onValueChanged.AddListener(OnFPSChanged);
             fpsSlider.onValueChanged.AddListener(value => OnFPSChanged((int)value));
+            
+            showFpsToggle.isOn = _pendingSettings.TempOptionsData.showFps;
             showFpsToggle.onValueChanged.AddListener(OnShowFpsChanged);
             #endregion
 
@@ -79,12 +106,7 @@ namespace _Scripts.Settings
             #endregion
 
             #region Control Settings
-            var controlMode = _pendingSettings.TempOptionsData.controlMode;
-            touchScreenToggle.isOn = controlMode == OptionsData.ControlModes.Touchscreen;
-            joystickToggle.isOn = controlMode == OptionsData.ControlModes.Joystick;
-            
             SetupControlToggles();
-            UpdateToggleInteractableStates();
             #endregion
 
             #region Audio Settings
@@ -98,10 +120,31 @@ namespace _Scripts.Settings
             #endregion
         }
 
+        private void RemoveAllListeners()
+        {
+            applyButton.onClick.RemoveAllListeners();
+            closeButton.onClick.RemoveAllListeners();
+            confirmButton.onClick.RemoveAllListeners();
+            cancelButton.onClick.RemoveAllListeners();
+            
+            fpsDropdown.onValueChanged.RemoveAllListeners();
+            fpsSlider.onValueChanged.RemoveAllListeners();
+            showFpsToggle.onValueChanged.RemoveAllListeners();
+            vsyncToggle.onValueChanged.RemoveAllListeners();
+            touchScreenToggle.onValueChanged.RemoveAllListeners();
+            joystickToggle.onValueChanged.RemoveAllListeners();
+            musicVolumeSlider.onValueChanged.RemoveAllListeners();
+            sfxVolumeSlider.onValueChanged.RemoveAllListeners();
+            uiSoundVolumeSlider.onValueChanged.RemoveAllListeners();
+        }
+
         #region Settings Change Handlers
         private void OnFPSChanged(int index)
         {
             var fps = GetFPSValueFromSlider(index);
+            if (fpsDropdown.value != index) fpsDropdown.value = index;
+            if (!Mathf.Approximately(fpsSlider.value, index)) fpsSlider.value = index;
+            
             _pendingSettings.TempOptionsData.fpsCount = fps;
             MarkAsModified();
         }
@@ -145,7 +188,7 @@ namespace _Scripts.Settings
                 if (isOn)
                 {
                     _pendingSettings.TempOptionsData.controlMode = OptionsData.ControlModes.Touchscreen;
-                    joystickToggle.isOn = false;
+                    joystickToggle.SetIsOnWithoutNotify(false);
                     UpdateToggleInteractableStates();
                     MarkAsModified();
                 }
@@ -156,7 +199,7 @@ namespace _Scripts.Settings
                 if (isOn)
                 {
                     _pendingSettings.TempOptionsData.controlMode = OptionsData.ControlModes.Joystick;
-                    touchScreenToggle.isOn = false;
+                    touchScreenToggle.SetIsOnWithoutNotify(false);
                     UpdateToggleInteractableStates();
                     MarkAsModified();
                 }
@@ -173,12 +216,11 @@ namespace _Scripts.Settings
         #region FPS Utility Methods
         private static int GetFPSSliderIndex(int fps)
         {
-            var maxFps = GetMaxRefreshRateForMobile();
             return fps switch
             {
                 60 => 0,
-                90 when maxFps >= 90 => 1,
-                120 when maxFps >= 120 => 2,
+                90 => 1,
+                120 => 2,
                 _ => 0
             };
         }
@@ -193,21 +235,25 @@ namespace _Scripts.Settings
                 _ => 60
             };
         }
-
-        private static int GetMaxRefreshRateForMobile()
-        {
-            return Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value);
-        }
         #endregion
 
         #region Menu Navigation
         private void ApplySettings()
         {
-            SettingsManager.ApplyAndSaveSettings(_pendingSettings.TempOptionsData);
+            int targetFps = _pendingSettings.TempOptionsData.fpsCount;
+            SettingsManager.ApplyFPS(targetFps);
+
+            SettingsManager.ApplyShowFPS(_pendingSettings.TempOptionsData.showFps);
+            SettingsManager.ApplyVSync(_pendingSettings.TempOptionsData.vSync);
+            SettingsManager.ApplyControlMode(_pendingSettings.TempOptionsData.controlMode);
+            SettingsManager.ApplyMusicVolume(_pendingSettings.TempOptionsData.musicVolume);
+            SettingsManager.ApplySfxVolume(_pendingSettings.TempOptionsData.sfxVolume);
+            SettingsManager.ApplyUiVolume(_pendingSettings.TempOptionsData.uiVolume);
+
+            _pendingSettings.TempOptionsData.fpsCount = SettingsManager.OptionsData.fpsCount;
             _pendingSettings.IsModified = false;
             applyButton.interactable = false;
         }
-
 
         private void OnCloseButtonClick()
         {
@@ -220,7 +266,6 @@ namespace _Scripts.Settings
                 CloseMenu();
             }
         }
-
 
         private void OnConfirmExit()
         {
@@ -241,8 +286,7 @@ namespace _Scripts.Settings
             gameObject.SetActive(false);
             _pendingSettings = new PendingSettings(SettingsManager.OptionsData);
         
-            // Show the main menu panel when closing settings
-            if (mainMenuPanel)
+            if (mainMenuPanel != null)
             {
                 mainMenuPanel.SetActive(true);
             }
@@ -253,8 +297,12 @@ namespace _Scripts.Settings
             _pendingSettings.IsModified = true;
             applyButton.interactable = true;
         }
-
         #endregion
+
+        private void OnDisable()
+        {
+            RemoveAllListeners();
+        }
     }
 
     public class PendingSettings
