@@ -16,7 +16,7 @@ namespace _Scripts.Managers.Menu_Logic
         public void StartGame()
         {
             Time.timeScale = 1;
-            SceneManager.LoadScene("EmScene");
+            SceneManager.LoadScene("GameScene");
         }
 
         public void BackToMenu()

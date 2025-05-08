@@ -2,6 +2,7 @@ using _Scripts.Audio;
 using _Scripts.CoreSystem;
 using _Scripts.Entities.EntityStateMachine;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace _Scripts.Entities.EntitySpecific.Skeleton
 {
@@ -13,6 +14,8 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
         public E1LongRangeAttackState LongRangeAttackState { get; private set; }
         
         public SkeletonAudio SkeletonAudio { get; private set; }
+
+        public Transform shootPoint;
         
         public override void Awake()
         {

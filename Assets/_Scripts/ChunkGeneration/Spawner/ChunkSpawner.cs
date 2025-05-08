@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace _Scripts.ChunkGeneration.Spawner
 {
@@ -32,7 +33,7 @@ namespace _Scripts.ChunkGeneration.Spawner
         [Header("Bonus Chunk Settings")]
         [SerializeField] [Range(0f, 1f)] private float bonusChunkSpawnChance = 0.05f;
 
-        private Dictionary<ChunkType, Queue<GameObject>> chunkPools;
+        private Dictionary<ChunkType, List<GameObject>> chunkPools; // Changed from Queue to List for random selection
         private List<GameObject> activeChunks;
         private Transform playerTransform;
         private float nextSpawnHeight;
@@ -55,10 +56,23 @@ namespace _Scripts.ChunkGeneration.Spawner
 
         private void InitializeChunkPools()
         {
-            chunkPools = new Dictionary<ChunkType, Queue<GameObject>>();
-            foreach (ChunkType type in System.Enum.GetValues(typeof(ChunkType)))
+            chunkPools = new Dictionary<ChunkType, List<GameObject>>();
+            
+            var poolContainer = new GameObject("Chunk Pools").transform;
+            poolContainer.parent = transform;
+            
+            // Initialize pool for each chunk type
+            foreach (var prefabGroup in chunkPrefabs)
             {
-                chunkPools[type] = new Queue<GameObject>();
+                chunkPools[prefabGroup.type] = new List<GameObject>();
+        
+                // Instantiate all prefabs in the group
+                foreach (var prefab in prefabGroup.prefabs)
+                {
+                    var chunk = Instantiate(prefab, poolContainer);
+                    chunk.SetActive(false);
+                    chunkPools[prefabGroup.type].Add(chunk);
+                }
             }
         }
 
@@ -115,20 +129,20 @@ namespace _Scripts.ChunkGeneration.Spawner
 
         private void SpawnChunk(ChunkType type, Vector3 position)
         {
-            GameObject chunk;
-            if (chunkPools[type].Count > 0)
+            var availableChunks = chunkPools[type].Where(c => !c.activeInHierarchy).ToList();
+    
+            if (availableChunks.Count == 0)
             {
-                chunk = chunkPools[type].Dequeue();
-                chunk.SetActive(true);
-            }
-            else
-            {
-                var prefabGroup = chunkPrefabs.Find(x => x.type == type);
-                var prefab = prefabGroup.prefabs[Random.Range(0, prefabGroup.prefabs.Count)];
-                chunk = Instantiate(prefab);
+                Debug.LogWarning($"No inactive chunks of type {type} available. Consider increasing pool size.");
+                return;
             }
 
+            // Get random inactive chunk from pool
+            var randomIndex = Random.Range(0, availableChunks.Count);
+            var chunk = availableChunks[randomIndex];
+    
             chunk.transform.position = position;
+            chunk.SetActive(true);
             activeChunks.Add(chunk);
         }
 
@@ -139,10 +153,9 @@ namespace _Scripts.ChunkGeneration.Spawner
                 if (activeChunks[i].transform.position.y < playerTransform.position.y - chunkHeight)
                 {
                     var chunk = activeChunks[i];
-                    var type = DetermineChunkTypeFromPrefab(chunk);
                     chunk.SetActive(false);
-                    chunkPools[type].Enqueue(chunk);
                     activeChunks.RemoveAt(i);
+                    // No need to add back to pool since we're just enabling/disabling now
                 }
             }
         }
