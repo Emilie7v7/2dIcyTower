@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
@@ -16,10 +15,10 @@ namespace _Scripts.InputHandler
         [SerializeField] private GameObject throwButton;
         
         private static UnityEngine.Camera MainCamera => UnityEngine.Camera.main;
-        
-        public Vector2 RawThrowDirection { get; private set; }
+
+        private Vector2 RawThrowDirection { get; set; }
         public Vector2 ThrowDirectionInput { get; private set; }
-        public Vector2 RawMovementInput { get; private set; }
+        private Vector2 RawMovementInput { get; set; }
         public Vector2 AimJoystickInput { get; private set; }
 
         public int NormInputX { get; private set; }
@@ -28,7 +27,7 @@ namespace _Scripts.InputHandler
         public bool ThrowInput { get; private set; }
         public bool CanThrow { get; set; } = true;
         
-        private bool _throwLocked = false;
+        private bool _throwLocked;
 
         private void Start()
         {
@@ -45,7 +44,7 @@ namespace _Scripts.InputHandler
                 // Get the joystick direction
                 var joystickDirection = aimingJoystick.JoystickDirection;
 
-                // If joystick is moving, update throw direction
+                // If the joystick is moving, update a throw direction
                 if (joystickDirection != Vector2.zero)
                 {
                     AimJoystickInput = joystickDirection;
@@ -127,7 +126,7 @@ namespace _Scripts.InputHandler
             //Reads the Vector2 x,y for movement input
             RawMovementInput = ctx.ReadValue<Vector2>();
 
-            //Normalized X,Y inputs for steady movement
+            //Normalized X, Y inputs for steady movement
             NormInputX = Mathf.RoundToInt(RawMovementInput.x);
             NormInputY = Mathf.RoundToInt(RawMovementInput.y);
         }
@@ -135,8 +134,8 @@ namespace _Scripts.InputHandler
 
     public enum ControlMode
     {
-        TapToThrow,
-        DualJoysticks
+        DualJoysticks,
+        TapToThrow
     }
 }
 

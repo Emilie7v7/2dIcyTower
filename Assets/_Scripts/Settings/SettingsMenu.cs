@@ -1,4 +1,3 @@
-using System;
 using _Scripts.JSON;
 using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
@@ -113,9 +112,9 @@ namespace _Scripts.Settings
             MarkAsModified();
         }
 
-        private void OnVSyncChanged(bool enabled)
+        private void OnVSyncChanged(bool enable)
         {
-            _pendingSettings.TempOptionsData.vSync = enabled;
+            _pendingSettings.TempOptionsData.vSync = enable;
             MarkAsModified();
         }
 
