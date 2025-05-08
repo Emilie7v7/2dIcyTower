@@ -16,6 +16,9 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
         public SkeletonAudio SkeletonAudio { get; private set; }
 
         public Transform shootPoint;
+        [SerializeField] private GameObject ledgeCheck;
+
+        private GameObject _player;
         
         public override void Awake()
         {
@@ -34,6 +37,40 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
             SkeletonAudio = GetComponent<SkeletonAudio>();
             
             StateMachine.Initialize(IdleState);
+            if (!ledgeCheck)
+            {
+                ledgeCheck = CollisionSenses.LedgeCheckVertical.gameObject;
+                ledgeCheck.transform.position = transform.position + transform.right * 1.4f + Vector3.up * -1.45f;
+            }
+
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            
+            if (CollisionSenses.IsPlayerInLineOfSight())
+            {
+                FacePlayer();
+            }
+
+        }
+        
+        public void FacePlayer()
+        {
+            if (_player == null)
+            {
+                _player = GameObject.FindGameObjectWithTag("Player");
+                if (_player == null) return;
+            }
+
+            // Determine if the player is to the left or right of the enemy
+            float directionToPlayer = _player.transform.position.x - transform.position.x;
+    
+            // If player is to the left, rotate 180 degrees
+            // If player is to the right, rotate 0 degrees
+            float targetRotation = directionToPlayer < 0 ? 180f : 0f;
+            transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
         }
 
         // Visualize the raycasts

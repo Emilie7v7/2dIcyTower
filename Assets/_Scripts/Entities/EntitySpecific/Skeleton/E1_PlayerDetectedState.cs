@@ -12,6 +12,14 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
             this._enemy = enemy;
         }
 
+        public override void Enter()
+        {
+            base.Enter();
+            
+            _enemy.FacePlayer();
+
+        }
+
         public override void LogicUpdate()
         {
             base.LogicUpdate();

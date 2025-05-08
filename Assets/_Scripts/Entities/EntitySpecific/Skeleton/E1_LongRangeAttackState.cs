@@ -21,6 +21,7 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
             base.Enter();
         
             Movement?.SetZeroVelocity();
+            _enemy.FacePlayer();
             //Debug.Log("We have entered Long Range State");
         }
 
@@ -51,6 +52,7 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
                 return;
             }
             
+
             var projectilePrefab = EnemyProjectilePool.Instance.GetObject(Entity.transform.position);
             if (projectilePrefab is null)
             {
@@ -62,7 +64,7 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
             if (!_enemy.shootPoint)
             {
                 var newShootPoint = new GameObject("ShootPoint");
-                newShootPoint.transform.position = _enemy.transform.position + _enemy.transform.right * 2f;
+                newShootPoint.transform.position = _enemy.transform.position + _enemy.transform.right * 1.3f;
                 newShootPoint.transform.parent = _enemy.transform;
                 _enemy.shootPoint = newShootPoint.transform;
             }
