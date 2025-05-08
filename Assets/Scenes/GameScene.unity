@@ -335,8 +335,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1962584535
-  m_SortingLayer: 0
+  m_SortingLayerID: 1527278905
+  m_SortingLayer: 9
   m_SortingOrder: 2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -3300,6 +3300,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 752227131}
   m_CullTransparentMesh: 1
+--- !u!1 &795512288
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 795512289}
+  - component: {fileID: 795512290}
+  m_Layer: 0
+  m_Name: PoolResetManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &795512289
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 795512288}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &795512290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 795512288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c05869709ee94926b029cc564de01e37, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &805081675
 GameObject:
   m_ObjectHideFlags: 0
@@ -3374,8 +3418,8 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1962584535
-  m_SortingLayer: 0
+  m_SortingLayerID: 1527278905
+  m_SortingLayer: 9
   m_SortingOrder: 2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
@@ -4244,7 +4288,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1015319094
 Transform:
   m_ObjectHideFlags: 0
@@ -4281,7 +4325,7 @@ MonoBehaviour:
   minLavaSpeed: 0.2
   maxLavaSpeed: 3
   wallLeft: -16
-  wallRight: 16
+  wallRight: 15
 --- !u!1 &1033909204
 GameObject:
   m_ObjectHideFlags: 0
@@ -7527,6 +7571,7 @@ SceneRoots:
   - {fileID: 1216273662}
   - {fileID: 166963200}
   - {fileID: 11610914}
+  - {fileID: 795512289}
   - {fileID: 760922252254583069}
   - {fileID: 317267309}
   - {fileID: 1505895660}

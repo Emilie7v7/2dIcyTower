@@ -130,7 +130,7 @@ namespace _Scripts.ChunkGeneration.Spawner
         private void SpawnChunk(ChunkType type, Vector3 position)
         {
             var availableChunks = chunkPools[type].Where(c => !c.activeInHierarchy).ToList();
-    
+
             if (availableChunks.Count == 0)
             {
                 Debug.LogWarning($"No inactive chunks of type {type} available. Consider increasing pool size.");
@@ -140,9 +140,9 @@ namespace _Scripts.ChunkGeneration.Spawner
             // Get random inactive chunk from pool
             var randomIndex = Random.Range(0, availableChunks.Count);
             var chunk = availableChunks[randomIndex];
-    
+
             chunk.transform.position = position;
-            chunk.SetActive(true);
+            HandleChunkActivation(chunk, true);
             activeChunks.Add(chunk);
         }
 
@@ -153,9 +153,8 @@ namespace _Scripts.ChunkGeneration.Spawner
                 if (activeChunks[i].transform.position.y < playerTransform.position.y - chunkHeight)
                 {
                     var chunk = activeChunks[i];
-                    chunk.SetActive(false);
+                    HandleChunkActivation(chunk, false);
                     activeChunks.RemoveAt(i);
-                    // No need to add back to pool since we're just enabling/disabling now
                 }
             }
         }
@@ -171,6 +170,17 @@ namespace _Scripts.ChunkGeneration.Spawner
             Debug.LogWarning($"Chunk {chunk.name} has no recognized tag! Defaulting to Easy type.");
             return ChunkType.Easy;
         }
-
+        
+        private static void HandleChunkActivation(GameObject chunk, bool activate)
+        {
+            if (activate)
+            {
+                chunk.SetActive(true);
+            }
+            else
+            {
+                chunk.SetActive(false);
+            }
+        }
     }
 }

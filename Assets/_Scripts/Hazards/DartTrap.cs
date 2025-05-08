@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.Projectiles;
@@ -14,19 +13,43 @@ namespace _Scripts.Hazards
         [SerializeField] private float arrowSpeed = 10f;
         [SerializeField] private Vector2 shootDirection;
         
+        private bool shouldShoot;
+        private Coroutine shootingCoroutine;
+
         private void OnEnable()
         {
-            StartCoroutine(LaunchDart());
+            // Start shooting when the chunk becomes active
+            StartShooting();
         }
 
         private void OnDisable()
         {
-            StopAllCoroutines();
+            // Stop shooting when the chunk becomes inactive
+            StopShooting();
+        }
+
+        private void StartShooting()
+        {
+            shouldShoot = true;
+            if (shootingCoroutine == null)
+            {
+                shootingCoroutine = StartCoroutine(LaunchDart());
+            }
+        }
+
+        private void StopShooting()
+        {
+            shouldShoot = false;
+            if (shootingCoroutine != null)
+            {
+                StopCoroutine(shootingCoroutine);
+                shootingCoroutine = null;
+            }
         }
 
         private IEnumerator LaunchDart()
         {
-            while (true)
+            while (shouldShoot)
             {
                 trapParticles.Play();
                 var arrowPrefab = ArrowPool.Instance?.GetObject(spawnPoint.position, Quaternion.identity);
