@@ -9,15 +9,20 @@ namespace _Scripts.Managers.Lava_Logic
         [SerializeField] private Tilemap hazardTilemap;
         [SerializeField] private RuleTile lavaTile;
         [SerializeField] private Transform player;
-        [SerializeField] private int startOffset = 10; // How far below the player lava starts
-        [SerializeField] private int maxLavaTiles = 12; // Maximum rows of lava before clearing old ones
-        [SerializeField] private float lavaStartDelay = 5f; // How long before lava starts rising
-        [SerializeField] private float minLavaSpeed = 10f; // Slowest speed (when close to player)
-        [SerializeField] private float maxLavaSpeed = 10f; // Fastest speed (when far from player)
+        [SerializeField] private int startOffset = 10;
+        [SerializeField] private int maxLavaTiles = 12;
+        [SerializeField] private float lavaStartDelay = 5f;
+        [SerializeField] private float minLavaSpeed = 10f;
+        [SerializeField] private float maxLavaSpeed = 10f;
         [SerializeField] private int wallLeft = -16;
         [SerializeField] private int wallRight = 16;
 
-        private int _lavaHeight; //Current lava Y position
+        [Header("Light Settings")]
+        [SerializeField] private UnityEngine.Rendering.Universal.Light2D lavaLight; // Reference to the Light2D component
+        [SerializeField] private float lightIntensity = 1f; // Base intensity of the light
+        [SerializeField] private Color lightColor = Color.red; // Color of the light
+
+        private int _lavaHeight;
         private bool _lavaActive = false;
         private float _timeSinceStart = 0f;
         private float _nextLavaRiseTime = 0f;
@@ -25,6 +30,35 @@ namespace _Scripts.Managers.Lava_Logic
         private void Start()
         {
             InitializeLava();
+            InitializeLight();
+        }
+
+        private void InitializeLight()
+        {
+            if (lavaLight == null)
+            {
+                // Create a new GameObject for the light if none is assigned
+                GameObject lightObject = new GameObject("LavaLight");
+                lavaLight = lightObject.AddComponent<UnityEngine.Rendering.Universal.Light2D>();
+                lavaLight.lightType = UnityEngine.Rendering.Universal.Light2D.LightType.Point;
+                lavaLight.intensity = lightIntensity;
+                lavaLight.color = lightColor;
+                lavaLight.pointLightOuterRadius = 5f; // Adjust this value to change light radius
+                lavaLight.pointLightInnerRadius = 0f;
+            }
+
+            // Position the light at the current lava height
+            UpdateLightPosition();
+        }
+
+        private void UpdateLightPosition()
+        {
+            if (lavaLight != null)
+            {
+                // Position light at the center of the lava horizontally and at current height
+                Vector3 lightPos = new Vector3(0f, _lavaHeight + 0.5f, 0f);
+                lavaLight.transform.position = lightPos;
+            }
         }
 
         private void Update()
@@ -44,24 +78,23 @@ namespace _Scripts.Managers.Lava_Logic
 
         private void InitializeLava()
         {
-            _lavaHeight = Mathf.FloorToInt(player.position.y) - startOffset; // Start below player
+            _lavaHeight = Mathf.FloorToInt(player.position.y) - startOffset;
 
             for (var y = _lavaHeight; y < _lavaHeight + startOffset; y++)
             {
-                for (var x = wallLeft; x <= wallRight; x++) // Adjust for walls
+                for (var x = wallLeft; x <= wallRight; x++)
                 {
                     hazardTilemap.SetTile(new Vector3Int(x, y, 0), lavaTile);
                 }
             }
 
-            _lavaHeight += startOffset - 1; //FIX: Ensure lavaHeight starts at the topmost lava row
+            _lavaHeight += startOffset - 1;
         }
 
         private void UpdateLava()
         {
             var playerY = Mathf.FloorToInt(player.position.y);
 
-            //Adjust Lava Speed: Faster if far, slower if close
             float distanceFromPlayer = playerY - _lavaHeight;
             const float maxLavaCatchupDistance = 15f;
             var lavaSpeed = Mathf.Lerp(minLavaSpeed, maxLavaSpeed, Mathf.Clamp01(distanceFromPlayer / maxLavaCatchupDistance));
@@ -70,15 +103,15 @@ namespace _Scripts.Managers.Lava_Logic
             {
                 _nextLavaRiseTime = Time.time + (1f / lavaSpeed);
 
-                _lavaHeight++; //Move lava up by 1 tile
+                _lavaHeight++;
 
-                for (int x = wallLeft; x <= wallRight; x++) //Adjust for walls
+                for (int x = wallLeft; x <= wallRight; x++)
                 {
                     hazardTilemap.SetTile(new Vector3Int(x, _lavaHeight, 0), lavaTile);
                 }
 
-                //FIX: Ensure old lava is removed properly
                 ClearOldLava();
+                UpdateLightPosition(); // Update light position when lava moves
             }
         }
 
@@ -86,10 +119,9 @@ namespace _Scripts.Managers.Lava_Logic
         {
             var clearY = _lavaHeight - maxLavaTiles;
 
-            //FIX: Ensure it clears the initial lava rows as well
-            if (clearY < _lavaHeight - startOffset) 
+            if (clearY < _lavaHeight - startOffset)
             {
-                clearY = _lavaHeight - startOffset; //Start clearing from the first placed lava row
+                clearY = _lavaHeight - startOffset;
             }
 
             for (var x = wallLeft; x <= wallRight; x++)
