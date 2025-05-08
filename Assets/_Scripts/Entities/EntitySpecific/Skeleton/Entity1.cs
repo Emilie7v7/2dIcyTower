@@ -1,8 +1,6 @@
 using _Scripts.Audio;
-using _Scripts.CoreSystem;
 using _Scripts.Entities.EntityStateMachine;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.Entities.EntitySpecific.Skeleton
 {
@@ -58,18 +56,18 @@ namespace _Scripts.Entities.EntitySpecific.Skeleton
         
         public void FacePlayer()
         {
-            if (_player == null)
+            if (!_player)
             {
                 _player = GameObject.FindGameObjectWithTag("Player");
-                if (_player == null) return;
+                if (!_player) return;
             }
 
             // Determine if the player is to the left or right of the enemy
-            float directionToPlayer = _player.transform.position.x - transform.position.x;
+            var directionToPlayer = _player.transform.position.x - transform.position.x;
     
             // If player is to the left, rotate 180 degrees
             // If player is to the right, rotate 0 degrees
-            float targetRotation = directionToPlayer < 0 ? 180f : 0f;
+            var targetRotation = directionToPlayer < 0 ? 180f : 0f;
             transform.rotation = Quaternion.Euler(0f, targetRotation, 0f);
         }
 
