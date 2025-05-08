@@ -1,8 +1,7 @@
-using System;
 using System.Collections;
+using System.Collections.Generic;
 using _Scripts.Audio;
 using _Scripts.Managers.Game_Manager_Logic;
-using _Scripts.ObjectPool.ObjectsToPool;
 using _Scripts.ScriptableObjects.SpawnSettingsData;
 using UnityEngine;
 
@@ -14,22 +13,23 @@ namespace _Scripts.Pickups
         [SerializeField] private float getPulledDistance = 5f;
         [SerializeField] private float maxPullSpeed = 30f;
         [SerializeField] private bool isPhysicalCoin;
-        
+
         private Collider2D _collider2D;
         private Rigidbody2D _rigidbody2D;
         private bool _isBeingPulled;
         private Transform _player;
-
+        private Vector3 _initialPosition;
 
         private void Start()
         {
             _collider2D = GetComponent<Collider2D>();
             _rigidbody2D = GetComponent<Rigidbody2D>();
+            _initialPosition = transform.position;
         }
 
         private void Update()
         {
-            if (_player is null) return; // Avoid null reference errors
+            if (_player is null) return;
 
             var distance = Vector3.Distance(_player.position, transform.position);
 
@@ -37,6 +37,7 @@ namespace _Scripts.Pickups
             {
                 StartCoroutine(BounceCoinsCoroutine());
             }
+
             if (!isPhysicalCoin)
             {
                 if (distance < getPulledDistance)
@@ -70,7 +71,7 @@ namespace _Scripts.Pickups
             var distance = Vector3.Distance(_player.position, transform.position);
             MoveTowardsPlayer(distance);
         }
-        
+
         public void StartPulling()
         {
             _isBeingPulled = true;
@@ -86,8 +87,28 @@ namespace _Scripts.Pickups
             {
                 coinValue += GameManager.Instance.PlayerData.coinValueUpgrade;
             }
+
             GameManager.Instance.AddCoins(coinValue);
-            //CoinPool.Instance?.ReturnObject(this);
+
+            ResetCoin();
+        }
+
+        private void ResetCoin()
+        {
+            transform.position = _initialPosition;
+            _isBeingPulled = false;
+            if (_rigidbody2D != null)
+            {
+                _rigidbody2D.velocity = Vector2.zero;
+                if (isPhysicalCoin)
+                {
+                    _rigidbody2D.gravityScale = 0f;
+                    _collider2D.isTrigger = false;
+                    _rigidbody2D.isKinematic = false;
+                }
+            }
+
+            gameObject.SetActive(false);
         }
 
         private void OnEnable()
@@ -96,7 +117,8 @@ namespace _Scripts.Pickups
             {
                 _player = GameManager.Instance?.Player;
             }
-            _isBeingPulled = false; // Reset pull state when re-enabled
+
+            _isBeingPulled = false;
         }
     }
 }
