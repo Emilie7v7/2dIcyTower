@@ -150,7 +150,7 @@ namespace _Scripts.ChunkGeneration.Spawner
         {
             for (var i = activeChunks.Count - 1; i >= 0; i--)
             {
-                if (activeChunks[i].transform.position.y < playerTransform.position.y - chunkHeight)
+                if (activeChunks[i].transform.position.y < playerTransform.position.y - chunkHeight -40f)
                 {
                     var chunk = activeChunks[i];
                     HandleChunkActivation(chunk, false);
