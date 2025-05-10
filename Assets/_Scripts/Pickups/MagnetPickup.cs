@@ -2,7 +2,6 @@ using System.Collections;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.Pickups
 {
@@ -10,8 +9,9 @@ namespace _Scripts.Pickups
     {
         [SerializeField] private float horizontalMagnetRange = 300f; // Wider horizontal range
         [SerializeField] private float verticalMagnetRange = 50f; // Shorter vertical range
+        [SerializeField] private ParticleSystem magnetEffect;
         private float _magnetDuration; // Will be fetched from PlayerData
-        private bool _isMagnetActive = false;
+        private bool _isMagnetActive;
         
         private void Start()
         {
@@ -44,6 +44,7 @@ namespace _Scripts.Pickups
             if (_isMagnetActive) return;
 
             _isMagnetActive = true;
+            magnetEffect.Play();
             transform.SetParent(Player.transform); // Attach to the player
             transform.localPosition = Vector3.zero; // Center it on the player
 
@@ -72,7 +73,8 @@ namespace _Scripts.Pickups
                 yield return null;
             }
 
-            _isMagnetActive = false; // Deactivate after duration ends
+            _isMagnetActive = false; // Deactivate after the duration ends
+            magnetEffect.Stop();
             PowerUpPool.Instance.ReturnObject(this);
         }
 
@@ -92,7 +94,7 @@ namespace _Scripts.Pickups
 
         private void OnEnable()
         {
-            if (Player == null && GameManager.Instance != null)
+            if (!Player && GameManager.Instance)
             {
                 Player = GameManager.Instance.Player;
             }

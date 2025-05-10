@@ -10,8 +10,8 @@ namespace _Scripts.Pickups
 {
     public class RocketPickup : PowerUp
     {
-
         [SerializeField] private LayerMask layerMask;
+        [SerializeField] private ParticleSystem rocketEffect;
 
         private float _rocketDuration;
         private const float RocketSpeed = 20f;
@@ -73,6 +73,7 @@ namespace _Scripts.Pickups
             if(_isRocketActive) return;
             
             _isRocketActive = true;
+            rocketEffect.Play();
             ScoreManager.Instance.FreezeTimer(_rocketDuration);
             transform.SetParent(_playerRb.transform);
             transform.localPosition = Vector3.zero;
@@ -113,12 +114,13 @@ namespace _Scripts.Pickups
 
             // Don't override Y — preserve current momentum
             _isRocketActive = false;
-
+            
             yield return StartCoroutine(WaitUntilNotInsidePlatform());
             foreach (var layers in _hazardLayers)
             {
                 Physics2D.IgnoreLayerCollision(PlayerLayer, layers, false);
             }
+            rocketEffect.Stop();
             _playerInput.CanThrow = true;
             PowerUpPool.Instance.ReturnObject(this);
         }
@@ -137,7 +139,7 @@ namespace _Scripts.Pickups
                 // Check if still overlapping any platform
                 var hit = Physics2D.OverlapBox(_playerRb.position, boxSize, 0f, layerMask);
 
-                if (hit == null) break; // No longer inside a platform
+                if (!hit) break; // No longer inside a platform
 
                 waitedTime += checkInterval;
                 yield return new WaitForSeconds(checkInterval);

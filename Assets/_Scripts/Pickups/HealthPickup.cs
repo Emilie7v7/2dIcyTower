@@ -1,4 +1,3 @@
-using System;
 using _Scripts.CoreSystem;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
@@ -8,6 +7,8 @@ namespace _Scripts.Pickups
 {
     public class HealthPickup : PowerUp
     {
+        [SerializeField] private ParticleSystem healthEffect;
+        
         private void Update()
         {
             if(Player is null) return;
@@ -31,6 +32,7 @@ namespace _Scripts.Pickups
         {
             if (other.CompareTag("Player"))
             {
+                healthEffect.Play();
                 var player = other.GetComponentInChildren<Stats>();
                 if (player.Health.CurrentValue < player.Health.MaxValue)
                 {
