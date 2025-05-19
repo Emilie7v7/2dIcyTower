@@ -3,13 +3,11 @@ using _Scripts.Audio;
 using _Scripts.CoreSystem;
 using _Scripts.InputHandler;
 using _Scripts.Managers.Spawn_Logic;
-using _Scripts.Player;
 using _Scripts.Player.Player_States;
 using _Scripts.Player.Player_States.SubStates;
 using _Scripts.PlayerState;
 using _Scripts.ScriptableObjects.PlayerData;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace _Scripts.PlayerComponent
 {
@@ -102,6 +100,14 @@ namespace _Scripts.PlayerComponent
                 Debug.Log("Hit by lava");
                 Stats.Health.CurrentValue = 0;
                 _hasBeenHit = true; // Mark as hit
+            }
+        }
+
+        private void OnCollisionEnter2D(Collision2D other)
+        {
+            if (other.gameObject.CompareTag("SolidPlatform"))
+            {
+                Debug.Log("Hit by solid platform");
             }
         }
 

@@ -94,7 +94,9 @@ namespace _Scripts.Pickups
             {
                 Physics2D.IgnoreLayerCollision(PlayerLayer, layers, true);
             }
-            while (elapsedTime < _rocketDuration)
+            
+            bool shouldContinueBoost;
+            do
             {
                 _playerInput.CanThrow = false;
                 
@@ -107,10 +109,16 @@ namespace _Scripts.Pickups
                 // Apply velocity directly
                 _playerRb.velocity = new Vector2(xSpeed, RocketSpeed);
 
-
                 elapsedTime += Time.deltaTime;
+                
+                // Check if we're inside a solid platform (layer 14)
+                var boxSize = new Vector2(0.9f, 1.8f);
+                var solidPlatformLayer = 1 << 14; // Layer 14
+                shouldContinueBoost = elapsedTime >= _rocketDuration && 
+                                     Physics2D.OverlapBox(_playerRb.position, boxSize, 0f, solidPlatformLayer);
+                
                 yield return null;
-            }
+            } while (elapsedTime < _rocketDuration || shouldContinueBoost);
 
             // Don't override Y — preserve current momentum
             _isRocketActive = false;

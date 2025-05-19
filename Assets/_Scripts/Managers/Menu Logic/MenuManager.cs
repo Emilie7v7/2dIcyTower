@@ -16,7 +16,7 @@ namespace _Scripts.Managers.Menu_Logic
         public void StartGame()
         {
             Time.timeScale = 1;
-            SceneManager.LoadScene("GameScene");
+            SceneLoader.Instance.LoadScene("GameScene");
         }
 
         public void BackToMenu()
@@ -24,21 +24,21 @@ namespace _Scripts.Managers.Menu_Logic
             GameManager.Instance.SavePlayerGameData();
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneManager.LoadScene("MenuScene");
+            SceneLoader.Instance.LoadScene("MenuScene");
         }
 
         public void UponDeathBackToMenu()
         {
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneManager.LoadScene("MenuScene");
+            SceneLoader.Instance.LoadScene("MenuScene");
         }
         
         public void RestartGame()
         {
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            SceneLoader.Instance.LoadScene("GameScene");
         }
         
         public void QuitGame()
