@@ -1,4 +1,3 @@
-using System;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
@@ -16,7 +15,7 @@ namespace _Scripts.Managers.Menu_Logic
         public void StartGame()
         {
             Time.timeScale = 1;
-            SceneLoader.Instance.LoadScene("GameScene");
+            SceneManager.LoadScene("GameScene");
         }
 
         public void BackToMenu()
@@ -24,21 +23,21 @@ namespace _Scripts.Managers.Menu_Logic
             GameManager.Instance.SavePlayerGameData();
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneLoader.Instance.LoadScene("MenuScene");
+            SceneManager.LoadScene("MenuScene");
         }
 
         public void UponDeathBackToMenu()
         {
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneLoader.Instance.LoadScene("MenuScene");
+            SceneManager.LoadScene("MenuScene");
         }
         
         public void RestartGame()
         {
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneLoader.Instance.LoadScene("GameScene");
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
         
         public void QuitGame()

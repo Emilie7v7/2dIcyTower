@@ -103,14 +103,6 @@ namespace _Scripts.PlayerComponent
             }
         }
 
-        private void OnCollisionEnter2D(Collision2D other)
-        {
-            if (other.gameObject.CompareTag("SolidPlatform"))
-            {
-                Debug.Log("Hit by solid platform");
-            }
-        }
-
         #endregion
 
         private void IndicatorRotation()
