@@ -2,12 +2,21 @@ using System;
 using System.Collections.Generic;
 using _Scripts.Managers.Game_Manager_Logic;
 using UnityEngine;
+using UnityEngine.Audio;
 using UnityEngine.SceneManagement;
 
 namespace _Scripts.Managers.Audio_Logic
 {
     public class AudioManager : MonoBehaviour
     {
+        [Header("Audio Mixers")]
+        [SerializeField] private AudioMixer audioMixer;
+    
+        // Mixer parameter names - match these with your mixer exposed parameters
+        private const string MUSIC_VOLUME_PARAM = "MusicVolume";
+        private const string SFX_VOLUME_PARAM = "SFXVolume";
+        private const string UI_VOLUME_PARAM = "UIVolume";
+
         public static AudioManager Instance { get; private set; }
         
         public enum AudioTypes { Music, SFX, UI }
@@ -66,6 +75,22 @@ namespace _Scripts.Managers.Audio_Logic
                 return;
             }
             
+            // Convert linear volume (0-1) to logarithmic (-80db to 0db)
+            float mixerVolume = volume <= 0 ? -80f : Mathf.Log10(volume) * 20f;
+        
+            switch (type)
+            {
+                case AudioTypes.Music:
+                    audioMixer.SetFloat(MUSIC_VOLUME_PARAM, mixerVolume);
+                    break;
+                case AudioTypes.SFX:
+                    audioMixer.SetFloat(SFX_VOLUME_PARAM, mixerVolume);
+                    break;
+                case AudioTypes.UI:
+                    audioMixer.SetFloat(UI_VOLUME_PARAM, mixerVolume);
+                    break;
+            }
+
             foreach (var source in audioSource)
             {
                 if (source != null)
