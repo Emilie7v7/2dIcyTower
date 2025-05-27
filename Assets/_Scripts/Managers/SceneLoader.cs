@@ -1,12 +1,11 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace _Scripts.Managers
 {
     public class SceneLoader : MonoBehaviour
     {
         public static SceneLoader Instance { get; private set; }
-    
-        [SerializeField] private LoadingScreen loadingScreen;
     
         private void Awake()
         {
@@ -23,7 +22,8 @@ namespace _Scripts.Managers
     
         public void LoadScene(string sceneName)
         {
-            loadingScreen.LoadScene(sceneName);
+            // Simply load the loading scene
+            SceneManager.LoadScene("LoadingScene");
         }
     }
 }

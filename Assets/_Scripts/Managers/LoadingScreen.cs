@@ -1,60 +1,59 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI; // Add this if you have a progress bar
+using UnityEngine.UI;
 
 namespace _Scripts.Managers
 {
     public class LoadingScreen : MonoBehaviour
     {
-        private static LoadingScreen _instance;
-        
-        [SerializeField] private Canvas loadingCanvas; // Reference to your loading UI canvas
-        // Optional: Add references to UI elements
-        // [SerializeField] private Text loadingText;
-        // [SerializeField] private Image progressBar;
+        [SerializeField] private Canvas loadingCanvas;
+        [SerializeField] private string gameSceneName = "GameScene";
+        [SerializeField] private Image progressBar;
+        [SerializeField] private Text loadingText;
 
-        private void Awake()
+        private void Start()
         {
-            if (_instance == null)
-            {
-                _instance = this;
-                DontDestroyOnLoad(gameObject);
-                loadingCanvas.gameObject.SetActive(false); // Hide loading screen at start
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
-
-        public void LoadScene(string sceneName)
-        {
-            loadingCanvas.gameObject.SetActive(true); // Show loading screen
-            StartCoroutine(LoadSceneAsync(sceneName));
+            StartCoroutine(LoadSceneAsync(gameSceneName));
         }
     
         private IEnumerator LoadSceneAsync(string sceneName)
         {
+            // Start loading the game scene immediately
             var operation = SceneManager.LoadSceneAsync(sceneName);
             operation.allowSceneActivation = false;
+
+            // Wait for a frame to ensure loading has properly started
+            yield return null;
 
             while (!operation.isDone)
             {
                 float progress = Mathf.Clamp01(operation.progress / 0.9f);
-                // Optional: Update UI elements
-                // if (progressBar != null) progressBar.fillAmount = progress;
-                // if (loadingText != null) loadingText.text = $"Loading... {progress * 100}%";
+                
+                if (progressBar != null) progressBar.fillAmount = progress;
+                if (loadingText != null) loadingText.text = $"Loading... {(progress * 100).ToString("F0")}%";
 
                 if (operation.progress >= 0.9f)
                 {
-                    yield return new WaitForSeconds(1f); // Optional: minimum time to show loading screen
-                    loadingCanvas.gameObject.SetActive(false); // Hide loading screen
+                    // The scene is fully loaded at this point
+                    yield return new WaitForSeconds(1f);
+                    
+                    // Pre-activate any heavy systems here if needed
+                    // yield return StartCoroutine(PreloadGameSystems());
+                    
                     operation.allowSceneActivation = true;
                 }
 
                 yield return null;
             }
+        }
+
+        // Optional: If you have specific systems that need initialization
+        private IEnumerator PreloadGameSystems()
+        {
+            // Initialize any heavy systems here
+            // For example, object pools, audio system, etc.
+            yield return null;
         }
     }
 }

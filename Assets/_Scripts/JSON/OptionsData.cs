@@ -13,6 +13,7 @@ namespace _Scripts.JSON
         public float musicVolume;
         public float sfxVolume;
         public float uiVolume;
+        public bool hideControlsPopUp;
         public enum ControlModes { Joystick, Touchscreen}
         
         public OptionsData()
@@ -24,6 +25,7 @@ namespace _Scripts.JSON
             sfxVolume = 1f;
             uiVolume = 1f;
             controlMode = ControlModes.Touchscreen;
+            hideControlsPopUp = false;
         }
     }
     

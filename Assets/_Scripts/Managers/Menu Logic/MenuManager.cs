@@ -1,3 +1,4 @@
+using System.Collections;
 using _Scripts.Entities.EntityStateMachine;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.ObjectPool.ObjectsToPool;
@@ -15,8 +16,22 @@ namespace _Scripts.Managers.Menu_Logic
         public void StartGame()
         {
             Time.timeScale = 1;
-            SceneManager.LoadScene("GameScene");
+            StartCoroutine(LoadLoadingScreen());
         }
+
+        private IEnumerator LoadLoadingScreen()
+        {
+            // Start loading the loading screen asynchronously
+            var loadOperation = SceneManager.LoadSceneAsync("LoadingScene");
+            loadOperation.allowSceneActivation = true;
+    
+            // Wait for the loading screen to load
+            while (!loadOperation.isDone)
+            {
+                yield return null;
+            }
+        }
+
 
         public void BackToMenu()
         {
@@ -37,7 +52,7 @@ namespace _Scripts.Managers.Menu_Logic
         {
             Time.timeScale = 1;
             ResetPooledObjects();
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            StartCoroutine(LoadLoadingScreen());
         }
         
         public void QuitGame()
