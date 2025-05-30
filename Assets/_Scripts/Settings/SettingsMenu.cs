@@ -1,5 +1,7 @@
+using System.Collections;
 using _Scripts.JSON;
 using _Scripts.Managers.Game_Manager_Logic;
+using _Scripts.Managers.Save_System_Logic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -39,9 +41,19 @@ namespace _Scripts.Settings
 
         private PendingSettings _pendingSettings;
 
+        private void Awake()
+        {
+            // Pre-initialize the toggle states
+            var options = SaveSystem.LoadOptionsData();
+    
+            if (touchScreenToggle) touchScreenToggle.isOn = (options.controlMode == OptionsData.ControlModes.Touchscreen);
+            if (joystickToggle) joystickToggle.isOn = (options.controlMode == OptionsData.ControlModes.Joystick);
+        }
+
         private void OnEnable()
         {
-            InitializeSettings();
+            InitializeSettings();    
+            StartCoroutine(UpdateControlModeNextFrame());
         }
 
         private void Start()
@@ -70,6 +82,31 @@ namespace _Scripts.Settings
             joystickToggle.SetIsOnWithoutNotify(controlMode == OptionsData.ControlModes.Joystick);
             
             UpdateToggleInteractableStates();
+        }
+
+        public void UpdateControlMode()
+        {
+            if (!gameObject.activeSelf) return; // Don't update if inactive
+    
+            var options = SaveSystem.LoadOptionsData();
+            Debug.Log($"Updating control mode to: {options.controlMode}");
+    
+            touchScreenToggle.SetIsOnWithoutNotify(options.controlMode == OptionsData.ControlModes.Touchscreen);
+            joystickToggle.SetIsOnWithoutNotify(options.controlMode == OptionsData.ControlModes.Joystick);
+    
+            UpdateToggleInteractableStates();
+    
+            if (_pendingSettings != null)
+            {
+                _pendingSettings.TempOptionsData.controlMode = options.controlMode;
+            }
+        }
+
+
+        private IEnumerator UpdateControlModeNextFrame()
+        {
+            yield return null; // Wait for the next frame
+            UpdateControlMode();
         }
 
         private void SetupUI()

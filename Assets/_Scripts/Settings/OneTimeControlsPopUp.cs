@@ -9,6 +9,7 @@ namespace _Scripts.Settings
 {
     public class OneTimeControlsPopUp : MonoBehaviour
     {
+        [SerializeField] private SettingsMenu settingsMenu;
         [SerializeField] private Toggle oneTimePopUpToggle;
         [SerializeField] private GameObject controlsPopUp;
         
@@ -16,6 +17,7 @@ namespace _Scripts.Settings
         [SerializeField] private Toggle touchScreenToggle;
         [SerializeField] private Toggle joystickToggle;
 
+        
         private void OnEnable()
         {
             InitializeSettings();
@@ -65,16 +67,22 @@ namespace _Scripts.Settings
         public void OnApplyButton()
         {
             var options = SaveSystem.LoadOptionsData();
-            
+    
             options.hideControlsPopUp = oneTimePopUpToggle.isOn;
-            
+            options.controlMode = touchScreenToggle.isOn ? 
+                OptionsData.ControlModes.Touchscreen : 
+                OptionsData.ControlModes.Joystick;
+    
             SaveSystem.SaveOptionsData(options);
-            
+    
+            // Don't try to update the settings menu UI here
             gameObject.SetActive(false);
         }
+
         
         private void SetupControlToggles()
         {
+            var options = SaveSystem.LoadOptionsData();
             touchScreenToggle.onValueChanged.AddListener(isOn =>
             {
                 if (isOn)
