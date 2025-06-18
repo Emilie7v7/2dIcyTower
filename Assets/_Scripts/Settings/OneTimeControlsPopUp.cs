@@ -10,7 +10,7 @@ namespace _Scripts.Settings
     public class OneTimeControlsPopUp : MonoBehaviour
     {
         [SerializeField] private SettingsMenu settingsMenu;
-        [SerializeField] private Toggle oneTimePopUpToggle;
+        //[SerializeField] private Toggle oneTimePopUpToggle;
         [SerializeField] private GameObject controlsPopUp;
         
         [Header("Control Settings")]
@@ -67,8 +67,10 @@ namespace _Scripts.Settings
         public void OnApplyButton()
         {
             var options = SaveSystem.LoadOptionsData();
-    
-            options.hideControlsPopUp = oneTimePopUpToggle.isOn;
+            
+            options.hideControlsPopUp = true;
+            //options.hideControlsPopUp = oneTimePopUpToggle.isOn;
+            
             options.controlMode = touchScreenToggle.isOn ? 
                 OptionsData.ControlModes.Touchscreen : 
                 OptionsData.ControlModes.Joystick;
