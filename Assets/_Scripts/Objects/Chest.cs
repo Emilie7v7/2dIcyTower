@@ -27,7 +27,6 @@ namespace _Scripts.Objects
         
         private static readonly int Exploded = Animator.StringToHash("exploded");
         private Animator _animator;
-        private bool _isOpened;
 
         private void Start()
         {
@@ -38,7 +37,6 @@ namespace _Scripts.Objects
         public void OpenChest()
         {
             Debug.Log("Chest got hit");
-            _isOpened = true;
             _animator.SetBool(Exploded, true);
             openedChest.SetActive(true);
             switch (chestType)
@@ -91,7 +89,6 @@ namespace _Scripts.Objects
         public void ResetChest()
         {
             gameObject.SetActive(true);
-            _isOpened = false;
             _animator.SetBool(Exploded, false);
             openedChest.SetActive(false);
         }
