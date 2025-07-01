@@ -41,6 +41,9 @@ namespace _Scripts.Ads
                     InitializeAds();
                 }
             });
+            
+            Debug.Log("Consent Status: " + ConsentInformation.ConsentStatus);
+            Debug.Log("Is Consent Form Available: " + ConsentInformation.IsConsentFormAvailable());
         }
 
         private static void LoadAndShowConsentForm()
