@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using _Scripts.GooglePlay;
 using _Scripts.JSON;
 using _Scripts.Managers.Save_System_Logic;
 using UnityEngine;
@@ -35,6 +36,7 @@ namespace _Scripts.Managers.Game_Manager_Logic
         private void Start()
         {
             SceneManager.sceneLoaded += OnSceneLoaded; //Listen for scene changes
+            GooglePlayManager.Instance.SignIn();
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)

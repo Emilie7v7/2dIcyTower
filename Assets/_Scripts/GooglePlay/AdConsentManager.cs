@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using GoogleMobileAds.Api;
 using GoogleMobileAds.Ump.Api;
 using UnityEngine;
 
-namespace _Scripts.Ads
+namespace _Scripts.GooglePlay
 {
     public class AdConsentManager : MonoBehaviour
     {
