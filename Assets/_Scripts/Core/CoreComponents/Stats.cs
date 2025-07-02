@@ -1,5 +1,6 @@
 using System.Collections;
 using _Scripts.CoreSystem.StatSystem;
+using _Scripts.GooglePlay;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.Managers.Save_System_Logic;
 using _Scripts.Managers.Score_Logic;
@@ -76,6 +77,9 @@ namespace _Scripts.CoreSystem
             if (ScoreManager.Instance.GetScore() > GameManager.Instance.PlayerData.highScore)
             {
                 GameManager.Instance.UpdateHighScore(ScoreManager.Instance.GetScore()); //Update in memory
+                
+                // Submit to Google Play Leaderboard
+                GooglePlayManager.Instance.ReportScore(ScoreManager.Instance.GetScore());
             }
             ScoreManager.Instance.OnDeathScoreUpdatedEvent();
             GameManager.Instance.SavePlayerGameData(); //Save everything (single save operation)

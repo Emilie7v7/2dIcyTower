@@ -35,6 +35,7 @@ namespace _Scripts.GooglePlay
 
             PlayGamesPlatform.Activate();
             Debug.Log("Google Play Games Initialized.");
+            
         }
 
         #region Authentication
