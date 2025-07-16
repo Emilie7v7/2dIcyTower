@@ -79,7 +79,7 @@ namespace _Scripts.CoreSystem
                 GameManager.Instance.UpdateHighScore(ScoreManager.Instance.GetScore()); //Update in memory
                 
                 // Submit to Google Play Leaderboard
-                GooglePlayManager.Instance.ReportScore(ScoreManager.Instance.GetScore());
+                GooglePlayManager.instance.ReportScore(ScoreManager.Instance.GetScore());
             }
             ScoreManager.Instance.OnDeathScoreUpdatedEvent();
             GameManager.Instance.SavePlayerGameData(); //Save everything (single save operation)

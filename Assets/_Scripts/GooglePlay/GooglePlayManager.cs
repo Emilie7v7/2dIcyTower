@@ -7,7 +7,7 @@ namespace _Scripts.GooglePlay
 {
     public class GooglePlayManager : MonoBehaviour
     {
-        public static GooglePlayManager Instance;
+        public static GooglePlayManager instance;
 
         [Header("Leaderboard ID")]
         [SerializeField] private string leaderboardID = "YOUR_LEADERBOARD_ID";
@@ -17,9 +17,9 @@ namespace _Scripts.GooglePlay
 
         private void Awake()
         {
-            if (Instance == null)
+            if (instance == null)
             {
-                Instance = this;
+                instance = this;
                 DontDestroyOnLoad(this);
                 InitializePlayGames();
             }
@@ -32,7 +32,7 @@ namespace _Scripts.GooglePlay
         private void InitializePlayGames()
         {
             PlayGamesPlatform.DebugLogEnabled = true;
-
+            
             PlayGamesPlatform.Activate();
             Debug.Log("Google Play Games Initialized.");
             
@@ -75,9 +75,11 @@ namespace _Scripts.GooglePlay
 
         public void ShowLeaderboardUI()
         {
-            if (IsSignedIn())
+            Debug.Log("Leaderboard button pressed.");
+            if (instance.IsSignedIn())
             {
-                Social.ShowLeaderboardUI();
+                Debug.Log("IsSignedIn: " + instance.IsSignedIn());
+                PlayGamesPlatform.Instance.ShowLeaderboardUI();
             }
             else
             {
@@ -85,7 +87,14 @@ namespace _Scripts.GooglePlay
                 SignIn(success =>
                 {
                     if (success)
-                        Social.ShowLeaderboardUI();
+                    {
+                        Debug.Log("Signed in from fallback. Showing leaderboard...");
+                        PlayGamesPlatform.Instance.ShowLeaderboardUI();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Sign-in failed. Cannot show leaderboard.");
+                    }
                 });
             }
         }
@@ -122,7 +131,7 @@ namespace _Scripts.GooglePlay
             }
             else
             {
-                Debug.LogWarning("Not signed in. Attempting sign-in...");
+                Debug.LogWarning("Not signed in. Attempting sign-in..."); 
                 SignIn(success =>
                 {
                     if (success)
