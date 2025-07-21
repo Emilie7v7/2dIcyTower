@@ -9,8 +9,7 @@ namespace _Scripts.GooglePlay
     {
         public static GooglePlayManager instance;
 
-        [Header("Leaderboard ID")]
-        [SerializeField] private string leaderboardID = "YOUR_LEADERBOARD_ID";
+        private readonly string leaderboardID = GPGSIds.leaderboard_spiremageleaderboard;
 
         [Header("Achievement ID (optional)")]
         [SerializeField] private string exampleAchievementID = "YOUR_ACHIEVEMENT_ID";
@@ -79,7 +78,7 @@ namespace _Scripts.GooglePlay
             if (instance.IsSignedIn())
             {
                 Debug.Log("IsSignedIn: " + instance.IsSignedIn());
-                PlayGamesPlatform.Instance.ShowLeaderboardUI();
+                PlayGamesPlatform.Instance.ShowLeaderboardUI(leaderboardID);
             }
             else
             {
