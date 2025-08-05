@@ -20,7 +20,6 @@ namespace _Scripts.GooglePlay
             {
                 instance = this;
                 DontDestroyOnLoad(this);
-                InitializePlayGames();
             }
             else
             {
@@ -28,13 +27,27 @@ namespace _Scripts.GooglePlay
             }
         }
 
+        private void Start()
+        {
+            InitializePlayGames();
+        }
+
         private void InitializePlayGames()
         {
+            PlayGamesPlatform.Instance.Authenticate((result) =>
+            {
+                Debug.Log("Google Play sign-in result: " + result);
+            });
+            
             PlayGamesPlatform.DebugLogEnabled = true;
             
             PlayGamesPlatform.Activate();
             Debug.Log("Google Play Games Initialized.");
             
+            PlayGamesPlatform.Instance.Authenticate((result) =>
+            {
+                Debug.Log("Google Play sign-in result: " + result);
+            });
         }
 
         #region Authentication
