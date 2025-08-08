@@ -1,37 +1,39 @@
-using System;
 using UnityEngine;
 using GooglePlayGames;
-using GooglePlayGames.BasicApi;
+using GooglePlayGames.BasicApi; // for SignInStatus
 using TMPro;
 
-public class TestGooglePlayManager : MonoBehaviour
+public class TestGooglePlayV2 : MonoBehaviour
 {
-    // Start is called before the first frame update
-
     [SerializeField] private TextMeshProUGUI text;
+
     void Start()
     {
-        SignIn();
+        // Auto sign-in attempt
+        PlayGamesPlatform.Instance.Authenticate(OnAuth);
     }
 
-    public void SignIn()
+    // Hook this to a UI button
+    public void RetrySignIn()
     {
-        PlayGamesPlatform.Instance.Authenticate(ProcessAuthentication);
+        PlayGamesPlatform.Instance.ManuallyAuthenticate(OnAuth);
     }
 
-    internal void ProcessAuthentication(SignInStatus status)
+    private void OnAuth(SignInStatus status)
     {
+        if (text == null) Debug.LogWarning("TMP text not assigned.");
+
         if (status == SignInStatus.Success)
         {
-            string name = PlayGamesPlatform.Instance.GetUserDisplayName();
-            string id = PlayGamesPlatform.Instance.GetUserId();
-            string imgUrl = PlayGamesPlatform.Instance.GetUserImageUrl();
-            
-            text.text = "Signed in as: \n" + name;
+            var p = PlayGamesPlatform.Instance;
+            var name = p.GetUserDisplayName();
+            if (text) text.text = $"Signed in as:\n{name}";
+            Debug.Log("GPG sign-in success");
         }
         else
         {
-            text.text = "Sign in failed";
+            if (text) text.text = $"Sign in failed: {status}\nTap Retry.";
+            Debug.LogWarning($"GPG sign-in failed: {status}");
         }
     }
 }
