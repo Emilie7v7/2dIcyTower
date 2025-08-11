@@ -38,7 +38,7 @@ namespace GooglePlayGames {
 
         public const string ApplicationId = "160908626949"; // Filled in automatically
         public const string IosClientId = "__IOS_CLIENTID__"; // Filled in automatically
-        public const string WebClientId = "160908626949-ldigf72fbm88034jriovhj8q4rj6fl28.apps.googleusercontent.com"; // Filled in automatically
+        public const string WebClientId = ""; // Filled in automatically
         public const string NearbyConnectionServiceId = "com.AetherBiteStudio.Spiremage";
 
         public static bool ApplicationIdInitialized() {
