@@ -1,3 +1,5 @@
+// TestGooglePlayV2.cs
+
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
 using TMPro;
@@ -12,16 +14,18 @@ namespace _Scripts.GooglePlay
         void Start()
         {
             PlayGamesPlatform.DebugLogEnabled = true;
+            PlayGamesPlatform.Activate();
+
             Debug.Log($"[GPG] Starting auto-auth. Package: {Application.identifier}");
-            GooglePlayDiagnostics.LogPlayServicesAvailability();
+            _Scripts.GooglePlay.GooglePlayDiagnosticsV210.LogPlayServicesAvailability();
 
             PlayGamesPlatform.Instance.Authenticate(OnAuth);
         }
 
         public void RetrySignIn()
         {
-            Debug.Log("[GPG] Manual auth triggered");
 #if UNITY_ANDROID
+            Debug.Log("[GPG] Manual auth triggered");
             PlayGamesPlatform.Instance.ManuallyAuthenticate(OnAuth);
 #else
         Debug.LogWarning("[GPG] ManualAuthenticate is Android only.");
@@ -30,26 +34,27 @@ namespace _Scripts.GooglePlay
 
         private void OnAuth(SignInStatus status)
         {
-            bool authed = PlayGamesPlatform.Instance.localUser.authenticated;
-            string explain = GooglePlayDiagnostics.ExplainSignInStatus(status);
+            bool authed = PlayGamesPlatform.Instance.localUser != null && PlayGamesPlatform.Instance.localUser.authenticated;
+            int code = (int)status;
+            string hint = _Scripts.GooglePlay.GooglePlayDiagnosticsV210.Explain(status);
 
-            Debug.Log($"[GPG] Auth callback. Status: {status}, Authenticated: {authed}");
-            Debug.Log($"[GPG] Explanation: {explain}");
+            Debug.Log($"[GPG] Auth callback. Status: {status} ({code}), Authenticated: {authed}");
+            Debug.Log($"[GPG] Hint: {hint}");
 
-            if (status == SignInStatus.Success)
+            if (authed)
             {
                 var p = PlayGamesPlatform.Instance;
                 var name = p.GetUserDisplayName();
                 var id = p.GetUserId();
                 var img = p.GetUserImageUrl();
-                Debug.Log($"[GPG] Success. Name: {name}, ID: {id}, Image URL: {img}");
 
+                Debug.Log($"[GPG] Success. Name: {name}, ID: {id}, Image URL: {img}");
                 if (text) text.text = $"Signed in as:\n{name}";
             }
             else
             {
-                if (text) text.text = $"Sign in failed: {status}\n{explain}\nTap Retry.";
-                GooglePlayDiagnostics.LogPlayServicesAvailability();
+                if (text) text.text = $"Sign in failed: {status}\n{hint}\nTap Retry.";
+                _Scripts.GooglePlay.GooglePlayDiagnosticsV210.LogAllPrechecks();
             }
         }
     }

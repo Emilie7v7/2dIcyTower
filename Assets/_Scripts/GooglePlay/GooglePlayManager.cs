@@ -1,7 +1,9 @@
+// GooglePlayManagerV210.cs
 using System;
 using UnityEngine;
 using GooglePlayGames;
 using GooglePlayGames.BasicApi;
+using TMPro;
 
 namespace _Scripts.GooglePlay
 {
@@ -9,7 +11,11 @@ namespace _Scripts.GooglePlay
     {
         public static GooglePlayManager instance;
 
+        // Keep your IDs
         private readonly string leaderboardID = GPGSIds.leaderboard_spiremageleaderboard;
+
+        [SerializeField] private TextMeshProUGUI text;
+        [SerializeField] private TextMeshProUGUI alreadySignInText;
 
         [Header("Achievement ID (optional)")]
         [SerializeField] private string exampleAchievementID = "YOUR_ACHIEVEMENT_ID";
@@ -31,33 +37,57 @@ namespace _Scripts.GooglePlay
         {
             InitializePlayGames();
             LogEnvironmentBasics();
-            GooglePlayDiagnostics.LogPlayServicesAvailability(); // device level check
-            SignIn(); // single auth path
+            // Auto-auth on start to mirror your original behavior
+            SignIn();
         }
 
         private void InitializePlayGames()
         {
-            // Configure as needed. Add .EnableSavedGames() or server auth if you use them.
-            var config = new PlayGamesClientConfiguration.Builder()
-                //.RequestServerAuthCode(false)
-                //.EnableSavedGames()
-                .Build();
-
-            PlayGamesPlatform.InitializeInstance(config);
-
             PlayGamesPlatform.DebugLogEnabled = true;
             PlayGamesPlatform.Activate();
 
-            Debug.Log("[GPG] Initialized Play Games Platform.");
-        }
+            Debug.Log($"[GPG] Starting auto-auth. Package: {Application.identifier}");
+            GooglePlayDiagnosticsV210.LogPlayServicesAvailability();
 
+            PlayGamesPlatform.Instance.Authenticate(OnAuth);
+        }
+        
+        private void OnAuth(SignInStatus status)
+        {
+            var authed = PlayGamesPlatform.Instance.localUser != null && PlayGamesPlatform.Instance.localUser.authenticated;
+            var code = (int)status;
+            var hint = GooglePlayDiagnosticsV210.Explain(status);
+
+            Debug.Log($"[GPG] Auth callback. Status: {status} ({code}), Authenticated: {authed}");
+            Debug.Log($"[GPG] Hint: {hint}");
+
+            if (authed)
+            {
+                var p = PlayGamesPlatform.Instance;
+                var name = p.GetUserDisplayName();
+                var id = p.GetUserId();
+                var img = p.GetUserImageUrl();
+
+                Debug.Log($"[GPG] Success. Name: {name}, ID: {id}, Image URL: {img}");
+                if (text) text.text = $"Signed in as:\n{name}";
+            }
+            else
+            {
+                if (text) text.text = $"Sign in failed: {status}\n{hint}\nTap Retry.";
+                GooglePlayDiagnosticsV210.LogAllPrechecks();
+            }
+        }
         private static void LogEnvironmentBasics()
         {
             Debug.Log($"[GPG] AppId: {Application.identifier} | Version: {Application.version} | Platform: {Application.platform}");
+#if UNITY_ANDROID && !UNITY_EDITOR
+            Debug.Log($"[GPG] Device: {SystemInfo.deviceModel} | OS: {SystemInfo.operatingSystem}");
+#endif
         }
 
-        #region Authentication
+        // ---------------- Authentication ----------------
 
+        // Signature kept identical to your original
         public void SignIn(Action<bool> callback = null)
         {
             if (IsSignedIn())
@@ -71,62 +101,61 @@ namespace _Scripts.GooglePlay
             PlayGamesPlatform.Instance.Authenticate(status =>
             {
                 bool authed = IsSignedIn();
-                Debug.Log($"[GPG] Authenticate result: {status} | Authenticated flag: {authed}");
-                Debug.Log($"[GPG] Explanation: {GooglePlayDiagnostics.ExplainSignInStatus(status)}");
+                Debug.Log($"[GPG] Authenticate result: {status} ({(int)status}) | authenticated={authed}");
+                Debug.Log($"[GPG] Hint: {GooglePlayDiagnosticsV210.Explain(status)}");
 
-                if (status == SignInStatus.Success)
+                if (authed)
                 {
                     var p = PlayGamesPlatform.Instance;
                     Debug.Log($"[GPG] Player: name='{p.GetUserDisplayName()}', id='{p.GetUserId()}', image='{p.GetUserImageUrl()}'");
-                    callback?.Invoke(true);
                 }
                 else
                 {
-                    // Extra device level signal on failure
-                    GooglePlayDiagnostics.LogPlayServicesAvailability();
-                    callback?.Invoke(false);
+                    GooglePlayDiagnosticsV210.LogAllPrechecks();
                 }
+
+                callback?.Invoke(authed);
             });
         }
 
-        public bool IsSignedIn()
+        private bool IsSignedIn()
         {
             return Social.localUser != null && Social.localUser.authenticated;
         }
 
-        public void ManuallySignIn(Action<bool> callback = null)
+        // Optional helper if you want a manual button. Not used automatically.
+        public void ManuallySignIn()
         {
-            Debug.Log("[GPG] Manual auth requested...");
-#if UNITY_ANDROID
-            PlayGamesPlatform.Instance.ManuallyAuthenticate(status =>
+            if (IsSignedIn())
             {
-                bool authed = IsSignedIn();
-                Debug.Log($"[GPG] Manual Authenticate result: {status} | Authenticated flag: {authed}");
-                Debug.Log($"[GPG] Explanation: {GooglePlayDiagnostics.ExplainSignInStatus(status)}");
-                if (status != SignInStatus.Success) GooglePlayDiagnostics.LogPlayServicesAvailability();
-                callback?.Invoke(status == SignInStatus.Success);
-            });
-#else
-            Debug.LogWarning("[GPG] ManualAuthenticate is Android only.");
-            callback?.Invoke(false);
-#endif
+                alreadySignInText.text = "Already signed in.";
+            }
+            else
+            {
+                Debug.Log("[GPG] Manual auth requested.");
+                PlayGamesPlatform.Instance.ManuallyAuthenticate(status =>
+                {
+                    bool authed = IsSignedIn();
+                    Debug.Log($"[GPG] Manual auth result: {status} ({(int)status}) | authenticated={authed}");
+                    Debug.Log($"[GPG] Hint: {GooglePlayDiagnosticsV210.Explain(status)}");
+                    if (!authed) GooglePlayDiagnosticsV210.LogAllPrechecks();
+                });
+                Debug.LogWarning("[GPG] ManualAuthenticate is Android only.");
+            }
         }
 
-        #endregion
-
-        #region Leaderboards
+        // ---------------- Leaderboards ----------------
 
         public void ShowLeaderboardUI()
         {
             Debug.Log("[GPG] Leaderboard button pressed.");
             if (IsSignedIn())
             {
-                Debug.Log("[GPG] Showing leaderboard UI for configured ID...");
                 PlayGamesPlatform.Instance.ShowLeaderboardUI(leaderboardID);
             }
             else
             {
-                Debug.LogWarning("[GPG] Not signed in. Attempting sign in before showing leaderboard...");
+                Debug.LogWarning("[GPG] Not signed in. Attempting sign in first...");
                 SignIn(success =>
                 {
                     if (success) PlayGamesPlatform.Instance.ShowLeaderboardUI(leaderboardID);
@@ -156,9 +185,7 @@ namespace _Scripts.GooglePlay
             }
         }
 
-        #endregion
-
-        #region Achievements
+        // ---------------- Achievements ----------------
 
         public void ShowAchievementsUI()
         {
@@ -203,57 +230,35 @@ namespace _Scripts.GooglePlay
         {
             UnlockAchievement(exampleAchievementID);
         }
-
-        #endregion
     }
 
-    /// <summary>
-    /// Centralized diagnostics for Google Play Games. Explains statuses and checks Play Services.
-    /// </summary>
-    internal static class GooglePlayDiagnostics
+    // ---------- Diagnostics helper tailored for v2.1.0 ----------
+    internal static class GooglePlayDiagnosticsV210
     {
-        public static string ExplainSignInStatus(SignInStatus status)
+        public static string Explain(GooglePlayGames.BasicApi.SignInStatus s)
         {
-            switch (status)
+            switch (s)
             {
                 case SignInStatus.Success:
-                    return "Success. The user is authenticated.";
-
-                case SignInStatus.UiSignInRequired:
-                    return "UI sign in required. You must call ManuallyAuthenticate or trigger a UI flow. Often occurs when silent sign in is not possible.";
-
+                    return "Success - user authenticated.";
                 case SignInStatus.Canceled:
-                    return "User canceled the sign in UI. The user backed out or closed the dialog.";
-
-                case SignInStatus.NetworkError:
-                    return "Network error. No connectivity or flaky connection. Check internet, captive portals, or airplane mode.";
-
-                case SignInStatus.Timeout:
-                    return "Timed out waiting for Google services. Device may have poor connectivity or Play Services is updating.";
-
-                case SignInStatus.DeveloperError:
-                    return "Developer error. Common causes: package name or app signing certificate mismatch, wrong OAuth client in Play Console, or not using the correct applicationId.";
-
-                case SignInStatus.AlreadyInProgress:
-                    return "A sign in attempt is already in progress. Debounce your calls or wait for the current auth to complete.";
-
-                case SignInStatus.BadAuthentication:
-                    return "Bad authentication. Account token invalid or revoked. Try removing the account from device, clear Google Play Games data, and sign in again.";
-
-                case SignInStatus.NotAuthorized:
-                    return "Not authorized. The user disabled Google Play Games access for your app or did not grant required scopes.";
-
+                    return "User canceled the sign in UI.";
                 case SignInStatus.InternalError:
-                    return "Internal error from Google Play Games services. Check logcat for GooglePlayGames and GamesSignIn tags. Often transient.";
-
+                    return "Internal error - check logcat for GamesSignIn or GoogleSignIn.";
                 default:
-                    return "Unknown status. Check logcat for GooglePlayGames and GoogleSignIn tags for more detail.";
+                    return "Unknown status - check logcat.";
             }
         }
 
-        /// <summary>
-        /// Checks if Google Play Services is available and logs a readable reason if not.
-        /// </summary>
+        public static void LogAllPrechecks()
+        {
+            LogPlayServicesAvailability();
+            LogPlayGamesAppPresence();
+            LogHasGoogleAccount();
+            LogNetworkState();
+            LogSigningCertSha1();
+        }
+
         public static void LogPlayServicesAvailability()
         {
 #if UNITY_ANDROID && !UNITY_EDITOR
@@ -265,47 +270,214 @@ namespace _Scripts.GooglePlay
                 {
                     var instance = gaa.CallStatic<AndroidJavaObject>("getInstance");
                     int code = instance.Call<int>("isGooglePlayServicesAvailable", activity);
-                    string txt = ExplainConnectionResult(code);
-                    Debug.Log($"[GPG] Google Play Services availability code: {code} -> {txt}");
+                    Debug.Log($"[GPG] Play Services availability: {code} - {ExplainConn(code)}");
                 }
             }
             catch (Exception e)
             {
-                Debug.LogWarning($"[GPG] Could not query Google Play Services availability: {e.Message}");
+                Debug.LogWarning($"[GPG] Play Services check failed: {e.Message}");
             }
 #else
-            Debug.Log("[GPG] Play Services availability check skipped. Not running on Android device.");
+            Debug.Log("[GPG] Play Services check skipped - not on Android device.");
 #endif
         }
 
-        private static string ExplainConnectionResult(int code)
+        public static void LogPlayGamesAppPresence()
         {
-            // Based on com.google.android.gms.common.ConnectionResult constants
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
+                {
+                    const string pkg = "com.google.android.play.games";
+                    var appInfo = pm.Call<AndroidJavaObject>("getApplicationInfo", pkg, 0);
+                    bool enabled = appInfo.Get<bool>("enabled");
+                    Debug.Log($"[GPG] Play Games app installed: yes - enabled={enabled}");
+                }
+            }
+            catch
+            {
+                Debug.LogWarning("[GPG] Play Games app installed: no");
+            }
+#else
+            Debug.Log("[GPG] Play Games app check skipped - not on Android device.");
+#endif
+        }
+
+        public static void LogHasGoogleAccount()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using (var accountManagerClass = new AndroidJavaClass("android.accounts.AccountManager"))
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                {
+                    var am = accountManagerClass.CallStatic<AndroidJavaObject>("get", activity);
+                    var accounts = am.Call<AndroidJavaObject[]>("getAccountsByType", "com.google");
+                    int count = accounts != null ? accounts.Length : 0;
+                    Debug.Log($"[GPG] Google accounts on device: {count}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[GPG] Could not query Google accounts: {e.Message}");
+            }
+#else
+            Debug.Log("[GPG] Account check skipped - not on Android device.");
+#endif
+        }
+
+        public static void LogNetworkState()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var cm = activity.Call<AndroidJavaObject>("getSystemService", "connectivity"))
+                {
+                    var active = cm.Call<AndroidJavaObject>("getActiveNetworkInfo");
+                    bool connected = active != null && active.Call<bool>("isConnected");
+                    string type = active != null ? active.Call<int>("getType").ToString() : "none";
+                    Debug.Log($"[GPG] Network connected={connected} type={type}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[GPG] Network state check failed: {e.Message}");
+            }
+#else
+            Debug.Log("[GPG] Network check skipped - not on Android device.");
+#endif
+        }
+
+        public static void LogSigningCertSha1()
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            try
+            {
+                using (var unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+                using (var activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+                using (var pm = activity.Call<AndroidJavaObject>("getPackageManager"))
+                using (var version = new AndroidJavaClass("android.os.Build$VERSION"))
+                {
+                    int sdk = version.GetStatic<int>("SDK_INT");
+                    string pkg = activity.Call<string>("getPackageName");
+                    int flag = sdk >= 28 ? 134217728 : 64; // GET_SIGNING_CERTIFICATES or GET_SIGNATURES
+
+                    var pi = pm.Call<AndroidJavaObject>("getPackageInfo", pkg, flag);
+                    string sha1 = TryComputeSha1(pi, sdk);
+                    if (!string.IsNullOrEmpty(sha1))
+                        Debug.Log($"[GPG] App signing SHA-1: {sha1} - compare with Play Console OAuth client.");
+                    else
+                        Debug.LogWarning("[GPG] Could not compute signing SHA-1.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[GPG] SHA-1 read failed: {e.Message}");
+            }
+#else
+            Debug.Log("[GPG] SHA-1 check skipped - not on Android device.");
+#endif
+        }
+
+#if UNITY_ANDROID && !UNITY_EDITOR
+        private static string TryComputeSha1(AndroidJavaObject packageInfo, int sdk)
+        {
+            // API 28+: signingInfo.apkContentsSigners[0]
+            if (sdk >= 28)
+            {
+                try
+                {
+                    using (var signingInfo = packageInfo.Get<AndroidJavaObject>("signingInfo"))
+                    {
+                        if (signingInfo != null)
+                        {
+                            var signers = signingInfo.Call<AndroidJavaObject[]>("getApkContentsSigners");
+                            if (signers != null && signers.Length > 0)
+                                return DigestToHexSha1(signers[0]);
+                        }
+                    }
+                }
+                catch { /* fall back */ }
+            }
+
+            // Legacy: signatures[0]
+            try
+            {
+                var sigs = packageInfo.Get<AndroidJavaObject[]>("signatures");
+                if (sigs != null && sigs.Length > 0)
+                    return DigestToHexSha1(sigs[0]);
+            }
+            catch { }
+
+            return null;
+        }
+
+        private static string DigestToHexSha1(AndroidJavaObject signature)
+        {
+            // signature.toByteArray returns sbyte[] from Java. Convert to byte[] first.
+            sbyte[] sbytes = signature.Call<sbyte[]>("toByteArray");
+            byte[] bytes = SBytesToBytes(sbytes);
+
+            using (var mdClass = new AndroidJavaClass("java.security.MessageDigest"))
+            using (var md = mdClass.CallStatic<AndroidJavaObject>("getInstance", "SHA1"))
+            {
+                md.Call("update", bytes);
+                byte[] digest = md.Call<byte[]>("digest");
+                return BytesToHex(digest);
+            }
+        }
+
+        private static byte[] SBytesToBytes(sbyte[] s)
+        {
+            if (s == null) return null;
+            var b = new byte[s.Length];
+            for (int i = 0; i < s.Length; i++) b[i] = unchecked((byte)s[i]);
+            return b;
+        }
+
+        private static string BytesToHex(byte[] bytes)
+        {
+            if (bytes == null) return null;
+            char[] c = new char[bytes.Length * 3 - 1];
+            int i = 0;
+            for (int b = 0; b < bytes.Length; b++)
+            {
+                string h = bytes[b].ToString("X2");
+                c[i++] = h[0];
+                c[i++] = h[1];
+                if (b < bytes.Length - 1) c[i++] = ':';
+            }
+            return new string(c);
+        }
+#endif
+
+        private static string ExplainConn(int code)
+        {
             switch (code)
             {
-                case 0: return "SUCCESS. Play Services OK.";
-                case 1: return "SERVICE_MISSING. Play Services not installed.";
-                case 2: return "SERVICE_VERSION_UPDATE_REQUIRED. Update Play Services in Play Store.";
-                case 3: return "SERVICE_DISABLED. Play Services disabled on device.";
-                case 4: return "SIGN_IN_REQUIRED. User must sign in to Google on device.";
-                case 5: return "INVALID_ACCOUNT. The provided account is invalid on this device.";
-                case 6: return "RESOLUTION_REQUIRED. User action required to fix Play Services.";
-                case 7: return "NETWORK_ERROR. No or unstable network.";
-                case 8: return "INTERNAL_ERROR. Google services internal failure.";
-                case 9: return "SERVICE_INVALID. The installed Play Services is invalid.";
-                case 10: return "DEVELOPER_ERROR. Likely config mismatch in app id, package, or SHA certificate.";
-                case 11: return "LICENSE_CHECK_FAILED. Licensing failure.";
-                case 13: return "CANCELED. Operation canceled.";
-                case 14: return "TIMEOUT. Operation timed out.";
-                case 15: return "INTERRUPTED. Operation interrupted.";
-                case 16: return "API_UNAVAILABLE. Requested API unavailable on this device.";
-                case 17: return "SIGN_IN_FAILED. Generic sign in failure.";
-                case 18: return "SERVICE_UPDATING. Play Services currently updating.";
-                case 19: return "SERVICE_MISSING_PERMISSION. Missing required permission.";
-                case 20: return "RESTRICTED_PROFILE. Restricted profile prevents sign in.";
-                case 21: return "API_DISABLED. API disabled on device.";
-                case 22: return "API_DISABLED_FOR_CONNECTION. API disabled for this connection.";
-                default: return "Unknown Play Services error code.";
+                case 0: return "SUCCESS";
+                case 1: return "SERVICE_MISSING";
+                case 2: return "SERVICE_VERSION_UPDATE_REQUIRED";
+                case 3: return "SERVICE_DISABLED";
+                case 4: return "SIGN_IN_REQUIRED";
+                case 5: return "INVALID_ACCOUNT";
+                case 7: return "NETWORK_ERROR";
+                case 8: return "INTERNAL_ERROR";
+                case 9: return "SERVICE_INVALID";
+                case 10: return "DEVELOPER_ERROR";
+                case 13: return "CANCELED";
+                case 14: return "TIMEOUT";
+                case 16: return "API_UNAVAILABLE";
+                case 17: return "SIGN_IN_FAILED";
+                case 18: return "SERVICE_UPDATING";
+                case 20: return "RESTRICTED_PROFILE";
+                default: return "UNKNOWN";
             }
         }
     }
