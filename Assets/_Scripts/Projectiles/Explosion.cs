@@ -99,7 +99,7 @@ namespace _Scripts.Projectiles
                             var forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x,
                                 distance / effectiveRadius) * 1.8f;
 
-                            rb.velocity = Vector2.zero;
+                            rb.linearVelocity = Vector2.zero;
                             rb.AddForce(explosionDirection * (forceMagnitude * 1.5f), ForceMode2D.Impulse);
                             rb.gravityScale = 0.5f;
                         }
@@ -157,7 +157,7 @@ namespace _Scripts.Projectiles
                             var forceMagnitude = Mathf.Lerp(explosionDataSo.explosionStrength.y, explosionDataSo.explosionStrength.x,
                                 distance / effectiveRadius) * 1.8f;
 
-                            rb.velocity = Vector2.zero;
+                            rb.linearVelocity = Vector2.zero;
                             rb.AddForce(explosionDirection * (forceMagnitude * 1.5f), ForceMode2D.Impulse);
                             rb.gravityScale = 0.5f;
                         }

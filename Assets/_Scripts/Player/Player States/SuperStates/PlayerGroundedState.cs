@@ -56,7 +56,7 @@ namespace _Scripts.Player.Player_States.SuperStates
             if (Movement is not null)
             {
                 Movement.Rb2D.gravityScale = PlayerData.defaultGravityScale; // Reset gravity scale
-                Movement.Rb2D.drag = 0f; // Reset drag
+                Movement.Rb2D.linearDamping = 0f; // Reset drag
             }
         }
     }

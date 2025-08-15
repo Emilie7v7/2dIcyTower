@@ -99,7 +99,7 @@ namespace _Scripts.Pickups
             _isBeingPulled = false;
             if (_rigidbody2D != null)
             {
-                _rigidbody2D.velocity = Vector2.zero;
+                _rigidbody2D.linearVelocity = Vector2.zero;
                 if (isPhysicalCoin)
                 {
                     _rigidbody2D.gravityScale = 0f;

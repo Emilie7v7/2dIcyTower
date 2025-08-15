@@ -1,45 +1,56 @@
-using UnityEngine;
 using GooglePlayGames;
-using GooglePlayGames.BasicApi; // for SignInStatus
+using GooglePlayGames.BasicApi;
 using TMPro;
+using UnityEngine;
 
-public class TestGooglePlayV2 : MonoBehaviour
+namespace _Scripts.GooglePlay
 {
-    [SerializeField] private TextMeshProUGUI text;
-
-    void Start()
+    public class TestGooglePlayV2 : MonoBehaviour
     {
-        PlayGamesPlatform.DebugLogEnabled = true;
-        Debug.Log($"[GPG] Starting auto-auth. Package: {Application.identifier}");
-        PlayGamesPlatform.Instance.Authenticate(OnAuth);
-    }
+        [SerializeField] private TextMeshProUGUI text;
 
-    public void RetrySignIn()
-    {
-        Debug.Log("[GPG] Manual auth triggered");
-        PlayGamesPlatform.Instance.ManuallyAuthenticate(OnAuth);
-    }
-
-    private void OnAuth(SignInStatus status)
-    {
-        bool authed = PlayGamesPlatform.Instance.localUser.authenticated;
-        Debug.Log($"[GPG] Auth callback. Status: {status}, Authenticated: {authed}");
-
-        if (status == SignInStatus.Success)
+        void Start()
         {
-            var p = PlayGamesPlatform.Instance;
-            var name = p.GetUserDisplayName();
-            var id = p.GetUserId();
-            var img = p.GetUserImageUrl();
+            PlayGamesPlatform.DebugLogEnabled = true;
+            Debug.Log($"[GPG] Starting auto-auth. Package: {Application.identifier}");
+            GooglePlayDiagnostics.LogPlayServicesAvailability();
 
-            Debug.Log($"[GPG] Success! Name: {name}, ID: {id}, Image URL: {img}");
-
-            if (text) text.text = $"Signed in as:\n{name}";
+            PlayGamesPlatform.Instance.Authenticate(OnAuth);
         }
-        else
+
+        public void RetrySignIn()
         {
-            Debug.LogWarning($"[GPG] Sign-in failed: {status}");
-            if (text) text.text = $"Sign in failed: {status}\nTap Retry.";
+            Debug.Log("[GPG] Manual auth triggered");
+#if UNITY_ANDROID
+            PlayGamesPlatform.Instance.ManuallyAuthenticate(OnAuth);
+#else
+        Debug.LogWarning("[GPG] ManualAuthenticate is Android only.");
+#endif
+        }
+
+        private void OnAuth(SignInStatus status)
+        {
+            bool authed = PlayGamesPlatform.Instance.localUser.authenticated;
+            string explain = GooglePlayDiagnostics.ExplainSignInStatus(status);
+
+            Debug.Log($"[GPG] Auth callback. Status: {status}, Authenticated: {authed}");
+            Debug.Log($"[GPG] Explanation: {explain}");
+
+            if (status == SignInStatus.Success)
+            {
+                var p = PlayGamesPlatform.Instance;
+                var name = p.GetUserDisplayName();
+                var id = p.GetUserId();
+                var img = p.GetUserImageUrl();
+                Debug.Log($"[GPG] Success. Name: {name}, ID: {id}, Image URL: {img}");
+
+                if (text) text.text = $"Signed in as:\n{name}";
+            }
+            else
+            {
+                if (text) text.text = $"Sign in failed: {status}\n{explain}\nTap Retry.";
+                GooglePlayDiagnostics.LogPlayServicesAvailability();
+            }
         }
     }
 }

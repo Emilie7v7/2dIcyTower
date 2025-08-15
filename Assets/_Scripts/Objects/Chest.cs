@@ -54,7 +54,7 @@ namespace _Scripts.Objects
                         {
                             var burstX = Random.Range(-burstStrengthX, burstStrengthX);
                             var burstY = Random.Range(burstStrengthYMin, burstStrengthYMax);
-                            rb.velocity = Vector2.zero;
+                            rb.linearVelocity = Vector2.zero;
                             rb.gravityScale = 2f;
                             rb.AddForce(new Vector2(burstX, burstY), ForceMode2D.Impulse);
                         }
@@ -75,7 +75,7 @@ namespace _Scripts.Objects
                         {
                             var burstX = Random.Range(-burstStrengthX, burstStrengthX);
                             var burstY = Random.Range(burstStrengthYMin, burstStrengthYMax);
-                            rb.velocity = Vector2.zero;
+                            rb.linearVelocity = Vector2.zero;
                             rb.gravityScale = 2f;
                             rb.AddForce(new Vector2(burstX, burstY), ForceMode2D.Impulse);
                         }

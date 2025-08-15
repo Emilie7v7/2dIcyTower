@@ -27,7 +27,7 @@ namespace _Scripts.CoreSystem
 
         public override void LogicUpdate()
         {
-            CurrentVelocity = Rb2D.velocity;
+            CurrentVelocity = Rb2D.linearVelocity;
         }
 
         #region Set Velocity
@@ -71,14 +71,14 @@ namespace _Scripts.CoreSystem
             direction = direction.normalized;
 
             // Apply a force in the given direction with impulse mode
-            Rb2D.velocity = Vector2.zero; // Reset velocity to avoid accumulation
+            Rb2D.linearVelocity = Vector2.zero; // Reset velocity to avoid accumulation
             Rb2D.AddForce(direction * force, ForceMode2D.Impulse);
             //Debug.Log($"Projectile launched with force: {force}, direction: {direction}");
         }
         private void SetFinalVelocity()
         {
             if(!CanSetVelocity) return;
-            Rb2D.velocity = _workspace;
+            Rb2D.linearVelocity = _workspace;
             CurrentVelocity = _workspace;
         }
         

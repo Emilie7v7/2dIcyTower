@@ -107,7 +107,7 @@ namespace _Scripts.Pickups
                 var xSpeed = (deltaX > 0.05f) ? moveCenterSpeed * directionX : 0f;
 
                 // Apply velocity directly
-                _playerRb.velocity = new Vector2(xSpeed, RocketSpeed);
+                _playerRb.linearVelocity = new Vector2(xSpeed, RocketSpeed);
 
                 elapsedTime += Time.deltaTime;
                 

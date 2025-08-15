@@ -69,7 +69,7 @@ namespace _Scripts.Hazards
                             knockBackDirection = direction;
                         }
 
-                        rb.velocity = Vector2.zero;
+                        rb.linearVelocity = Vector2.zero;
                         rb.AddForce(knockBackDirection * (knockBackStrength * 1.5f), ForceMode2D.Impulse);
                         rb.gravityScale = 0.5f;
                     }

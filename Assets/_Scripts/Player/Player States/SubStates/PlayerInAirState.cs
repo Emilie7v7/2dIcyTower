@@ -67,12 +67,12 @@ namespace _Scripts.Player.Player_States.SubStates
                     float newGravity = Mathf.Lerp(PlayerData.gravityScaleUp, PlayerData.gravityScaleDown, heightFactor);
 
                     Movement.Rb2D.gravityScale = Mathf.Clamp(newGravity, PlayerData.gravityScaleUp, PlayerData.gravityScaleDown);
-                    Movement.Rb2D.drag = PlayerData.dragUp;
+                    Movement.Rb2D.linearDamping = PlayerData.dragUp;
                 }
                 else if (Movement.CurrentVelocity.y < -0.1f) // Falling
                 {
                     Movement.Rb2D.gravityScale = PlayerData.gravityScaleDown;
-                    Movement.Rb2D.drag = PlayerData.dragDown;
+                    Movement.Rb2D.linearDamping = PlayerData.dragDown;
                 }
             }
 
@@ -89,7 +89,7 @@ namespace _Scripts.Player.Player_States.SubStates
         private void ResetGravity()
         {
             Movement.Rb2D.gravityScale = PlayerData.defaultGravityScale; // Reset to normal gravity
-            Movement.Rb2D.drag = 0f; // Reset drag
+            Movement.Rb2D.linearDamping = 0f; // Reset drag
         }
     }
 }

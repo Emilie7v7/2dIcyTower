@@ -50,7 +50,7 @@ namespace _Scripts.Projectiles
                     {
                         var punchDirection = (other.transform.position - transform.position).normalized;
                         
-                        rb.velocity = Vector2.zero;
+                        rb.linearVelocity = Vector2.zero;
                         rb.AddForce(punchDirection * (punchStrengthX * 1.5f), ForceMode2D.Impulse);
                         rb.gravityScale = 0.5f;
                     }
@@ -81,7 +81,7 @@ namespace _Scripts.Projectiles
                 _rb = GetComponent<Rigidbody2D>();
 
             _rb.gravityScale = 0f;
-            _rb.velocity = direction.normalized * speed;
+            _rb.linearVelocity = direction.normalized * speed;
 
             var sr = GetComponent<SpriteRenderer>();
             if (sr)
