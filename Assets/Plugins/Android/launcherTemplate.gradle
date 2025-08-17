@@ -1,23 +1,23 @@
 apply plugin: 'com.android.application'
 apply from: 'setupSymbols.gradle'
 apply from: '../shared/keepUnitySymbols.gradle'
+apply from: '../shared/common.gradle'
 
 dependencies {
     implementation project(':unityLibrary')
-    implementation 'com.google.android.gms:play-services-ads:24.4.0'
-    }
+}
 
 android {
-    ndkVersion "**NDKVERSION**"
     namespace "**NAMESPACE**"
     ndkPath "**NDKPATH**"
+    ndkVersion "**NDKVERSION**"
 
     compileSdk **APIVERSION**
-    buildToolsVersion '**BUILDTOOLS**'
+    buildToolsVersion = "**BUILDTOOLS**"
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     defaultConfig {
@@ -25,8 +25,8 @@ android {
         targetSdk **TARGETSDK**
         applicationId '**APPLICATIONID**'
         ndk {
-            debugSymbolLevel **DEBUGSYMBOLLEVEL**
             abiFilters **ABIFILTERS**
+            debugSymbolLevel **DEBUGSYMBOLLEVEL**
         }
         versionCode **VERSIONCODE**
         versionName '**VERSIONNAME**'
@@ -63,5 +63,10 @@ android {
         abi {
             enableSplit = true
         }
+        texture {
+            enableSplit = true
+        }
     }
+
+	**GOOGLE_PLAY_DEPENDENCIES**
 }**SPLITS_VERSION_CODE****LAUNCHER_SOURCE_BUILD_SETUP**
