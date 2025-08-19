@@ -17,7 +17,6 @@ namespace _Scripts.GooglePlay
             PlayGamesPlatform.Activate();
 
             Debug.Log($"[GPG] Starting auto-auth. Package: {Application.identifier}");
-            _Scripts.GooglePlay.GooglePlayDiagnosticsV210.LogPlayServicesAvailability();
 
             PlayGamesPlatform.Instance.Authenticate(OnAuth);
         }
@@ -36,10 +35,8 @@ namespace _Scripts.GooglePlay
         {
             bool authed = PlayGamesPlatform.Instance.localUser != null && PlayGamesPlatform.Instance.localUser.authenticated;
             int code = (int)status;
-            string hint = _Scripts.GooglePlay.GooglePlayDiagnosticsV210.Explain(status);
 
             Debug.Log($"[GPG] Auth callback. Status: {status} ({code}), Authenticated: {authed}");
-            Debug.Log($"[GPG] Hint: {hint}");
 
             if (authed)
             {
@@ -50,11 +47,6 @@ namespace _Scripts.GooglePlay
 
                 Debug.Log($"[GPG] Success. Name: {name}, ID: {id}, Image URL: {img}");
                 if (text) text.text = $"Signed in as:\n{name}";
-            }
-            else
-            {
-                if (text) text.text = $"Sign in failed: {status}\n{hint}\nTap Retry.";
-                _Scripts.GooglePlay.GooglePlayDiagnosticsV210.LogAllPrechecks();
             }
         }
     }
