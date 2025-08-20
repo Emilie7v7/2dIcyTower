@@ -15,13 +15,9 @@ namespace _Scripts.GooglePlay
         // Keep your IDs
         private readonly string leaderboardID = GPGSIds.leaderboard_spiremageleaderboard;
 
-        [SerializeField] private TextMeshProUGUI text;
-        [SerializeField] private TextMeshProUGUI alreadySignInText;
-
         [Header("Achievement ID (optional)")] [SerializeField]
         private string exampleAchievementID = "YOUR_ACHIEVEMENT_ID";
-
-        // Notify UI when auth changes
+        
         public event Action<bool, string> OnAuthStateChanged;
 
         private bool _initialized;
@@ -54,13 +50,6 @@ namespace _Scripts.GooglePlay
             if (IsSignedIn())
                 RaiseAuthChanged(true);
             else
-                SignInSilently();
-        }
-
-        private void OnApplicationFocus(bool hasFocus)
-        {
-            // On resume - quickly try silent sign in so UI stays correct
-            if (hasFocus && !IsSignedIn())
                 SignInSilently();
         }
 
@@ -103,7 +92,6 @@ namespace _Scripts.GooglePlay
                 var img = p.GetUserImageUrl();
 
                 Debug.Log($"[GPG] Success. Name: {name}, ID: {id}, Image URL: {img}");
-                if (text) text.text = $"Signed in as:\n{name}";
             }
         }
         
@@ -161,43 +149,23 @@ namespace _Scripts.GooglePlay
         {
             return Social.localUser != null && Social.localUser.authenticated;
         }
-
-        // Optional helper if you want a manual button. Not used automatically.
-        public void ManuallySignIn()
-        {
-            if (IsSignedIn())
-            {
-                alreadySignInText.text = "Already signed in.";
-            }
-            else
-            {
-                Debug.Log("[GPG] Manual auth requested.");
-                PlayGamesPlatform.Instance.ManuallyAuthenticate(status =>
-                {
-                    bool authed = IsSignedIn();
-                    Debug.Log($"[GPG] Manual auth result: {status} ({(int)status}) | authenticated={authed}");
-                });
-                Debug.LogWarning("[GPG] ManualAuthenticate is Android only.");
-            }
-        }
-
-
+        
         private void RaiseAuthChanged(bool signedIn)
         {
-            string nick = signedIn && Social.localUser != null ? Social.localUser.userName : string.Empty;
-
-            // Update your existing TMP fields
-            if (text)
-                text.text = signedIn ? $"Signed in as:\n{nick}" : "Not signed in";
-
-            if (alreadySignInText)
-                alreadySignInText.text = signedIn ? "Already signed in." : string.Empty;
+            var nick = signedIn && Social.localUser != null ? Social.localUser.userName : string.Empty;
 
             OnAuthStateChanged?.Invoke(signedIn, nick);
             Debug.Log($"[GPG] Auth state - {(signedIn ? "signed in" : "signed out")} {nick}");
         }
+        
+        public void ForceRefreshAuthUI()
+        {
+            RaiseAuthChanged(IsSignedIn());
+        }
 
         // ---------------- Leaderboards ----------------
+
+        #region Leaderboards
 
         public void ShowLeaderboardUI()
         {
@@ -239,7 +207,11 @@ namespace _Scripts.GooglePlay
             }
         }
 
+        #endregion
+
         // ---------------- Achievements ----------------
+
+        #region Achievements
 
         public void ShowAchievementsUI()
         {
@@ -287,5 +259,8 @@ namespace _Scripts.GooglePlay
         {
             UnlockAchievement(exampleAchievementID);
         }
+
+        #endregion
+        
     }
 }

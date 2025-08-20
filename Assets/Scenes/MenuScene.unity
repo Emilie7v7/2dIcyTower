@@ -1173,7 +1173,7 @@ GameObject:
   - component: {fileID: 75558330}
   - component: {fileID: 75558329}
   m_Layer: 5
-  m_Name: Sign in Text
+  m_Name: Status Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4179,7 +4179,7 @@ GameObject:
   - component: {fileID: 321272540}
   - component: {fileID: 321272539}
   m_Layer: 5
-  m_Name: VersionText
+  m_Name: Version Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4224,7 +4224,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: v0.9.7.7
+  m_text: v0.9.7.8
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5518,8 +5518,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8c762f556c7a354996df1b7ccc0ceea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Scripts.GooglePlay.GooglePlayManager
-  text: {fileID: 75558329}
-  alreadySignInText: {fileID: 1926388078}
   exampleAchievementID: YOUR_ACHIEVEMENT_ID
 --- !u!1 &410130883
 GameObject:
@@ -8056,6 +8054,8 @@ GameObject:
   - component: {fileID: 607483448}
   - component: {fileID: 607483447}
   - component: {fileID: 607483446}
+  - component: {fileID: 607483450}
+  - component: {fileID: 607483451}
   m_Layer: 5
   m_Name: MainMenuCanvas
   m_TagString: Untagged
@@ -8150,6 +8150,32 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &607483450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607483445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a77e8bd847158904ea0c938d0760d9e3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Scripts.GooglePlay.GooglePlayUIProxy
+--- !u!114 &607483451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607483445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7204a5d98432764583140577338e7b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Scripts.GooglePlay.GooglePlayUIBinder
+  statusText: {fileID: 75558329}
+  alreadySignedInText: {fileID: 1926388078}
 --- !u!1 &627025311
 GameObject:
   m_ObjectHideFlags: 0
@@ -15898,9 +15924,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 402119127}
-        m_TargetAssemblyTypeName: _Scripts.GooglePlay.GooglePlayManager, Assembly-CSharp
-        m_MethodName: ShowLeaderboardUI
+      - m_Target: {fileID: 607483450}
+        m_TargetAssemblyTypeName: _Scripts.GooglePlay.GooglePlayUIProxy, Assembly-CSharp
+        m_MethodName: OnShowLeaderboardButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -22668,9 +22694,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 402119127}
-        m_TargetAssemblyTypeName: _Scripts.GooglePlay.GooglePlayManager, Assembly-CSharp
-        m_MethodName: ManuallySignIn
+      - m_Target: {fileID: 607483450}
+        m_TargetAssemblyTypeName: _Scripts.GooglePlay.GooglePlayUIProxy, Assembly-CSharp
+        m_MethodName: OnSignInButton
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -23172,51 +23198,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0.049987793, y: 0}
   m_SizeDelta: {x: 1.100022, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!1 &2053541067
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2053541069}
-  - component: {fileID: 2053541070}
-  m_Layer: 0
-  m_Name: GooglePlayTestManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &2053541069
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2053541067}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2053541070
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2053541067}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2143c70f2da35947b7245228f97e9e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::TestGooglePlayV2
-  text: {fileID: 75558329}
 --- !u!1 &2066664608
 GameObject:
   m_ObjectHideFlags: 0
@@ -23829,7 +23810,6 @@ SceneRoots:
   - {fileID: 196676626}
   - {fileID: 975974485}
   - {fileID: 1465944029}
-  - {fileID: 2053541069}
   - {fileID: 402119126}
   - {fileID: 824357403}
   - {fileID: 1314965065}
