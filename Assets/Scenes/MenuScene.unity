@@ -7648,7 +7648,6 @@ GameObject:
   - component: {fileID: 584130534}
   - component: {fileID: 584130533}
   - component: {fileID: 584130532}
-  - component: {fileID: 584130535}
   m_Layer: 5
   m_Name: Ko-Fi donate
   m_TagString: Untagged
@@ -7719,8 +7718,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 584130535}
-        m_TargetAssemblyTypeName: KoFiLink, Assembly-CSharp
+      - m_Target: {fileID: 607483452}
+        m_TargetAssemblyTypeName: _Scripts.DonationsSocials.LinkManager, Assembly-CSharp
         m_MethodName: OpenKoFi
         m_Mode: 1
         m_Arguments:
@@ -7769,18 +7768,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 584130530}
   m_CullTransparentMesh: 1
---- !u!114 &584130535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 584130530}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d898db9ec3faef645a083ec911cad565, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::KoFiLink
 --- !u!1 &590095381
 GameObject:
   m_ObjectHideFlags: 0
@@ -8065,6 +8052,7 @@ GameObject:
   - component: {fileID: 607483448}
   - component: {fileID: 607483447}
   - component: {fileID: 607483446}
+  - component: {fileID: 607483452}
   - component: {fileID: 607483450}
   - component: {fileID: 607483451}
   m_Layer: 5
@@ -8186,6 +8174,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::_Scripts.GooglePlay.GooglePlayUIBinder
   statusText: {fileID: 93736349}
+--- !u!114 &607483452
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 607483445}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b2007ff63cd62a42b37577bc1a7c217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Scripts.DonationsSocials.LinkManager
 --- !u!1 &627025311
 GameObject:
   m_ObjectHideFlags: 0
@@ -15300,7 +15300,6 @@ GameObject:
   - component: {fileID: 1270157134}
   - component: {fileID: 1270157133}
   - component: {fileID: 1270157132}
-  - component: {fileID: 1270157135}
   m_Layer: 5
   m_Name: Instagram
   m_TagString: Untagged
@@ -15371,8 +15370,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1270157135}
-        m_TargetAssemblyTypeName: InstagramLink, Assembly-CSharp
+      - m_Target: {fileID: 607483452}
+        m_TargetAssemblyTypeName: _Scripts.DonationsSocials.LinkManager, Assembly-CSharp
         m_MethodName: OpenInstagram
         m_Mode: 1
         m_Arguments:
@@ -15421,18 +15420,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1270157130}
   m_CullTransparentMesh: 1
---- !u!114 &1270157135
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1270157130}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b2007ff63cd62a42b37577bc1a7c217, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InstagramLink
 --- !u!1 &1277498945
 GameObject:
   m_ObjectHideFlags: 0
@@ -16183,9 +16170,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1328266576}
   - component: {fileID: 1328266580}
-  - component: {fileID: 1328266579}
   - component: {fileID: 1328266578}
   - component: {fileID: 1328266577}
+  - component: {fileID: 1328266581}
   m_Layer: 5
   m_Name: Privacy Policy
   m_TagString: Untagged
@@ -16210,8 +16197,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 277.3, y: -302.8}
-  m_SizeDelta: {x: 287.002, y: 30}
+  m_AnchoredPosition: {x: -150, y: -300}
+  m_SizeDelta: {x: 280, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1328266577
 MonoBehaviour:
@@ -16257,9 +16244,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1328266579}
-        m_TargetAssemblyTypeName: PrivacyPolicyLink, Assembly-CSharp
-        m_MethodName: OpenPrivacyPolicy
+      - m_Target: {fileID: 1328266581}
+        m_TargetAssemblyTypeName: _Scripts.PrivacyPolicy.PrivacyPolicy, Assembly-CSharp
+        m_MethodName: OpenPrivacyPolicyLink
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16299,7 +16286,15 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1328266579
+--- !u!222 &1328266580
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1328266575}
+  m_CullTransparentMesh: 1
+--- !u!114 &1328266581
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -16310,15 +16305,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e46f4149279e79b418264d550c78b0e8, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PrivacyPolicyLink
---- !u!222 &1328266580
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1328266575}
-  m_CullTransparentMesh: 1
+  m_EditorClassIdentifier: Assembly-CSharp::_Scripts.PrivacyPolicy.PrivacyPolicy
 --- !u!1 &1339465451
 GameObject:
   m_ObjectHideFlags: 0
@@ -19376,8 +19363,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -5.05, y: 44}
-  m_SizeDelta: {x: -10.1, y: -88}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1715598750
 MonoBehaviour:
@@ -19433,7 +19420,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -20168,9 +20155,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1792380368}
   - component: {fileID: 1792380372}
-  - component: {fileID: 1792380371}
   - component: {fileID: 1792380370}
   - component: {fileID: 1792380369}
+  - component: {fileID: 1792380373}
   m_Layer: 5
   m_Name: Privacy Settings
   m_TagString: Untagged
@@ -20195,8 +20182,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 267.9, y: -323.4}
-  m_SizeDelta: {x: 287.002, y: 30}
+  m_AnchoredPosition: {x: 155, y: -300}
+  m_SizeDelta: {x: 290, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1792380369
 MonoBehaviour:
@@ -20242,8 +20229,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1792380371}
-        m_TargetAssemblyTypeName: PrivacySettings, Assembly-CSharp
+      - m_Target: {fileID: 1792380373}
+        m_TargetAssemblyTypeName: _Scripts.PrivacyPolicy.PrivacyPolicy, Assembly-CSharp
         m_MethodName: ShowPrivacyOptions
         m_Mode: 1
         m_Arguments:
@@ -20284,18 +20271,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1792380371
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1792380367}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a65632a29652d904eb8b254cfc9f23b1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PrivacySettings
 --- !u!222 &1792380372
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -20304,6 +20279,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1792380367}
   m_CullTransparentMesh: 1
+--- !u!114 &1792380373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1792380367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e46f4149279e79b418264d550c78b0e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::_Scripts.PrivacyPolicy.PrivacyPolicy
 --- !u!1 &1792476095
 GameObject:
   m_ObjectHideFlags: 0
@@ -20449,8 +20436,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 18}
-  m_SizeDelta: {x: 0, y: -88}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1819802028
 MonoBehaviour:
@@ -20506,7 +20493,7 @@ MonoBehaviour:
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 4
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -24376,7 +24363,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 364371466}
-  - {fileID: 1866100146}
   - {fileID: 103171052}
   - {fileID: 1994267649}
   - {fileID: 1469903547}
@@ -24390,6 +24376,7 @@ SceneRoots:
   - {fileID: 228165149}
   - {fileID: 1965322784}
   - {fileID: 313033287}
+  - {fileID: 1866100146}
   - {fileID: 54236862}
   - {fileID: 1565806849}
   - {fileID: 1519757533}
