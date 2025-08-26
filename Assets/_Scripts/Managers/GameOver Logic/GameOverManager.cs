@@ -3,6 +3,7 @@ using System.Collections;
 using _Scripts.CoreSystem;
 using _Scripts.GooglePlay;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace _Scripts.Managers.GameOver_Logic
@@ -12,11 +13,11 @@ namespace _Scripts.Managers.GameOver_Logic
         public static GameOverManager Instance { get; private set; }
         [SerializeField] private GameObject gameOverUI;
         [SerializeField] private Button reviveButton;
+        [SerializeField] private PlayerComponent.Player player;
+        [SerializeField] private Stats playerStats;
+        [SerializeField] private GameObject playerGo;
         
         private AdsManager adsManager;
-        private GameObject _playerGO;
-        private PlayerComponent.Player player;
-        private Stats playerStats;
         private bool _reviveUsed = false;
         private bool lastDeathWasLava = false;
         private Vector3 _revivePosition;
@@ -49,19 +50,12 @@ namespace _Scripts.Managers.GameOver_Logic
                 if (adsObj != null)
                     adsManager = adsObj.GetComponent<AdsManager>();
             }
-            
-            _playerGO = GameObject.FindGameObjectWithTag("Player");
-            if (_playerGO != null)
-            {
-                player = _playerGO.GetComponent<PlayerComponent.Player>();
-                playerStats = _playerGO.GetComponentInChildren<Stats>();
-            }
         }
 
         public void TriggerGameOver()
         {
-            if (_playerGO != null)
-                _revivePosition = _playerGO.transform.position;
+            if (playerGo != null)
+                _revivePosition = playerGo.transform.position;
             lastDeathWasLava = player != null && player.DiedByLava;
             StartCoroutine(ShowGameOverWithDelay());
         }
@@ -74,7 +68,7 @@ namespace _Scripts.Managers.GameOver_Logic
 
             if (reviveButton != null)
             {
-                reviveButton.gameObject.SetActive(!_reviveUsed);
+                reviveButton.gameObject.SetActive(!_reviveUsed || lastDeathWasLava);
             }
         }
 
@@ -96,14 +90,15 @@ namespace _Scripts.Managers.GameOver_Logic
             
             Time.timeScale = 1;
 
-            if (_playerGO != null)
+            if (playerGo != null)
             {
-                _playerGO.SetActive(true);
-                _playerGO.transform.position = _revivePosition + Vector3.up * 1f;
+                playerGo.SetActive(true);
+                playerGo.transform.position = _revivePosition + Vector3.up * 1f;
 
                 if (playerStats != null)
                 {
                     playerStats.Health.Reset();
+                    playerStats.ActivateImmortality(3f);
                 }
                 if (player != null)
                     player.ClearDeathCause();
