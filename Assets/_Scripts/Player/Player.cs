@@ -45,6 +45,7 @@ namespace _Scripts.PlayerComponent
         
         private bool _hasBeenHit = false; // Prevent multiple triggers
         public bool WasThrowingInAir { get; set; }
+        public bool DiedByLava { get; private set; } = false;
         
         #endregion
         
@@ -98,13 +99,20 @@ namespace _Scripts.PlayerComponent
             if (other.CompareTag("Lava"))
             {
                 Debug.Log("Hit by lava");
+                DiedByLava = true;
                 Stats.Health.CurrentValue = 0;
                 _hasBeenHit = true; // Mark as hit
             }
         }
-
+        
         #endregion
 
+        public void ClearDeathCause()
+        {
+            DiedByLava = false;
+            _hasBeenHit = false;            
+        }
+        
         private void IndicatorRotation()
         {
             var targetAngle = Vector2.SignedAngle(Vector2.right, InputHandler.ThrowDirectionInput);
