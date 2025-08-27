@@ -122,7 +122,7 @@ namespace _Scripts.Managers.GameOver_Logic
             
                         _reviveUsed = true;
 
-                        StartCoroutine(PauseGame(1f));
+                        StartCoroutine(PauseGame(0.5f));
                     }
                     else
                     {
