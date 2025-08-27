@@ -172,10 +172,21 @@ namespace _Scripts.GooglePlay
             });
         }
 
-        public bool ShowRewarded(Action<Reward> onReward)
+        public bool ShowRewarded(Action<GoogleMobileAds.Api.Reward> onReward, Action onClosed = null)
         {
             if (rewarded != null && rewarded.CanShowAd())
             {
+                // run when the fullscreen view is dismissed
+                rewarded.OnAdFullScreenContentClosed += () =>
+                {
+                    try { onClosed?.Invoke(); }
+                    finally
+                    {
+                        rewarded = null;
+                        LoadRewarded(); // warm next
+                    }
+                };
+
                 rewarded.Show(r =>
                 {
                     try { onReward?.Invoke(r); } catch (Exception e) { Debug.LogException(e); }

@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -31,6 +32,9 @@ namespace _Scripts.Managers.Lava_Logic
         {
             InitializeLava();
             InitializeLight();
+
+            _lavaActive = false;
+            StartCoroutine(StartLava(lavaStartDelay));
         }
 
         private void InitializeLight()
@@ -56,26 +60,46 @@ namespace _Scripts.Managers.Lava_Logic
             if (lavaLight != null)
             {
                 // Position light at the center of the lava horizontally and at current height
-                Vector3 lightPos = new Vector3(0f, _lavaHeight + 0.5f, 0f);
+                var lightPos = new Vector3(0f, _lavaHeight + 0.5f, 0f);
                 lavaLight.transform.position = lightPos;
             }
         }
 
         private void Update()
         {
-            _timeSinceStart += Time.deltaTime;
-
-            if (!_lavaActive && _timeSinceStart >= lavaStartDelay)
-            {
-                _lavaActive = true;
-            }
-
             if (_lavaActive)
             {
                 UpdateLava();
             }
         }
 
+        private IEnumerator StartLava(float duration)
+        {
+            while (_timeSinceStart < duration)
+            {
+                _lavaActive = false;
+                _timeSinceStart += Time.deltaTime;
+                yield return null;
+            }
+            _lavaActive = true;
+        }
+        public void ActivateLavaDelay(float duration)
+        {
+            StartCoroutine(ResumeLavaAfterDelay(duration));
+        }
+        private IEnumerator ResumeLavaAfterDelay(float delay)
+        {
+            var elapsedTime = 0f;
+            Debug.Log("Delay started for lava");
+            while (elapsedTime < delay)
+            {
+                _lavaActive = false;
+                elapsedTime += Time.deltaTime;
+                yield return null;
+            }
+            _lavaActive = true;
+            Debug.Log("Delay ended for lava");
+        }
         private void InitializeLava()
         {
             _lavaHeight = Mathf.FloorToInt(player.position.y) - startOffset;
