@@ -6,6 +6,8 @@ using _Scripts.InputHandler;
 using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.Managers.Lava_Logic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.EnhancedTouch;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -122,14 +124,6 @@ namespace _Scripts.Managers.GameOver_Logic
                             playerGo.SetActive(true);
                             playerGo.transform.position = _revivePosition + Vector3.up * 1f;
 
-                            // Re-enable player input
-                            var inputHandler = playerGo.GetComponent<PlayerInputHandler>();
-                            if (inputHandler != null)
-                            {
-                                inputHandler.enabled = false;
-                                inputHandler.enabled = true;
-                            }
-
                             if (playerStats != null)
                             {
                                 playerStats.Health.Reset();
@@ -142,7 +136,10 @@ namespace _Scripts.Managers.GameOver_Logic
             
                         _reviveUsed = true;
 
-                        StartCoroutine(PauseGame(0.5f));
+                        // Fix touch input AFTER game is resumed and everything is active
+                        StartCoroutine(FixTouchInputAfterAd());
+
+                        //StartCoroutine(PauseGame(0.5f));
                     }
                     else
                     {
@@ -172,8 +169,9 @@ namespace _Scripts.Managers.GameOver_Logic
                         GameManager.Instance.DoubleCoinsFromLastGame();
                         _doubleCoinsUsed = true;
                         
-                        reviveButton.gameObject.SetActive(false);
                         doubleCoinsButton.gameObject.SetActive(false);
+
+                        StartCoroutine(FreezeGameAfterAd());
                     }
                 });
             
@@ -183,11 +181,94 @@ namespace _Scripts.Managers.GameOver_Logic
             }
         }
         
-        private IEnumerator PauseGame(float time)
+        private void PauseGame()
         {
-            yield return new WaitForSeconds(time);
             pausePanel.SetActive(true);
             Time.timeScale = 0;
+        }
+        private IEnumerator FreezeGameAfterAd()
+        {
+            yield return new WaitForEndOfFrame();
+            Time.timeScale = 0;
+        }
+        
+        private IEnumerator FixTouchInputAfterAd()
+        {
+            // Wait for the game to fully resume
+            yield return new WaitForEndOfFrame();
+            yield return new WaitForEndOfFrame();
+            
+            Debug.Log("Attempting to fix touch input after ad...");
+            
+            // Method 1: Reset EnhancedTouchSupport
+            bool touchSupportReset = false;
+            try
+            {
+                EnhancedTouchSupport.Disable();
+                touchSupportReset = true;
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"EnhancedTouchSupport.Disable() failed: {e.Message}");
+            }
+            
+            if (touchSupportReset)
+            {
+                yield return new WaitForEndOfFrame();
+                try
+                {
+                    EnhancedTouchSupport.Enable();
+                    Debug.Log("EnhancedTouchSupport reset completed");
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogError($"EnhancedTouchSupport.Enable() failed: {e.Message}");
+                }
+            }
+            
+            // Method 2: Reset the touchscreen device
+            yield return new WaitForEndOfFrame();
+            try
+            {
+                var touchscreen = Touchscreen.current;
+                if (touchscreen != null)
+                {
+                    InputSystem.ResetDevice(touchscreen);
+                    Debug.Log("Touchscreen device reset completed");
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Touchscreen reset failed: {e.Message}");
+            }
+            
+            // Method 3: Reset PlayerInputHandler
+            yield return new WaitForEndOfFrame();
+            var inputHandler = playerGo != null ? playerGo.GetComponent<PlayerInputHandler>() : null;
+            
+            if (inputHandler != null)
+            {
+                // Reset PlayerInput component
+                var playerInput = inputHandler.GetComponent<PlayerInput>();
+                if (playerInput != null)
+                {
+                    playerInput.enabled = false;
+                    yield return new WaitForEndOfFrame();
+                    playerInput.enabled = true;
+                    Debug.Log("PlayerInput component reset completed");
+                }
+                
+                // Reset the handler itself
+                inputHandler.enabled = false;
+                yield return new WaitForEndOfFrame();
+                inputHandler.enabled = true;
+                Debug.Log("PlayerInputHandler reset completed");
+            }
+            
+            Debug.Log("Touch input fix sequence completed");
+            
+            yield return new WaitForEndOfFrame();
+            PauseGame();
         }
         
     }
