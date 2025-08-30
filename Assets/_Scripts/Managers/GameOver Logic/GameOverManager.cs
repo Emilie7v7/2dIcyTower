@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using _Scripts.CoreSystem;
 using _Scripts.GooglePlay;
+using _Scripts.InputHandler;
+using _Scripts.Managers.Game_Manager_Logic;
 using _Scripts.Managers.Lava_Logic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -14,6 +16,7 @@ namespace _Scripts.Managers.GameOver_Logic
         public static GameOverManager Instance { get; private set; }
         [SerializeField] private GameObject gameOverUI;
         [SerializeField] private Button reviveButton;
+        [SerializeField] private Button doubleCoinsButton;
         [SerializeField] private PlayerComponent.Player player;
         [SerializeField] private Stats playerStats;
         [SerializeField] private GameObject playerGo;
@@ -24,6 +27,7 @@ namespace _Scripts.Managers.GameOver_Logic
         private bool _reviveUsed = false;
         private bool lastDeathWasLava = false;
         private Vector3 _revivePosition;
+        private bool _doubleCoinsUsed = false;
         
         private void Awake()
         {
@@ -45,6 +49,11 @@ namespace _Scripts.Managers.GameOver_Logic
             if (reviveButton != null)
             {
                 reviveButton.onClick.AddListener(OnReviveButtonClicked);
+            }
+
+            if (doubleCoinsButton != null)
+            {
+                doubleCoinsButton.onClick.AddListener(OnDoubleCoinsButtonClicked);
             }
             
             if (adsManager == null)
@@ -68,6 +77,7 @@ namespace _Scripts.Managers.GameOver_Logic
             lastDeathWasLava = player.DiedByLava;
             Debug.Log("player died by lava true or false: " + lastDeathWasLava);
             StartCoroutine(ShowGameOverWithDelay());
+            
         }
 
         private IEnumerator ShowGameOverWithDelay()
@@ -75,7 +85,7 @@ namespace _Scripts.Managers.GameOver_Logic
             yield return new WaitForSeconds(1); // Wait for death animation
             gameOverUI.SetActive(true);
             
-            if (lastDeathWasLava || _reviveUsed)
+            if (lastDeathWasLava || _reviveUsed || _doubleCoinsUsed)
             {
                 reviveButton.gameObject.SetActive(false);
             }
@@ -83,6 +93,8 @@ namespace _Scripts.Managers.GameOver_Logic
             {
                 reviveButton.gameObject.SetActive(true);
             }
+
+            doubleCoinsButton.gameObject.SetActive(!_doubleCoinsUsed);
 
             Time.timeScale = 0;
             
@@ -110,6 +122,14 @@ namespace _Scripts.Managers.GameOver_Logic
                             playerGo.SetActive(true);
                             playerGo.transform.position = _revivePosition + Vector3.up * 1f;
 
+                            // Re-enable player input
+                            var inputHandler = playerGo.GetComponent<PlayerInputHandler>();
+                            if (inputHandler != null)
+                            {
+                                inputHandler.enabled = false;
+                                inputHandler.enabled = true;
+                            }
+
                             if (playerStats != null)
                             {
                                 playerStats.Health.Reset();
@@ -136,35 +156,39 @@ namespace _Scripts.Managers.GameOver_Logic
                 Debug.Log("Rewarded ad not ready");
             }
         }
+        
+        private void OnDoubleCoinsButtonClicked()
+        {
+            if (_doubleCoinsUsed) return;
 
+            var rewardEarned = false;
+            
+            var shown = adsManager.ShowRewarded(
+                onReward: r => { rewardEarned = true; },
+                onClosed: () =>
+                {
+                    if (rewardEarned)
+                    {
+                        GameManager.Instance.DoubleCoinsFromLastGame();
+                        _doubleCoinsUsed = true;
+                        
+                        reviveButton.gameObject.SetActive(false);
+                        doubleCoinsButton.gameObject.SetActive(false);
+                    }
+                });
+            
+            if (!shown)
+            {
+                Debug.Log("Rewarded ad not ready");
+            }
+        }
+        
         private IEnumerator PauseGame(float time)
         {
             yield return new WaitForSeconds(time);
             pausePanel.SetActive(true);
             Time.timeScale = 0;
         }
-        private void OnAdRewarded(GoogleMobileAds.Api.Reward reward)
-        {
-            gameOverUI.SetActive(false);
-            
-            Time.timeScale = 1;
-
-            if (playerGo != null)
-            {
-                playerGo.SetActive(true);
-                playerGo.transform.position = _revivePosition + Vector3.up * 1f;
-
-                if (playerStats != null)
-                {
-                    playerStats.Health.Reset();
-                    playerStats.ActivateImmortality(3f);
-                }
-                if (player != null)
-                    player.ClearDeathCause();
-            }
-            lavaManager.ActivateLavaDelay(15f);
-            
-            _reviveUsed = true;
-        }
+        
     }
 }

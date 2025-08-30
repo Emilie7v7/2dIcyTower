@@ -19,7 +19,7 @@ namespace _Scripts.Pickups
         private bool _isBeingPulled;
         private Transform _player;
         private Vector3 _initialPosition;
-
+        
         private void Start()
         {
             _collider2D = GetComponent<Collider2D>();
@@ -89,10 +89,11 @@ namespace _Scripts.Pickups
             }
 
             GameManager.Instance.AddCoins(coinValue);
-
+            
             ResetCoin();
         }
-
+        
+        
         private void ResetCoin()
         {
             transform.position = _initialPosition;

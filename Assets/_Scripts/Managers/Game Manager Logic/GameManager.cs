@@ -19,6 +19,9 @@ namespace _Scripts.Managers.Game_Manager_Logic
 
         public event Action<int> OnCoinsUpdated;
         
+        // Add this to GameManager class
+        private int _coinsCollectedThisGame = 0;
+        
         private void Awake()
         {
             if (Instance == null)
@@ -57,12 +60,33 @@ namespace _Scripts.Managers.Game_Manager_Logic
             // }
         }
         
-        public void AddCoins(int amount)
+        public int CoinsCollectedThisGame 
         {
-            PlayerData.playerCoins += amount;
-            OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
+            get => _coinsCollectedThisGame;
+            set {
+                _coinsCollectedThisGame = value;
+                OnCoinsUpdated?.Invoke(PlayerData.playerCoins);
+            }
         }
 
+        public void AddCoins(int amount) 
+        {
+            PlayerData.playerCoins += amount;
+            CoinsCollectedThisGame += amount;
+            SavePlayerGameData();
+        }
+
+
+        public void DoubleCoinsFromLastGame() 
+        {
+            if (CoinsCollectedThisGame > 0) {
+                int doubledAmount = CoinsCollectedThisGame;
+                PlayerData.playerCoins += doubledAmount; // Add the doubled amount
+                CoinsCollectedThisGame = 0; // Reset the counter
+                SavePlayerGameData();
+            }
+        }
+        
         public void UpdateHighScore(int score)
         {
             PlayerData.highScore = score; 
