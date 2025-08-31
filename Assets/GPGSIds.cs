@@ -24,7 +24,9 @@
 
 public static class GPGSIds
 {
+        public const string achievement_freshly_enchanted = "CgkIhZibt9cEEAIQBA"; // <GPGSID>
         public const string leaderboard_spiremageleaderboard = "CgkIhZibt9cEEAIQAA"; // <GPGSID>
+        public const string achievement_game_on = "CgkIhZibt9cEEAIQAw"; // <GPGSID>
 
 }
 
