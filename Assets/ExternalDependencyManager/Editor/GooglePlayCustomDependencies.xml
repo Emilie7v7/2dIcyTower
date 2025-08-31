@@ -1,17 +1,9 @@
 <dependencies>
     <androidPackages>
+        <androidPackage spec="com.google.android.gms:play-services-auth:21.2.0" />
+        <!-- You can keep 21.0.0, but 20.1.2 is also fine. -->
+        <androidPackage spec="com.google.android.gms:play-services-games-v2:21.0.0" />
+        <!-- This is the missing bridge (contains HelperFragment, etc.) -->
         <androidPackage spec="com.google.games:gpgs-plugin-support:2.1.0" />
-        <androidPackage spec="com.google.android.gms:play-services-auth:21.2.0">
-            <repositories>
-                <repository>https://maven.google.com</repository>
-                <repository>https://repo.maven.apache.org/maven2</repository>
-            </repositories>
-        </androidPackage>
-        <androidPackage spec="com.google.android.gms:play-services-games-v2:20.1.2">
-            <repositories>
-                <repository>https://maven.google.com</repository>
-                <repository>https://repo.maven.apache.org/maven2</repository>
-            </repositories>
-        </androidPackage>
     </androidPackages>
 </dependencies>
